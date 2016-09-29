@@ -1,9 +1,8 @@
 #!/bin/bash
 
 set -e
-. ~/.bashrc
 
+echo "Copying emacs conf to the machine..."
 configs_backup_path="${YANDEXDISK_DIR}/configs/emacs"
-cp "${configs_backup_path}/.emacs" ~/
 cp -r "${configs_backup_path}/.emacs.d" ~/
 

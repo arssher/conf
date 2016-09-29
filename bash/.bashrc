@@ -1,6 +1,13 @@
-IMDGTEST_PROPS="/home/ars/sber-pilot/ansible/templates/IMDGTEST_PROPS.j2"
-YANDEXDISK_DIR=`cat ~/.config/yandex-disk/config.cfg | grep "dir=" | sed 's/dir=\"\(.*\)\"/\1/'`
+export YANDEXDISK_DIR=`cat ~/.config/yandex-disk/config.cfg | grep "dir=" | sed 's/dir=\"\(.*\)\"/\1/'`
 export LC_ALL="en_US.UTF-8"
+
+
+# Read file with machine-dependant global env variables
+# include .bashrc if it exists
+if [ -f ~/.global_vars ]; then
+      source ~/.global_vars
+      # echo "global vars loaded"
+fi
 
 # Eternal bash history. It is not reread after every command, so every terminal have it's own history.
 # To search all commands, including typed in other terminals, see Bendersky's addition below.

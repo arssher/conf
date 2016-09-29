@@ -1,8 +1,0 @@
-PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
-export YANDEXDISK_DIR="/media/ars/linux_storage/Yandex.Disk/"
-export CLASSPATH=/home/ars/tmp/jgroups-3.4.1.Final.jar:$CLASSPATH
-export JAVA_HOME="/usr/lib/jvm/java-7-oracle"
-export SPARK_HOME="/home/ars/spark-1.1.1"
-export MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512M -XX:ReservedCodeCacheSize=512m"
-export VAGRANT_HOME=/media/ars/linux_storage/vagrant
-

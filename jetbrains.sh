@@ -2,14 +2,13 @@
 
 set -e
 
-sudo echo "Hi!"
 show_help() {
     cat << EOF
     Usage: ${0##*/} [-n NAME] [-u URL]
     Download tar.gz NAME=<idea|pycharm|clion> jetbrains product from URL to JETBRAINS_DIR, extract it and add name to /etc/environment
 
         -h          display this help and exit
-        -n NAME     idea or pycharm
+        -n NAME     <idea|pycharm|clion>
         -u URL      url to download from, https://download.jetbrains.com/python/pycharm-professional-5.0.4.tar.gz, for example
 EOF
     exit 0
@@ -26,7 +25,6 @@ update_env_var() {
     sudo cp /etc/tmpenvironment /etc/environment
 }
 
-source /etc/environment
 name=""
 url=""
 OPTIND=1
@@ -57,8 +55,6 @@ rm "${targzfilename}"
 update_env_var "${name}" "${foldername}"
 
 #update shortcuts
-source /etc/environment
-curr_dir=`dirname "$(readlink -f "$0")"`
 cd "${YANDEXDISK_DIR}/configs/mint_shortcuts"
 chmod +x "import.sh"
-./import.sh
+bash import.sh
