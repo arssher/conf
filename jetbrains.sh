@@ -4,8 +4,8 @@ set -e
 
 show_help() {
     cat << EOF
-    Usage: ${0##*/} [-n NAME] [-u URL]
-    Download tar.gz NAME=<idea|pycharm|clion> jetbrains product from URL to JETBRAINS_DIR, extract it and add name to /etc/environment
+    Usage: bash ${0##*/} [-n NAME] [-u URL]
+    Download tar.gz NAME=<idea|pycharm|clion> jetbrains product from URL to JETBRAINS_DIR, extract it and add {{PRODUCTNAME}}BIN variable with path to executable to .global_vars. It will be used to create a shorcut.
 
         -h          display this help and exit
         -n NAME     <idea|pycharm|clion>
@@ -20,10 +20,20 @@ update_env_var() {
     env_var_name="${name^^}_BIN"
     bin_path="${JETBRAINS_DIR}/${foldername}/bin/${name}.sh"
     echo "name=${name}, foldername=${foldername}, env_var_name=${env_var_name}, bin_path=${bin_path}"
-    sudo bash -c "sed '/^export ${env_var_name}=/ d' < /etc/environment > /etc/tmpenvironment"
-    sudo bash -c "echo 'export ${env_var_name}=${bin_path}' >> /etc/tmpenvironment"
-    sudo cp /etc/tmpenvironment /etc/environment
+    # delete old entry if exists
+    sed "/^export ${env_var_name}=/ d" < ~/.global_vars > ~/.global_vars_tmp
+    # add entry
+    echo "export ${env_var_name}=${bin_path}" >> ~/.global_vars_tmp
+    cp ~/.global_vars_tmp ~/.global_vars
+    rm ~/.global_vars_tmp
+    source ~/.bashrc
 }
+
+# check if JETBRAINS_DIR variable is present
+if [ -z ${JETBRAINS_DIR+x} ]; then 
+  echo "JETBRAINS_DIR variable is unset, exiting"
+  exit 1
+fi
 
 name=""
 url=""
@@ -56,5 +66,4 @@ update_env_var "${name}" "${foldername}"
 
 #update shortcuts
 cd "${YANDEXDISK_DIR}/configs/mint_shortcuts"
-chmod +x "import.sh"
-bash import.sh
+bash "${YANDEXDISK_DIR}/configs/mint_shortcuts/ydisk_to_machine.sh"
