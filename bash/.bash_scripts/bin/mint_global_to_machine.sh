@@ -6,6 +6,6 @@ set -e
 export YANDEXDISK_DIR=`cat ~/.config/yandex-disk/config.cfg | grep "dir=" | sed 's/dir=\"\(.*\)\"/\1/'`
 
 bash "${YANDEXDISK_DIR}/configs/bash/ydisk_to_machine.sh"
-source ~/.bashrc
 bash "${YANDEXDISK_DIR}/configs/mint_shortcuts/ydisk_to_machine.sh"
 bash "${YANDEXDISK_DIR}/configs/emacs/ydisk_to_machine.sh"
+echo "Now run source ~/.bashrc to get changes"
