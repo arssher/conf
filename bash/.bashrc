@@ -1,4 +1,5 @@
 export YANDEXDISK_DIR=`cat ~/.config/yandex-disk/config.cfg | grep "dir=" | sed 's/dir=\"\(.*\)\"/\1/'`
+PATH=$PATH:~/.bash_scripts/bin # TODO: perhaps check if it is already added?
 export LC_ALL="en_US.UTF-8"
 
 
@@ -8,6 +9,8 @@ if [ -f ~/.global_vars ]; then
       source ~/.global_vars
       # echo "global vars loaded"
 fi
+
+source ~/.bash_scripts/aliases.sh
 
 # Eternal bash history. It is not reread after every command, so every terminal have it's own history.
 # To search all commands, including typed in other terminals, see Bendersky's addition below.
@@ -42,4 +45,4 @@ log_bash_persistent_history()
   fi
 }
 PROMPT_COMMAND="log_bash_persistent_history; $PROMT_COMMAND"
-alias phgrep='cat ~/.persistent_history|grep --color'
+
