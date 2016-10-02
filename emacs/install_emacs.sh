@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# installs emacs 24.5 on Ubuntu 14.04. Source repos must be enabled!
+
 set -e
 
 sudo apt-get update
