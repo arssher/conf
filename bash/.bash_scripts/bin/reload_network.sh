@@ -3,7 +3,7 @@
 set -e
 
 # turn off and on all NM's connections
-sudo nmcli nm enable false && sleep 3 && sudo nmcli nm enable true 
+sudo nmcli nm enable false && sleep 1 && sudo nmcli nm enable true 
 
 # bonus: that's how you connect to wifi from cmd using network manager:
 #sudo /usr/lib/2013.com.canonical.certification:checkbox/bin/create_connection wifi "host7314(netorn.ru)" -S wpa -K "89057218970"
