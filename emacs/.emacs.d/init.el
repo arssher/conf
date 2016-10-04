@@ -11,15 +11,12 @@
                          ("marmalade" . "https://marmalade-repo.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
 ; load elpa packages right now because we need package-installed-p, see https://www.emacswiki.org/emacs/ELPA
-; now we must require every (or almost every? -- move-text, for instance, works without it) used package
 (setq package-enable-at-startup nil)
 (package-initialize)
-(load "auctex.el" nil t t)
-(require 'move-text)
 (message "Packages are loaded")
 
 (defvar required-packages
-  '(auctex move-text)
+  '(auctex move-text desktop+)
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
 
@@ -35,6 +32,7 @@
   (dolist (p required-packages)
     (when (not (package-installed-p p))
       (package-install p))))
+; TODO: check out https://github.com/jwiegley/use-package
 			    
 ; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
 (global-set-key [M-insert] '(lambda() (interactive) (load-file "~/.emacs.d/init.el")))
@@ -55,31 +53,19 @@
 
 ;;__________________________________________________
 ;; Desktop saving stuff
-;; Automatically save and restore sessions
-(require 'desktop)
-(setq desktop-dirname             "~/.emacs.d/desktop/"
-      desktop-base-file-name      "emacs.desktop"
-      desktop-base-lock-name      "lock"
-      desktop-path                (list desktop-dirname)
-      desktop-save                t
-      desktop-files-not-to-save   "^$" ;reload tramp paths
-      desktop-load-locked-desktop nil
+; Finally I decided to use desktop+ extension:
+; https://github.com/ffevotte/desktop-plus
+; It just works.
+; TODO: add bash command
+(setq desktop-load-locked-desktop "ask"
       desktop-restore-frames      t) ; save windows layout; works only since 24.4Xo
-(desktop-save-mode 1) ; save session on exit
-; taken from https://www.emacswiki.org/emacs?action=browse;oldid=DeskTop;id=Desktop
-(defun my-desktop-save ()
-  (interactive)
-  ;; Don't call desktop-save-in-desktop-dir, as it prints a message.
-  (if (eq (desktop-owner) (emacs-pid))
-    (desktop-save desktop-dirname)))
-;; save desktop automatically on each autosave, i.e. each 30 seconds by default
-(add-hook 'auto-save-hook 'my-desktop-save)
 ;;__________________________________________________
 
 
 ;;_________________________________________________
 ;; Text processing
-(cua-mode t) ; Make usual C-c C-v copypasting work
+; CUA things
+(cua-mode t) ; It will make usual C-c C-v copypasting work, but I will try to avoid them for now.
 (setq cua-auto-tabify-rectangles nil) ; Don't tabify after rectangle commands WTF
 (transient-mark-mode 1) ; No region when it is not highlighted WTF
 (setq cua-keep-region-after-copy t) ; Standard Windows behaviour WTF
@@ -97,53 +83,52 @@
 )
 (global-set-key (kbd "\C-c\C-d") 'duplicate-line)
 
+; TODO: call to mind why I wasn't satisfied with out-of-the-box move-text package and decided to rewrite
+; these functions manually. Probably because of regions? 
 ; move text arg lines down (or |arg| lines up, if arg < 0)
 ; TODO: rewrite marked mode and handle start of buffer case
-(defun move-text-internal (arg)
-  (message "arg is %d" arg)
-  (cond
-    ((and mark-active transient-mark-mode)
-     (if (> (point) (mark))
-            (exchange-point-and-mark))
-     (let ((column (current-column))
-              (text (delete-and-extract-region (point) (mark))))
-       (forward-line arg)
-       (move-to-column column t)
-       (set-mark (point))
-       (insert text)
-       (exchange-point-and-mark)
-       (setq deactivate-mark nil)))
-    (t
-     ; TODO: save cursor
-     (beginning-of-line)
-     (forward-line)
-     (transpose-lines arg)
-     (forward-line -1)
-     (when (< arg 0)
-       (forward-line arg)
-     )
-    )
-  )
-)
+;(defun move-text-internal (arg)
+;  (message "arg is %d" arg)
+;  (cond
+;    ((and mark-active transient-mark-mode)
+;     (if (> (point) (mark))
+;            (exchange-point-and-mark))
+;     (let ((column (current-column))
+;              (text (delete-and-extract-region (point) (mark))))
+;       (forward-line arg)
+;       (move-to-column column t)
+;       (set-mark (point))
+;       (insert text)
+;       (exchange-point-and-mark)
+;       (setq deactivate-mark nil)))
+;    (t
+;     ; TODO: save cursor
+;     (beginning-of-line)
+;     (forward-line)
+;     (transpose-lines arg)
+;     (forward-line -1)
+;     (when (< arg 0)
+;       (forward-line arg)
+;     )
+;    )
+;  )
+;)
+;(defun move-text-down (arg)
+;  "Move region (transient-mark-mode active) or current line
+;  arg lines down."
+;   ; 'interactive makes function a command;
+;   ; p converts argument to number, * ensures that buffer is writable (signals, if it is read-only)
+;  (interactive "*p")
+;  (move-text-internal arg))
+; 
+;(defun move-text-up (arg)
+;   "Move region (transient-mark-mode active) or current line arg lines up."
+;   (interactive "*p")
+;   (move-text-internal (- arg)))
 
-(defun move-text-down (arg)
-  "Move region (transient-mark-mode active) or current line
-  arg lines down."
-   ; 'interactive makes function a command;
-   ; p converts argument to number, * ensures that buffer is writable (signals, if it is read-only)
-  (interactive "*p")
-  (move-text-internal arg))
-
-(defun move-text-up (arg)
-   "Move region (transient-mark-mode active) or current line arg lines up."
-   (interactive "*p")
-   (move-text-internal (- arg)))
-
-(global-set-key [\C-\S-down] 'move-text-down)
-(global-set-key [\C-\S-up] 'move-text-up)
-
-
-;(move-text-default-bindings) ; enable move text with default bindings, M-up M-down moves lines
+;(global-set-key [\C-\S-down] 'move-text-down)
+;(global-set-key [\C-\S-up] 'move-text-up)
+(move-text-default-bindings) ; enable move text with default bindings, M-up M-down moves lines
 ;;__________________________________________________
 
 ; maximize window by pressing F11, see 
@@ -158,8 +143,14 @@
      (list (cons 'fullscreen next)))))
 (define-key global-map [f11] 'switch-fullscreen)
 
+;; Managing global minor modes
 (global-linum-mode t) ; show line numbers
-
+(if window-system
+    (progn
+      (tool-bar-mode -1)
+      (menu-bar-mode -1)
+    )
+)
 
 ;______________________________________
 ; Latex stuff
@@ -174,4 +165,13 @@
       (quote
        (("^pdf$" "." "evince -f %o")
         ("^html?$" "." "iceweasel %o"))))
+
+					; TODO list:
+					; cua functionality
+					; very strange idents
+					; ruler at 80
+					; cheatsheet in txt
+					; winner mode?
+					; correct syncing
+
 
