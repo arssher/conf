@@ -33,7 +33,12 @@
     (when (not (package-installed-p p))
       (package-install p))))
 ; TODO: check out https://github.com/jwiegley/use-package
-			    
+
+; add to load path all packages under static_packages.
+; TODO: subdirs will not be added! deal with it
+; We will put packages not found in repos here.
+(add-to-list 'load-path "~/.emacs.d/static_packages/")
+
 ; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
 (global-set-key [M-insert] '(lambda() (interactive) (load-file "~/.emacs.d/init.el")))
 ; TODO: save init.el automatically before reloading
@@ -145,12 +150,16 @@
 
 ;; Managing global minor modes
 (global-linum-mode t) ; show line numbers
+(require 'fill-column-indicator)
+(setq fci-rule-color "#4d4d4d")
+(fci-mode t)
 (if window-system
     (progn
       (tool-bar-mode -1)
       (menu-bar-mode -1)
     )
 )
+
 
 ;______________________________________
 ; Latex stuff
