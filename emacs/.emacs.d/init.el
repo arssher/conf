@@ -54,6 +54,10 @@
 (setq backup-directory-alist `(("." . "~/.emacs_saves")))
 ; always backup by copying. TODO: read what that means
 (setq backup-by-copying t)
+; put autosave files there too
+(setq auto-save-file-name-transforms
+      `((".*" ,"~/.emacs_saves")))
+
 ;;
 
 ;;__________________________________________________
@@ -160,11 +164,20 @@
     )
 )
 
+; ruler at 80
+(setq-default fill-column 80)
 (require 'fill-column-indicator)
 (setq fci-rule-color "#4d4d4d")
 (define-globalized-minor-mode my-global-fci-mode fci-mode
   (lambda () (fci-mode 1)))
 (my-global-fci-mode 1)
+
+; load dired-x library. I use it to quickly rename files
+; not sure it is a right way to load it...
+(require 'dired-x)
+
+; autoreload all files from disk
+(global-auto-revert-mode 1)
 
 ;______________________________________
 ; Latex stuff
@@ -183,11 +196,11 @@
 					; TODO list:
 					; cua functionality
 					; very strange idents
-					; ruler at 80
 					; cheatsheet in txt
 					; winner mode?
 					; icicles?
-					; reload files automatically
+					; totally remove backup files
+
 
 
 
