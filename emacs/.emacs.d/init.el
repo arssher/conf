@@ -10,13 +10,19 @@
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("marmalade" . "https://marmalade-repo.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
-; load elpa packages right now because we need package-installed-p, see https://www.emacswiki.org/emacs/ELPA
+; load elpa packages right now because we need package-installed-p,
+; see https://www.emacswiki.org/emacs/ELPA
 (setq package-enable-at-startup nil)
 (package-initialize)
 (message "Packages are loaded")
 
 (defvar required-packages
-  '(auctex move-text desktop+)
+  '(auctex
+    move-text ; to move lines and regions
+    desktop+ ; to save sessions
+    neotree ; project tree
+    dash ; required by all-icons
+    )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
 
@@ -32,12 +38,13 @@
   (dolist (p required-packages)
     (when (not (package-installed-p p))
       (package-install p))))
-; TODO: check out https://github.com/jwiegley/use-package
 
 ; add to load path all packages under static_packages.
-; TODO: subdirs will not be added! deal with it
+; TODO: subdirs will not be added! deal with it.
+; for now I will include every multifile package manually
 ; We will put packages not found in repos here.
 (add-to-list 'load-path "~/.emacs.d/static_packages/")
+(add-to-list 'load-path "~/.emacs.d/static_packages/all-the-icons.el")
 
 ; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
 (global-set-key [M-insert] '(lambda() (interactive) (load-file "~/.emacs.d/init.el")))
@@ -152,6 +159,11 @@
      (list (cons 'fullscreen next)))))
 (define-key global-map [f11] 'switch-fullscreen)
 
+; open project tree on f8
+(require 'all-the-icons) ; load icons for 'icons regime
+(global-set-key [f8] 'neotree-toggle)
+(setq neo-theme (if window-system 'icons 'arrow))
+
 ;; Managing global minor modes
 (global-linum-mode t) ; show line numbers
 (setq column-number-mode t) ; show column number
@@ -199,7 +211,10 @@
 					; cheatsheet in txt
 					; winner mode?
 					; icicles?
-					; totally remove backup files
+					; TODO: check out https://github.com/jwiegley/use-package
+					; moving regions?
+
+
 
 
 
