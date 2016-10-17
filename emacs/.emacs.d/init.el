@@ -150,9 +150,9 @@
 
 ;; Managing global minor modes
 (global-linum-mode t) ; show line numbers
-(require 'fill-column-indicator)
-(setq fci-rule-color "#4d4d4d")
-(fci-mode t)
+(setq column-number-mode t) ; show column number
+
+;; hide toolbar and menubar
 (if window-system
     (progn
       (tool-bar-mode -1)
@@ -160,15 +160,20 @@
     )
 )
 
+(require 'fill-column-indicator)
+(setq fci-rule-color "#4d4d4d")
+(define-globalized-minor-mode my-global-fci-mode fci-mode
+  (lambda () (fci-mode 1)))
+(my-global-fci-mode 1)
 
 ;______________________________________
 ; Latex stuff
 ;______________________________________
 (setq TeX-parse-self t) ; enable parse on load.
-(setq TeX-auto-save t) ; enable parse on save.
+(setq TeX-auto-save t) ; enable parse on saVe.
 (setq TeX-PDF-mode t) ; use pdflatex instead of latex
 
-(add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+(add-hook 'Latex-mode-hook 'LaTeX-math-mode)
 
 (setq TeX-output-view-style
       (quote
@@ -181,6 +186,8 @@
 					; ruler at 80
 					; cheatsheet in txt
 					; winner mode?
-					; correct syncing
+					; icicles?
+					; reload files automatically
+
 
 
