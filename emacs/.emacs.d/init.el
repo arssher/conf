@@ -145,6 +145,12 @@
 ;(global-set-key [\C-\S-down] 'move-text-down)
 ;(global-set-key [\C-\S-up] 'move-text-up)
 (move-text-default-bindings) ; enable move text with default bindings, M-up M-down moves lines
+
+;; enable comments like in idea
+(require 'comment-idea)
+;; (load "comment-idea.el") ;; for debugging
+(global-set-key (kbd "C-;") 'comment-idea)
+
 ;;__________________________________________________
 
 ; maximize window by pressing F11, see 
@@ -184,12 +190,28 @@
   (lambda () (fci-mode 1)))
 (my-global-fci-mode 1)
 
+;; highlight matching braces
+(setq show-paren-delay 0)           ; how long to wait?
+(show-paren-mode t)                 ; turn paren-mode on
+(setq show-paren-style 'parenthesis) ; highlight only parenthesis
+
+
 ; load dired-x library. I use it to quickly rename files
 ; not sure it is a right way to load it...
 (require 'dired-x)
 
 ; autoreload all files from disk
 (global-auto-revert-mode 1)
+
+;; always tail *Messages* buffer, see
+;; http://stackoverflow.com/questions/13316494/how-to-follow-the-end-of-messages-buffer-in-emacs
+(defun tail-f-msgs ()
+  "Go to the end of Messages buffer."
+  (let ((msg-window (get-buffer-window "*Messages*")))
+    (if msg-window
+        (with-current-buffer (window-buffer msg-window)
+          (set-window-point msg-window (point-max))))))
+(add-hook 'post-command-hook 'tail-f-msgs)
 
 ;______________________________________
 ; Latex stuff
@@ -209,13 +231,10 @@
 					; cua functionality
 					; very strange idents
 					; cheatsheet in txt
-					; winner mode?
+					; Winner mode?
 					; icicles?
 					; TODO: check out https://github.com/jwiegley/use-package
 					; moving regions?
-
-
-
-
-
+					; Transient mark
+					; fix highlight matching ()
 
