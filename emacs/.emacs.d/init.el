@@ -74,7 +74,8 @@
 ; It just works.
 ; TODO: add bash command
 (setq desktop-load-locked-desktop "ask"
-      desktop-restore-frames      t) ; save windows layout; works only since 24.4Xo
+      desktop-restore-frames      t) ; save windows layout; works only since 24.4
+(global-set-key [f7] 'desktop+-load)
 ;;__________________________________________________
 
 
@@ -168,6 +169,9 @@
 ; open project tree on f8
 (require 'all-the-icons) ; load icons for 'icons regime
 (global-set-key [f8] 'neotree-toggle)
+;; Every time when the neotree window is opened, let it find current file and
+;; jump to node.
+(setq neo-smart-open t)
 (setq neo-theme (if window-system 'icons 'arrow))
 
 ;; Managing global minor modes
