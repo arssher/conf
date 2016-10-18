@@ -2,7 +2,9 @@
 ; See how to build it in Ubuntu here:
 ; http://ubuntuhandbook.org/index.php/2014/10/emacs-24-4-released-install-in-ubuntu-14-04/
 
-; (load "myplugin.el")  ; example of loading a plugin
+; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
+(global-set-key [M-insert] '(lambda() (interactive) (load-file "~/.emacs.d/init.el")))
+; TODO: save init.el automatically before reloading
 
 ;;________________________________________________
 ;; Packaging stuff
@@ -46,17 +48,13 @@
 (add-to-list 'load-path "~/.emacs.d/static_packages/")
 (add-to-list 'load-path "~/.emacs.d/static_packages/all-the-icons.el")
 
-; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
-(global-set-key [M-insert] '(lambda() (interactive) (load-file "~/.emacs.d/init.el")))
-; TODO: save init.el automatically before reloading
-;;_________________________________________________
-
-;; Visual things
+;;____________________________________________________________
+;; Visual things, colours, fonts, etc
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'wombat t) ; current theme
-;;
 
-;; Backup files
+;;____________________________________________________________
+;; Backup things
 ; a place where to put backup files
 (setq backup-directory-alist `(("." . "~/.emacs_saves")))
 ; always backup by copying. TODO: read what that means
@@ -65,9 +63,6 @@
 (setq auto-save-file-name-transforms
       `((".*" ,"~/.emacs_saves")))
 
-;;
-
-;;__________________________________________________
 ;; Desktop saving stuff
 ; Finally I decided to use desktop+ extension:
 ; https://github.com/ffevotte/desktop-plus
@@ -76,7 +71,9 @@
 (setq desktop-load-locked-desktop "ask"
       desktop-restore-frames      t) ; save windows layout; works only since 24.4
 (global-set-key [f7] 'desktop+-load)
-;;__________________________________________________
+
+; autoreload all files from disk
+(global-auto-revert-mode 1)
 
 
 ;;_________________________________________________
@@ -152,9 +149,9 @@
 ;; (load "comment-idea.el") ;; for debugging
 (global-set-key (kbd "C-;") 'comment-idea)
 
-;;__________________________________________________
-
-; maximize window by pressing F11, see 
+;;______________________________________________________________
+;; Windows and frames
+; maximize window by pressing F11, see
 ; http://stackoverflow.com/questions/9248996/how-to-toggle-fullscreen-with-emacs-as-default 
 (defun switch-fullscreen nil
   (interactive)
@@ -174,7 +171,21 @@
 (setq neo-smart-open t)
 (setq neo-theme (if window-system 'icons 'arrow))
 
-;; Managing global minor modes
+;; always tail *Messages* buffer, see
+;; http://stackoverflow.com/questions/13316494/how-to-follow-the-end-of-messages-buffer-in-emacs
+(defun tail-f-msgs ()
+  "Go to the end of Messages buffer."
+  (let ((msg-window (get-buffer-window "*Messages*")))
+    (if msg-window
+        (with-current-buffer (window-buffer msg-window)
+          (set-window-point msg-window (point-max))))))
+(add-hook 'post-command-hook 'tail-f-msgs)
+
+;; enable switching windows with M-left and M-right
+(windmove-default-keybindings 'meta)
+
+;;____________________________________________________________
+;; Managing minor modes
 (global-linum-mode t) ; show line numbers
 (setq column-number-mode t) ; show column number
 
@@ -199,23 +210,11 @@
 (show-paren-mode t)                 ; turn paren-mode on
 (setq show-paren-style 'parenthesis) ; highlight only parenthesis
 
-
 ; load dired-x library. I use it to quickly rename files
 ; not sure it is a right way to load it...
 (require 'dired-x)
 
-; autoreload all files from disk
-(global-auto-revert-mode 1)
 
-;; always tail *Messages* buffer, see
-;; http://stackoverflow.com/questions/13316494/how-to-follow-the-end-of-messages-buffer-in-emacs
-(defun tail-f-msgs ()
-  "Go to the end of Messages buffer."
-  (let ((msg-window (get-buffer-window "*Messages*")))
-    (if msg-window
-        (with-current-buffer (window-buffer msg-window)
-          (set-window-point msg-window (point-max))))))
-(add-hook 'post-command-hook 'tail-f-msgs)
 
 ;______________________________________
 ; Latex stuff
