@@ -179,8 +179,8 @@
 (defun my-split-root-window-right (&optional size)
   (interactive "P")
   (my-split-root-window size 'right))
-(global-set-key (kbd "\C-x4") 'my-split-root-window-below) 
-(global-set-key (kbd "\C-x5") 'my-split-root-window-right) 
+(global-set-key (kbd "\C-x4") 'my-split-root-window-below)
+(global-set-key (kbd "\C-x5") 'my-split-root-window-right)
 
 ;; open project tree on f8
 (require 'all-the-icons) ; load icons for 'icons regime
@@ -198,10 +198,19 @@
     (if msg-window
         (with-current-buffer (window-buffer msg-window)
           (set-window-point msg-window (point-max))))))
-(add-hook 'post-command-hook 'tail-f-msgs)
+(defun tail-messages-enable()
+  (interactive)
+  (add-hook 'post-command-hook 'tail-f-msgs))
+(defun tail-messages-disable()
+  (interactive)
+  (remove-hook 'post-command-hook 'tail-f-msgs))
+(tail-messages-enable)
 
-;; enable switching windows with M-left and M-right
+
+;; enable switching windows with M-arrows
 (windmove-default-keybindings 'meta)
+;; ...and with M-vim arrows
+
 
 
 ;;____________________________________________________________
@@ -274,4 +283,6 @@
 ;; save remote files in desktop+?
 ;; autorevert remote files?
 ;; newline from middle of the string
+;; tail messages toggle instead of enable/disable; or better disable when active,
+;; enable when leaving
 
