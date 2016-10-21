@@ -1,19 +1,19 @@
-; Targeted at GNU Emacs, minimum version 24.5
-; See how to build it in Ubuntu here:
-; http://ubuntuhandbook.org/index.php/2014/10/emacs-24-4-released-install-in-ubuntu-14-04/
+;; Targeted at GNU Emacs, minimum version 24.5
+;; See how to build it in Ubuntu here:
+;; http://ubuntuhandbook.org/index.php/2014/10/emacs-24-4-released-install-in-ubuntu-14-04/
 
-; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
+;; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
 (global-set-key [M-insert] '(lambda() (interactive) (load-file "~/.emacs.d/init.el")))
-; TODO: save init.el automatically before reloading
+;; TODO: save init.el automatically before reloading
 
 ;;________________________________________________
 ;; Packaging stuff
-; add package repos
+;; add package repos
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
                          ("marmalade" . "https://marmalade-repo.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
-; load elpa packages right now because we need package-installed-p,
-; see https://www.emacswiki.org/emacs/ELPA
+;; load elpa packages right now because we need package-installed-p,
+;; see https://www.emacswiki.org/emacs/ELPA
 (setq package-enable-at-startup nil)
 (package-initialize)
 (message "Packages are loaded")
@@ -41,10 +41,10 @@
     (when (not (package-installed-p p))
       (package-install p))))
 
-; add to load path all packages under static_packages.
-; TODO: subdirs will not be added! deal with it.
-; for now I will include every multifile package manually
-; We will put packages not found in repos here.
+;; add to load path all packages under static_packages.
+;; TODO: subdirs will not be added! deal with it.
+;; for now I will include every multifile package manually
+;; We will put packages not found in repos here.
 (add-to-list 'load-path "~/.emacs.d/static_packages/")
 (add-to-list 'load-path "~/.emacs.d/static_packages/all-the-icons.el")
 
@@ -58,37 +58,37 @@
 
 ;;____________________________________________________________
 ;; Backup things
-; a place where to put backup files
+;; a place where to put backup files
 (setq backup-directory-alist `(("." . "~/.emacs_saves")))
-; always backup by copying. TODO: read what that means
+;; always backup by copying. TODO: read what that means
 (setq backup-by-copying t)
-; put autosave files there too
+;; put autosave files there too
 (setq auto-save-file-name-transforms
       `((".*" ,"~/.emacs_saves")))
 
 ;; Desktop saving stuff
-; Finally I decided to use desktop+ extension:
-; https://github.com/ffevotte/desktop-plus
-; It just works.
-; TODO: add bash command
+;; Finally I decided to use desktop+ extension:
+;; https://github.com/ffevotte/desktop-plus
+;; It just works.
+;; TODO: add bash command
 (setq desktop-load-locked-desktop "ask"
       desktop-restore-frames      t) ; save windows layout; works only since 24.4
 (global-set-key [f7] 'desktop+-load)
 
-; autoreload all files from disk
+;; autoreload all files from disk
 (global-auto-revert-mode 1)
 
 
 ;;_________________________________________________
 ;; Text processing
-; CUA things
+;; CUA things
 (cua-mode t) ; It will make usual C-c C-v copypasting work, but I will try to avoid them for now.
 (setq cua-auto-tabify-rectangles nil) ; Don't tabify after rectangle commands WTF
 (transient-mark-mode 1) ; No region when it is not highlighted WTF
 (setq cua-keep-region-after-copy t) ; Standard Windows behaviour WTF
 
-; duplicate line by C-c C-d, see
-; http://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs
+;; duplicate line by C-c C-d, see
+;; http://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs
 (defun duplicate-line()
   (interactive)
   (move-beginning-of-line 1)
@@ -100,51 +100,51 @@
 )
 (global-set-key (kbd "\C-c\C-d") 'duplicate-line)
 
-; TODO: call to mind why I wasn't satisfied with out-of-the-box move-text package and decided to rewrite
-; these functions manually. Probably because of regions? 
-; move text arg lines down (or |arg| lines up, if arg < 0)
-; TODO: rewrite marked mode and handle start of buffer case
-;(defun move-text-internal (arg)
-;  (message "arg is %d" arg)
-;  (cond
-;    ((and mark-active transient-mark-mode)
-;     (if (> (point) (mark))
-;            (exchange-point-and-mark))
-;     (let ((column (current-column))
-;              (text (delete-and-extract-region (point) (mark))))
-;       (forward-line arg)
-;       (move-to-column column t)
-;       (set-mark (point))
-;       (insert text)
-;       (exchange-point-and-mark)
-;       (setq deactivate-mark nil)))
-;    (t
-;     ; TODO: save cursor
-;     (beginning-of-line)
-;     (forward-line)
-;     (transpose-lines arg)
-;     (forward-line -1)
-;     (when (< arg 0)
-;       (forward-line arg)
-;     )
-;    )
-;  )
-;)
-;(defun move-text-down (arg)
-;  "Move region (transient-mark-mode active) or current line
-;  arg lines down."
-;   ; 'interactive makes function a command;
-;   ; p converts argument to number, * ensures that buffer is writable (signals, if it is read-only)
-;  (interactive "*p")
-;  (move-text-internal arg))
-; 
-;(defun move-text-up (arg)
-;   "Move region (transient-mark-mode active) or current line arg lines up."
-;   (interactive "*p")
-;   (move-text-internal (- arg)))
+;; TODO: call to mind why I wasn't satisfied with out-of-the-box move-text package and decided to rewrite
+;; these functions manually. Probably because of regions? 
+;; move text arg lines down (or |arg| lines up, if arg < 0)
+;; TODO: rewrite marked mode and handle start of buffer case
+;;(defun move-text-internal (arg)
+;;  (message "arg is %d" arg)
+;;  (cond
+;;    ((and mark-active transient-mark-mode)
+;;     (if (> (point) (mark))
+;;            (exchange-point-and-mark))
+;;     (let ((column (current-column))
+;;              (text (delete-and-extract-region (point) (mark))))
+;;       (forward-line arg)
+;;       (move-to-column column t)
+;;       (set-mark (point))
+;;       (insert text)
+;;       (exchange-point-and-mark)
+;;       (setq deactivate-mark nil)))
+;;    (t
+;;     ; TODO: save cursor
+;;     (beginning-of-line)
+;;     (forward-line)
+;;     (transpose-lines arg)
+;;     (forward-line -1)
+;;     (when (< arg 0)
+;;       (forward-line arg)
+;;     )
+;;    )
+;;  )
+;;)
+;;(defun move-text-down (arg)
+;;  "Move region (transient-mark-mode active) or current line
+;;  arg lines down."
+;;   ; 'interactive makes function a command;
+;;   ; p converts argument to number, * ensures that buffer is writable (signals, if it is read-only)
+;;  (interactive "*p")
+;;  (move-text-internal arg))
+;; 
+;;(defun move-text-up (arg)
+;;   "Move region (transient-mark-mode active) or current line arg lines up."
+;;   (interactive "*p")
+;;   (move-text-internal (- arg)))
 
-;(global-set-key [\C-\S-down] 'move-text-down)
-;(global-set-key [\C-\S-up] 'move-text-up)
+;; (global-set-key [\C-\S-down] 'move-text-down)
+;; (global-set-key [\C-\S-up] 'move-text-up)
 (move-text-default-bindings) ; enable move text with default bindings, M-up M-down moves lines
 
 ;; enable comments like in idea
@@ -154,8 +154,8 @@
 
 ;;______________________________________________________________
 ;; Windows and frames
-; maximize frame by pressing F11, see
-; http://stackoverflow.com/questions/9248996/how-to-toggle-fullscreen-with-emacs-as-default 
+;; maximize frame by pressing F11, see
+;; http://stackoverflow.com/questions/9248996/how-to-toggle-fullscreen-with-emacs-as-default 
 (defun switch-fullscreen nil
   (interactive)
   (let* ((modes '(nil maximized))
@@ -182,7 +182,7 @@
 (global-set-key (kbd "\C-x4") 'my-split-root-window-below) 
 (global-set-key (kbd "\C-x5") 'my-split-root-window-right) 
 
-; open project tree on f8
+;; open project tree on f8
 (require 'all-the-icons) ; load icons for 'icons regime
 (global-set-key [f8] 'neotree-toggle)
 ;; Every time when the neotree window is opened, let it find current file and
@@ -206,8 +206,8 @@
 
 ;;____________________________________________________________
 ;; dired things
-; load dired-x library. I use it to quickly rename files
-; not sure it is a right way to load it...
+;; load dired-x library. I use it to quickly rename files
+;; not sure it is a right way to load it...
 (require 'dired-x)
 
 ;; hide and show hidden files in dired by M-o
@@ -229,7 +229,7 @@
     )
 )
 
-; ruler at 80
+;; ruler at 80
 (setq-default fill-column 80)
 (require 'fill-column-indicator)
 (setq fci-rule-color "#4d4d4d")
@@ -247,9 +247,9 @@
 
 
 
-;______________________________________
+;;______________________________________
 ; Latex stuff
-;______________________________________
+;;______________________________________
 (setq TeX-parse-self t) ; enable parse on load.
 (setq TeX-auto-save t) ; enable parse on saVe.
 (setq TeX-PDF-mode t) ; use pdflatex instead of latex
@@ -261,20 +261,17 @@
        (("^pdf$" "." "evince -f %o")
         ("^html?$" "." "iceweasel %o"))))
 
-					; TODO list:
-					; cua functionality
-					; cheatsheet in txt
-					; Winner mode?
-					; icicles?
-					; TODO: check out https://github.com/jwiegley/use-package
-					; moving regions?
-					; Transient mark
-					; fix highlight matching ()
-					; save tree in desktop+?
-					; save remote files in desktop+?
-					; autorevert remote files?
-					; newline from middle of the string
-					; change comments here to ;;
-
-
+;; TODO list:
+;; cua functionality
+;; cheatsheet in txt
+;; Winner mode?
+;; icicles?
+;; TODO: check out https://github.com/jwiegley/use-package
+;; moving regions?
+;; Transient mark
+;; fix highlight matching ()
+;; save tree in desktop+?
+;; save remote files in desktop+?
+;; autorevert remote files?
+;; newline from middle of the string
 
