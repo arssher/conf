@@ -210,7 +210,10 @@
 ;; enable switching windows with M-arrows
 (windmove-default-keybindings 'meta)
 ;; ...and with M-vim arrows
-
+(global-set-key (kbd "M-h") 'windmove-left)
+(global-set-key (kbd "M-j") 'windmove-down)
+(global-set-key (kbd "M-k") 'windmove-up)
+(global-set-key (kbd "M-l") 'windmove-right)
 
 
 ;;____________________________________________________________
@@ -285,4 +288,4 @@
 ;; newline from middle of the string
 ;; tail messages toggle instead of enable/disable; or better disable when active,
 ;; enable when leaving
-
+;; check kbd escaping
