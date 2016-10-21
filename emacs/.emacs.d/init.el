@@ -52,6 +52,9 @@
 ;; Visual things, colours, fonts, etc
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'wombat t) ; current theme
+;; font size, in px*10
+(set-face-attribute 'default nil :height 140)
+(set-face-attribute 'default t :font "Ubuntu Mono")
 
 ;;____________________________________________________________
 ;; Backup things
@@ -151,7 +154,7 @@
 
 ;;______________________________________________________________
 ;; Windows and frames
-; maximize window by pressing F11, see
+; maximize frame by pressing F11, see
 ; http://stackoverflow.com/questions/9248996/how-to-toggle-fullscreen-with-emacs-as-default 
 (defun switch-fullscreen nil
   (interactive)
@@ -162,6 +165,22 @@
      (selected-frame)
      (list (cons 'fullscreen next)))))
 (define-key global-map [f11] 'switch-fullscreen)
+
+
+;; functions for adding window on right or below
+(defun my-split-root-window (size direction)
+  (split-window (frame-root-window)
+                (and size (prefix-numeric-value size))
+                direction))
+(defun my-split-root-window-below (&optional size)
+  (interactive "P")
+(define-key global-map [f11] 'switch-fullscreen)
+  (my-split-root-window size 'below))
+(defun my-split-root-window-right (&optional size)
+  (interactive "P")
+  (my-split-root-window size 'right))
+(global-set-key (kbd "\C-x4") 'my-split-root-window-below) 
+(global-set-key (kbd "\C-x5") 'my-split-root-window-right) 
 
 ; open project tree on f8
 (require 'all-the-icons) ; load icons for 'icons regime
@@ -183,6 +202,19 @@
 
 ;; enable switching windows with M-left and M-right
 (windmove-default-keybindings 'meta)
+
+
+;;____________________________________________________________
+;; dired things
+; load dired-x library. I use it to quickly rename files
+; not sure it is a right way to load it...
+(require 'dired-x)
+
+;; hide and show hidden files in dired by M-o
+(setq-default dired-omit-files-p t)
+(setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+(global-set-key (kbd "M-o") 'dired-omit-mode)
+
 
 ;;____________________________________________________________
 ;; Managing minor modes
@@ -210,9 +242,8 @@
 (show-paren-mode t)                 ; turn paren-mode on
 (setq show-paren-style 'parenthesis) ; highlight only parenthesis
 
-; load dired-x library. I use it to quickly rename files
-; not sure it is a right way to load it...
-(require 'dired-x)
+;; default method for remote editing
+ (setq tramp-default-method "ssh")
 
 
 
@@ -232,7 +263,6 @@
 
 					; TODO list:
 					; cua functionality
-					; very strange idents
 					; cheatsheet in txt
 					; Winner mode?
 					; icicles?
@@ -240,4 +270,11 @@
 					; moving regions?
 					; Transient mark
 					; fix highlight matching ()
+					; save tree in desktop+?
+					; save remote files in desktop+?
+					; autorevert remote files?
+					; newline from middle of the string
+					; change comments here to ;;
+
+
 
