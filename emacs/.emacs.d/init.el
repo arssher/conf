@@ -21,9 +21,9 @@
 (defvar required-packages
   '(auctex
     move-text ; to move lines and regions
-    desktop+ ; to save sessions
+    desktop+ ; to save sessionsq
     neotree ; project tree
-    dash ; required by all-icons
+    dash ; required by all-icons (used for neat icons in neotree)
     )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
@@ -73,19 +73,34 @@
 ;; TODO: add bash command
 (setq desktop-load-locked-desktop "ask"
       desktop-restore-frames      t) ; save windows layout; works only since 24.4
-(global-set-key [f7] 'desktop+-load)
 
 ;; autoreload all files from disk
 (global-auto-revert-mode 1)
 
 
 ;;_________________________________________________
+;; Moving
+;; Moving like in ergoemacs
+(global-set-key (kbd "M-j") 'backward-char)
+(global-set-key (kbd "M-k") 'next-line)
+(global-set-key (kbd "M-l") 'forward-char)
+(global-set-key (kbd "M-i") 'previous-line)
+(global-set-key (kbd "M-o") 'forward-word)
+(global-set-key (kbd "M-u") 'backward-word)
+
+;; make C-d behave like backspace
+(global-set-key (kbd "\C-d") 'delete-backwards-char)
+
+
+
+;;_________________________________________________
 ;; Text processing
+(transient-mark-mode 1) ; Highlight the region when the mark is active
+;; (next-line) will insert a newline at the end of the buffer
+(setq next-line-add-newlines t)
 ;; CUA things
 (cua-mode t) ; It will make usual C-c C-v copypasting work, but I will try to avoid them for now.
-(setq cua-auto-tabify-rectangles nil) ; Don't tabify after rectangle commands WTF
-(transient-mark-mode 1) ; No region when it is not highlighted WTF
-(setq cua-keep-region-after-copy t) ; Standard Windows behaviour WTF
+(setq cua-keep-region-after-copy t)
 
 ;; duplicate line by C-c C-d, see
 ;; http://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs
@@ -150,11 +165,19 @@
 ;; enable comments like in idea
 (require 'comment-idea)
 ;; (load "comment-idea.el") ;; for debugging
+
+
 (global-set-key (kbd "C-;") 'comment-idea)
+;; ergoemacs-like deletions
+(global-set-key (kbd "M-d") 'backward-delete-char)
+(global-set-key (kbd "M-f") 'delete-forward-char)
+(global-set-key (kbd "M-e") 'backward-kill-word)
+(global-set-key (kbd "M-r") 'kill-word)
+
 
 ;;______________________________________________________________
 ;; Windows and frames
-;; maximize frame by pressing F11, see
+;; maximize frame function, see
 ;; http://stackoverflow.com/questions/9248996/how-to-toggle-fullscreen-with-emacs-as-default 
 (defun switch-fullscreen nil
   (interactive)
@@ -164,7 +187,6 @@
     (modify-frame-parameters
      (selected-frame)
      (list (cons 'fullscreen next)))))
-(define-key global-map [f11] 'switch-fullscreen)
 
 
 ;; functions for adding window on right or below
@@ -174,7 +196,6 @@
                 direction))
 (defun my-split-root-window-below (&optional size)
   (interactive "P")
-(define-key global-map [f11] 'switch-fullscreen)
   (my-split-root-window size 'below))
 (defun my-split-root-window-right (&optional size)
   (interactive "P")
@@ -184,7 +205,6 @@
 
 ;; open project tree on f8
 (require 'all-the-icons) ; load icons for 'icons regime
-(global-set-key [f8] 'neotree-toggle)
 ;; Every time when the neotree window is opened, let it find current file and
 ;; jump to node.
 (setq neo-smart-open t)
@@ -210,10 +230,10 @@
 ;; enable switching windows with M-arrows
 (windmove-default-keybindings 'meta)
 ;; ...and with M-vim arrows
-(global-set-key (kbd "M-h") 'windmove-left)
-(global-set-key (kbd "M-j") 'windmove-down)
-(global-set-key (kbd "M-k") 'windmove-up)
-(global-set-key (kbd "M-l") 'windmove-right)
+;; (global-set-key (kbd "M-h") 'windmove-left)
+;; (global-set-key (kbd "M-j") 'windmove-down)
+;; (global-set-key (kbd "M-k") 'windmove-up)
+;; (global-set-key (kbd "M-l") 'windmove-right)
 
 
 ;;____________________________________________________________
@@ -222,10 +242,9 @@
 ;; not sure it is a right way to load it...
 (require 'dired-x)
 
-;; hide and show hidden files in dired by M-o
+;; setting hidden files in dired
 (setq-default dired-omit-files-p t)
 (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
-(global-set-key (kbd "M-o") 'dired-omit-mode)
 
 
 ;;____________________________________________________________
@@ -258,34 +277,55 @@
  (setq tramp-default-method "ssh")
 
 
+;;____________________________________________________________
+;; F key mappings
+(global-set-key [f1] help-map) ; help prefix
+(global-set-key [f7] 'desktop+-load) ; load saved desktop
+(global-set-key [f8] 'neotree-toggle) ; show and hide neotree
+(define-key global-map [f11] 'switch-fullscreen)
+(global-set-key [f12] 'dired-omit-mode) ; show and hide hidden files in dired
 
 ;;______________________________________
 ; Latex stuff
 ;;______________________________________
 (setq TeX-parse-self t) ; enable parse on load.
-(setq TeX-auto-save t) ; enable parse on saVe.
 (setq TeX-PDF-mode t) ; use pdflatex instead of latex
+(setq TeX-auto-save t) ; enable parse on saVe.
 
-(add-hook 'Latex-mode-hook 'LaTeX-math-mode)
+(add-hook 'Latex-mode-hook 'LaTeX-math-mobde)
 
+;; ???
 (setq TeX-output-view-style
       (quote
-       (("^pdf$" "." "evince -f %o")
+       (("^pdf$" "." "okulaar %o")
         ("^html?$" "." "iceweasel %o"))))
 
+(custom-set-variables
+  '(TeX-view-program-list (quote (("Okular" "okular --unique %o"))))
+ '(TeX-view-program-selection
+  (quote
+   (((output-dvi style-pstricks) "dvips and gv")
+   (output-dvi "xdvi")
+   (output-pdf "Okular")
+   (output-html "xdg-open")))))
+
 ;; TODO list:
-;; cua functionality
 ;; cheatsheet in txt
 ;; Winner mode?
 ;; icicles?
 ;; TODO: check out https://github.com/jwiegley/use-package
 ;; moving regions?
 ;; Transient mark
-;; fix highlight matching ()
+;; fix highlight matching ()n
 ;; save tree in desktop+?
 ;; save remote files in desktop+?
-;; autorevert remote files?
+;; autorevert remote files?n
 ;; newline from middle of the string
 ;; tail messages toggle instead of enable/disable; or better disable when active,
-;; enable when leaving
+;;   enable when leaving
 ;; check kbd escaping
+;; autocomplete in code
+;; autocomplethelm/ivy
+;; goto definition, goto file in project, etc
+;; go back?
+
