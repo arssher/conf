@@ -173,7 +173,11 @@
 (global-set-key (kbd "M-f") 'delete-forward-char)
 (global-set-key (kbd "M-e") 'backward-kill-word)
 (global-set-key (kbd "M-r") 'kill-word)
-
+;; ergoemacs-like set mark
+(global-set-key (kbd "M-<SPC>") 'cua-set-mark)
+;; ergoemacs-like goto start/end of line
+(global-set-key (kbd "M-h") 'move-beginning-of-line)
+(global-set-key (kbd "M-H") 'move-end-of-line)
 
 ;;______________________________________________________________
 ;; Windows and frames
