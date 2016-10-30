@@ -14,7 +14,8 @@ Bash conf:
   .bashrc
 
 Mint shorcuts conf:
-  Place new shorctcuts to dconf-settings-template.conf
+  Place new shorctcuts to dconf-settings-template.conf, then run
+  ydisk_to_machine.sh, it will install them on the system
 
 "to disk" scripts are not updated and perhaps should be eventually removed.
 
