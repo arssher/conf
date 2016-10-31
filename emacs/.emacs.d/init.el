@@ -268,12 +268,14 @@
 ;; * Ctrl Alt Shift -- I reserved for system apps
 
 ;; The home row:
-(global-set-key (kbd "C-a") 'mark-whole-buffer) ; mark whole buffer, ergo
-(global-set-key (kbd "M-a") 'execute-extended-command) ; run command, ergo
-(global-set-key (kbd "M-d") 'backward-delete-char)
-(global-set-key (kbd "M-f") 'delete-forward-char)
-(global-set-key (kbd "C-f") 'isearch-forward) ; ergo
-(global-set-key (kbd "C-M-f") 'isearch-backward)
+(global-set-key (kbd "C-a") 'mark-whole-buffer) ; ergo
+(global-set-key (kbd "M-a") 'execute-extended-command) ; ergo
+(global-set-key (kbd "C-s") 'save-buffer) ; ergo
+(global-set-key (kbd "M-d") 'backward-delete-char) ; ergo
+(global-set-key (kbd "C-d") 'duplicate-line)
+(global-set-key (kbd "M-f") 'delete-forward-char) ; ergo
+(global-set-key (kbd "C-f") 'isearch-repeat-forward) ; ergo
+(global-set-key (kbd "C-M-f") 'isearch-repeat-backward)
 (global-set-key (kbd "M-F") 'occur) ; like grep
 (global-set-key (kbd "M-g") 'kill-line) ; kill the rest of the line; ergo
 (global-set-key (kbd "M-G") '(lambda () (interactive) (kill-line 0))) ; kill the line up to the cursor, ergo
@@ -295,13 +297,20 @@
 (global-set-key (kbd "M-u") 'backward-word) ; ergo
 (global-set-key (kbd "M-i") 'previous-line) ; ergo
 (global-set-key (kbd "M-o") 'forward-word) ; ergo
-(global-set-key (kbd "M-p") 'recenter-top-bottom) ; ??? ergo
+(global-set-key (kbd "C-o") 'find-file) ; ergo
+(global-set-key (kbd "M-p") 'recenter-top-bottom) ; ergo
+
+;; The zxcv row:
+(global-set-key (kbd "M-c") 'forward-paragraph)
+;; cua is shadowing keys, http://stackoverflow.com/questions/34057023/how-do-you-rebind-a-key-set-by-cua-mode-in-emacs
+(define-key cua--cua-keys-keymap (kbd "M-v") 'backward-paragraph)
+(global-set-key (kbd "M-n") 'beginning-of-buffer)
+(global-set-key (kbd "M-N") 'end-of-buffer)
 
 ;; Space row
 (global-set-key (kbd "M-<SPC>") 'cua-set-mark) ; ergo
 ;;____________________
 
-(global-set-key (kbd "\C-c\C-d") 'duplicate-line)
 
 (global-set-key (kbd "\C-x4") 'my-split-root-window-below)
 (global-set-key (kbd "\C-x5") 'my-split-root-window-right)
@@ -312,11 +321,6 @@
 
 ;; enable switching windows with M-arrows
 (windmove-default-keybindings 'meta)
-;; ...and with M-vim arrows
-;; (global-set-key (kbd "M-h") 'windmove-left)
-;; (global-set-key (kbd "M-j") 'windmove-down)
-;; (global-set-key (kbd "M-k") 'windmove-up)
-;; (global-set-key (kbd "M-l") 'windmove-right)
 
 ;;____________________________________________________________
 ;; F key mappings
@@ -329,6 +333,25 @@
 ;; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
 (global-set-key [M-insert] '(lambda() (interactive) (load-file "~/.emacs.d/init.el")))
 ;; TODO: save init.el automatically before reloading
+
+;; Ideas for future mappings:
+;; C-y -- remove line and place it to the buffer (similar to idea), must have
+;; C-S-i/k -- moving lines/regions, must have
+;; S-return, newline from any place, must-have
+;; 
+;; C-S-Z -- redo, tree plugin needed. Should have another shortcut for the console...
+
+;; very future mappings:
+;; C-space -- autocomplete
+;; C-b -- goto definition
+;; M-B -- go back?
+;; C-T -- reopen last closed
+;; fill-unfill from ergo
+
+;; cycle windows?
+;; cycle buffers?
+;; search is broken
+;; fix moving beyond the window
 
 ;; TODO list:
 ;; cheatsheet in txt
