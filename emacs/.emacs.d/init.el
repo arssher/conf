@@ -20,6 +20,7 @@
     desktop+ ; to save sessionsq
     neotree ; project tree
     dash ; required by all-icons (used for neat icons in neotree)
+    drag-stuff ; moving lines and regions
     )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
@@ -81,6 +82,9 @@
 ;; CUA things
 (cua-mode t) ; It will make usual C-c C-v copypasting work, but I will try to avoid them for now.
 (setq cua-keep-region-after-copy t) ; well, keep region after copy
+
+(setq drag-stuff-modifier '(meta shift))
+(drag-stuff-mode t) ; move lines and regions
 
 (require 'my-text-processing)
 ;; (load "my-text-processing.el") ;; for debugging
@@ -211,6 +215,36 @@
 ;; * Ctrl Shift doesn't work in terminals, avoid it for important keys!
 ;; * Ctrl Alt Shift -- I reserved for system apps
 
+;; The F keys row
+(global-set-key [f1] help-map) ; help prefix
+(global-set-key [f7] 'desktop+-load) ; load saved desktop
+(global-set-key [f8] 'neotree-toggle) ; show and hide neotree
+(define-key global-map [f11] 'switch-fullscreen)
+(global-set-key [f12] 'dired-omit-mode) ; show and hide hidden files in dired
+;; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
+(global-set-key [M-insert] '(lambda() (interactive) (load-file "~/.emacs.d/init.el")))
+;; TODO: save init.el automatically before reloading
+
+
+;; The digits row
+(global-set-key (kbd "\C-x4") 'my-split-root-window-below)
+(global-set-key (kbd "\C-x5") 'my-split-root-window-right)
+
+;; The qwerty row:
+(global-set-key (kbd "M-w") 'just-one-space) ; ergo
+(global-set-key (kbd "C-w") 'kill-this-buffer) ; ergo
+(global-set-key (kbd "M-e") 'backward-kill-word) ; ergo
+(global-set-key (kbd "M-r") 'kill-word) ; ergo
+(global-set-key (kbd "C-M-r") 'revert-buffer)
+(global-set-key (kbd "C-r") 'query-replace)
+(global-set-key (kbd "C-y") 'smart-kill-whole-line)
+(global-set-key (kbd "M-u") 'backward-word) ; ergo
+(global-set-key (kbd "M-i") 'previous-line) ; ergo
+(global-set-key (kbd "M-I") 'drag-stuff-up)
+(global-set-key (kbd "M-o") 'forward-word) ; ergo
+(global-set-key (kbd "C-o") 'find-file) ; ergo
+(global-set-key (kbd "M-p") 'recenter-top-bottom) ; ergo
+
 ;; The home row:
 (global-set-key (kbd "C-a") 'mark-whole-buffer) ; ergo
 (global-set-key (kbd "M-a") 'execute-extended-command) ; ergo
@@ -230,24 +264,12 @@
 (global-set-key (kbd "M-H") 'move-end-of-line) ; ergo
 (global-set-key (kbd "M-j") 'backward-char) ; ergo
 (global-set-key (kbd "M-k") 'next-line) ; ergo
+(global-set-key (kbd "M-K") 'drag-stuff-down) ; ergo
 (global-set-key (kbd "M-l") 'forward-char) ; ergo
 (global-set-key (kbd "C-l") 'goto-line) ; ergo
 (global-set-key (kbd "C-;") 'comment-idea)
 ;; idea's shift-enter, defined in my-text-processing.el
 (global-set-key (kbd "<S-return>") 'end-of-line-and-indented-new-line)
-
-;; The qwerty row:
-(global-set-key (kbd "M-w") 'just-one-space) ; ergo
-(global-set-key (kbd "C-w") 'kill-this-buffer) ; ergo
-(global-set-key (kbd "M-e") 'backward-kill-word) ; ergo
-(global-set-key (kbd "M-r") 'kill-word) ; ergo
-(global-set-key (kbd "C-M-r") 'revert-buffer)
-(global-set-key (kbd "C-r") 'query-replace)
-(global-set-key (kbd "M-u") 'backward-word) ; ergo
-(global-set-key (kbd "M-i") 'previous-line) ; ergo
-(global-set-key (kbd "M-o") 'forward-word) ; ergo
-(global-set-key (kbd "C-o") 'find-file) ; ergo
-(global-set-key (kbd "M-p") 'recenter-top-bottom) ; ergo
 
 ;; The zxcv row:
 (global-set-key (kbd "M-c") 'forward-paragraph)
@@ -258,34 +280,12 @@
 
 ;; Space row
 (global-set-key (kbd "M-<SPC>") 'cua-set-mark) ; ergo
-;;____________________
-
-
-(global-set-key (kbd "\C-x4") 'my-split-root-window-below)
-(global-set-key (kbd "\C-x5") 'my-split-root-window-right)
-
-;; (global-set-key [\C-\S-down] 'move-text-down)
-;; (global-set-key [\C-\S-up] 'move-text-up)
-(move-text-default-bindings) ; enable move text with default bindings, M-up M-down moves lines
-
+;; M-S-arrows move lines and words, it is set before loading drug-stuff
 ;; enable switching windows with M-arrows
 (windmove-default-keybindings 'meta)
-
 ;;____________________________________________________________
-;; F key mappings
-(global-set-key [f1] help-map) ; help prefix
-(global-set-key [f7] 'desktop+-load) ; load saved desktop
-(global-set-key [f8] 'neotree-toggle) ; show and hide neotree
-(define-key global-map [f11] 'switch-fullscreen)
-(global-set-key [f12] 'dired-omit-mode) ; show and hide hidden files in dired
-
-;; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
-(global-set-key [M-insert] '(lambda() (interactive) (load-file "~/.emacs.d/init.el")))
-;; TODO: save init.el automatically before reloading
 
 ;; Ideas for future mappings:
-;; C-y -- remove line and place it to the buffer (similar to idea), must have
-;; C-I/K -- moving lines/regions, must have
 ;; C-S-Z -- redo, tree plugin needed. Should have another shortcut for the console...
 
 ;; very future mappings:
