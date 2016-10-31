@@ -80,66 +80,10 @@
 (setq next-line-add-newlines t)
 ;; CUA things
 (cua-mode t) ; It will make usual C-c C-v copypasting work, but I will try to avoid them for now.
-(setq cua-keep-region-after-copy t)
+(setq cua-keep-region-after-copy t) ; well, keep region after copy
 
-;; duplicate line by C-c C-d, see
-;; http://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs
-(defun duplicate-line()
-  (interactive)
-  (move-beginning-of-line 1)
-  (kill-line)
-  (yank)
-  (open-line 1)
-  (next-line 1)
-  (yank)
-)
-
-;; TODO: call to mind why I wasn't satisfied with out-of-the-box move-text package and decided to rewrite
-;; these functions manually. Probably because of regions? 
-;; move text arg lines down (or |arg| lines up, if arg < 0)
-;; TODO: rewrite marked mode and handle start of buffer case
-;;(defun move-text-internal (arg)
-;;  (message "arg is %d" arg)
-;;  (cond
-;;    ((and mark-active transient-mark-mode)
-;;     (if (> (point) (mark))
-;;            (exchange-point-and-mark))
-;;     (let ((column (current-column))
-;;              (text (delete-and-extract-region (point) (mark))))
-;;       (forward-line arg)
-;;       (move-to-column column t)
-;;       (set-mark (point))
-;;       (insert text)
-;;       (exchange-point-and-mark)
-;;       (setq deactivate-mark nil)))
-;;    (t
-;;     ; TODO: save cursor
-;;     (beginning-of-line)
-;;     (forward-line)
-;;     (transpose-lines arg)
-;;     (forward-line -1)
-;;     (when (< arg 0)
-;;       (forward-line arg)
-;;     )
-;;    )
-;;  )
-;;)
-;;(defun move-text-down (arg)
-;;  "Move region (transient-mark-mode active) or current line
-;;  arg lines down."
-;;   ; 'interactive makes function a command;
-;;   ; p converts argument to number, * ensures that buffer is writable (signals, if it is read-only)
-;;  (interactive "*p")
-;;  (move-text-internal arg))
-;; 
-;;(defun move-text-up (arg)
-;;   "Move region (transient-mark-mode active) or current line arg lines up."
-;;   (interactive "*p")
-;;   (move-text-internal (- arg)))
-
-;; enable comments like in idea
-(require 'comment-idea)
-;; (load "comment-idea.el") ;; for debugging
+(require 'my-text-processing)
+;; (load "my-text-processing.el") ;; for debugging
 
 ;;______________________________________________________________
 ;; Windows and frames
@@ -274,8 +218,11 @@
 (global-set-key (kbd "M-d") 'backward-delete-char) ; ergo
 (global-set-key (kbd "C-d") 'duplicate-line)
 (global-set-key (kbd "M-f") 'delete-forward-char) ; ergo
-(global-set-key (kbd "C-f") 'isearch-repeat-forward) ; ergo
-(global-set-key (kbd "C-M-f") 'isearch-repeat-backward)
+;; http://stackoverflow.com/questions/7411920/how-to-bind-search-and-search-repeat-to-c-f-in-emacs
+(global-set-key (kbd "C-f") 'isearch-forward)
+(define-key isearch-mode-map (kbd "C-f") 'isearch-repeat-forward)
+(global-set-key (kbd "C-M-f") 'isearch-backward)
+(define-key isearch-mode-map (kbd "C-M-f") 'isearch-repeat-backward)
 (global-set-key (kbd "M-F") 'occur) ; like grep
 (global-set-key (kbd "M-g") 'kill-line) ; kill the rest of the line; ergo
 (global-set-key (kbd "M-G") '(lambda () (interactive) (kill-line 0))) ; kill the line up to the cursor, ergo
@@ -286,6 +233,8 @@
 (global-set-key (kbd "M-l") 'forward-char) ; ergo
 (global-set-key (kbd "C-l") 'goto-line) ; ergo
 (global-set-key (kbd "C-;") 'comment-idea)
+;; idea's shift-enter, defined in my-text-processing.el
+(global-set-key (kbd "<S-return>") 'end-of-line-and-indented-new-line)
 
 ;; The qwerty row:
 (global-set-key (kbd "M-w") 'just-one-space) ; ergo
@@ -336,9 +285,7 @@
 
 ;; Ideas for future mappings:
 ;; C-y -- remove line and place it to the buffer (similar to idea), must have
-;; C-S-i/k -- moving lines/regions, must have
-;; S-return, newline from any place, must-have
-;; 
+;; C-I/K -- moving lines/regions, must have
 ;; C-S-Z -- redo, tree plugin needed. Should have another shortcut for the console...
 
 ;; very future mappings:
