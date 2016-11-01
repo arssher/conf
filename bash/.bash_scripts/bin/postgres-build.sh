@@ -4,5 +4,5 @@ set -e
 script_dir=`dirname "$(readlink -f "$0")"`
 source "$script_dir"/postgres_common/postgres_common.sh
 
-cd $PGBDIR
+cd $PGSDIR
 make -j4
