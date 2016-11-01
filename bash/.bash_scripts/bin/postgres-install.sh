@@ -3,7 +3,7 @@
 script_dir=`dirname "$(readlink -f "$0")"`
 source "$script_dir"/postgres_common/postgres_common.sh
 
-cd $PGBDIR
+cd $PGDIR
 pkill -9 postgres
 make -j4 install
 
