@@ -23,6 +23,7 @@
     drag-stuff ; moving lines and regions
     xcscope ; frontend for cscope
     ggtags ; frontend for gnu global
+    swiper ; contains ivy, a completion frontend
     )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
@@ -124,7 +125,7 @@
 (setq neo-smart-open t)
 (setq neo-theme (if window-system 'icons 'arrow))
 ;; neo tree ignore list
-(setq neo-hidden-regexp-list '("^\\." "\\.cs\\.meta$" "\\.pyc$" "~$" "^#.*#$" "\\.elc$" "\\.o$"))
+(setq neo-hidden-regexp-list '("^\\." "\\.cs\\.meta$" "\\.pyc$" "~$" "^#.*#$" "\\.elc$" "\\.o$" "\\.so$"))
 
 ;; always tail *Messages* buffer, see
 ;; http://stackoverflow.com/questions/13316494/how-to-follow-the-end-of-messages-buffer-in-emacs
@@ -211,6 +212,7 @@
 
 ;;____________________________________________________________
 ;; Well, about going to definition, autocompletion, etc
+;;
 ;; Short review:
 ;; Etags & Ctags programs for generating tags -- definitions only.
 ;; It seems that there is buit-in support
@@ -238,6 +240,18 @@
             (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
               (ggtags-mode 1))))
 
+;;____________________________________________________________
+;; Autocompletion (non-code)
+;;
+;; Short review:
+;; Helm is a big buggy monster. ido seems to be good old stuff. ivy -- modern,
+;; small and efficient package. Let's try it.
+
+;; toggle it on and off to ivy-mode command
+(ivy-mode 1)
+;; don't know what these mean, fuck
+(setq ivy-use-virtual-buffers t)
+(setq ivy-count-format "(%d/%d) ")
 ;;____________________________________________________________
 ;; Now, the keys.
 ;; About prefixes:
@@ -289,11 +303,7 @@
 (global-set-key (kbd "M-d") 'backward-delete-char) ; ergo
 (global-set-key (kbd "C-d") 'duplicate-line)
 (global-set-key (kbd "M-f") 'delete-forward-char) ; ergo
-;; http://stackoverflow.com/questions/7411920/how-to-bind-search-and-search-repeat-to-c-f-in-emacs
-(global-set-key (kbd "C-f") 'isearch-forward)
-(define-key isearch-mode-map (kbd "C-f") 'isearch-repeat-forward)
-(global-set-key (kbd "C-M-f") 'isearch-backward)
-(define-key isearch-mode-map (kbd "C-M-f") 'isearch-repeat-backward)
+(global-set-key (kbd "C-f") 'swiper) ; ergo
 (global-set-key (kbd "M-F") 'occur) ; like grep
 (global-set-key (kbd "M-g") 'kill-line) ; kill the rest of the line; ergo
 (global-set-key (kbd "M-G") '(lambda () (interactive) (kill-line 0))) ; kill the line up to the cursor, ergo
@@ -314,13 +324,30 @@
 (define-key cua--cua-keys-keymap (kbd "M-v") 'backward-paragraph)
 (global-set-key (kbd "M-n") 'beginning-of-buffer)
 (global-set-key (kbd "M-N") 'end-of-buffer)
-(global-set-key (kbd "C-b") 'ggtags-find-tag-dwim)
 
 ;; Space row
 (global-set-key (kbd "M-<SPC>") 'cua-set-mark) ; ergo
 ;; M-S-arrows move lines and words, it is set before loading drug-stuff
 ;; enable switching windows with M-arrows
 (windmove-default-keybindings 'meta)
+
+;; Now mode-specific bindings
+;; ggtags:
+(global-set-key (kbd "C-b") 'ggtags-find-tag-dwim)
+(global-set-key (kbd "M-B") 'ggtags-prev-mark)
+(global-set-key (kbd "C-M-b") 'ggtags-next-mark)
+(require 'ggtags)
+(define-key ggtags-navigation-map (kbd "M-k") 'next-error)
+(define-key ggtags-navigation-map (kbd "M-i") 'previous-error)
+
+;; ivy:
+(require 'ivy)
+;; Since clever ivy just remaps his previous/next to global
+;; next-line/previous-line, in overall we don't have to remap it. However,
+;; concrete M-i mapping is occupied by ivy itself, to it is necessary
+(define-key ivy-minibuffer-map (kbd "M-i") 'ivy-previous-line)
+
+
 ;;____________________________________________________________
 
 ;; Ideas for future mappings:
