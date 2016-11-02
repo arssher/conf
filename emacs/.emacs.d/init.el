@@ -78,7 +78,7 @@
 ;; Text processing
 (transient-mark-mode 1) ; Highlight the region when the mark is active
 ;; (next-line) will insert a newline at the end of the buffer
-(setq next-line-add-newlines t)
+;; (setq next-line-add-newlines t)
 ;; CUA things
 (cua-mode t) ; It will make usual C-c C-v copypasting work, but I will try to avoid them for now.
 (setq cua-keep-region-after-copy t) ; well, keep region after copy
@@ -217,6 +217,7 @@
 
 ;; The F keys row
 (global-set-key [f1] help-map) ; help prefix
+(global-set-key [f6] 'desktop+-create) ; save desktop
 (global-set-key [f7] 'desktop+-load) ; load saved desktop
 (global-set-key [f8] 'neotree-toggle) ; show and hide neotree
 (define-key global-map [f11] 'switch-fullscreen)
@@ -229,6 +230,9 @@
 ;; The digits row
 (global-set-key (kbd "\C-x4") 'my-split-root-window-below)
 (global-set-key (kbd "\C-x5") 'my-split-root-window-right)
+(global-set-key (kbd "C-=") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+
 
 ;; The qwerty row:
 (global-set-key (kbd "M-w") 'just-one-space) ; ergo
@@ -295,28 +299,25 @@
 ;; C-T -- reopen last closed
 ;; fill-unfill from ergo
 
-;; cycle windows?
-;; cycle buffers?
-;; search is broken
-;; fix moving beyond the window
-
 ;; TODO list:
 ;; cheatsheet in txt
 ;; Winner mode?
 ;; icicles?
-;; TODO: check out https://github.com/jwiegley/use-package
-;; moving regions?
-;; Transient mark
-;; fix highlight matching ()n
+;; check out https://github.com/jwiegley/use-package
+;; fix highlight matching ()
 ;; save tree in desktop+?
 ;; save remote files in desktop+?
-;; autorevert remote files?n
-;; newline from middle of the string
+;; autorevert remote files?
 ;; tail messages toggle instead of enable/disable; or better disable when active,
 ;;   enable when leaving
 ;; check kbd escaping
 ;; autocomplete in code
-;; autocomplethelm/ivy
+;; autocomplete helm/ivy/ido -- ivy, to be more precise
 ;; goto definition, goto file in project, etc
 ;; go back?
+;; cycle windows?
+;; cycle buffers?
+;; fix moving beyond the window
+;; highlighting git differences like in idea
+;; tabs?
 
