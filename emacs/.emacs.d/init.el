@@ -21,6 +21,8 @@
     neotree ; project tree
     dash ; required by all-icons (used for neat icons in neotree)
     drag-stuff ; moving lines and regions
+    xcscope ; frontend for cscope
+    ggtags ; frontend for gnu global
     )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
@@ -115,12 +117,14 @@
   (interactive "P")
   (my-split-root-window size 'right))
 
-;; open project tree on f8
+;; project tree
 (require 'all-the-icons) ; load icons for 'icons regime
 ;; Every time when the neotree window is opened, let it find current file and
 ;; jump to node.
 (setq neo-smart-open t)
 (setq neo-theme (if window-system 'icons 'arrow))
+;; neo tree ignore list
+(setq neo-hidden-regexp-list '("^\\." "\\.cs\\.meta$" "\\.pyc$" "~$" "^#.*#$" "\\.elc$" "\\.o$"))
 
 ;; always tail *Messages* buffer, see
 ;; http://stackoverflow.com/questions/13316494/how-to-follow-the-end-of-messages-buffer-in-emacs
@@ -206,6 +210,35 @@
 
 
 ;;____________________________________________________________
+;; Well, about going to definition, autocompletion, etc
+;; Short review:
+;; Etags & Ctags programs for generating tags -- definitions only.
+;; It seems that there is buit-in support
+;; for etags format in emacs, ctags can also  generate these files
+;;
+;; GNU Global. Another tagger, more powerful, knows about references. Have it's
+;; own file format. There a bunch of emacs frontends, most notable are ggtags.el
+;; and helm-gtags.el. Global also provides and interface like cscope, so it
+;; can be used instead of it. I don't know cons and pros of this approach yet.
+
+;; Cscope. Another tagger, powerful beast too, knows about references.
+;; There are again a number of frontends, but the most popular seems to be
+;; xcscope.el
+
+;; CEDET, senator, and a lot of more great words: some monster which seems to
+;; be capable of anything, but it looks like no one can set it up rightly.
+
+;; Let's try Cscope with xcscope.el for now.
+(require 'xcscope)
+(cscope-setup)
+
+;; Now let's try gnu global
+(add-hook 'c-mode-common-hook
+          (lambda ()
+            (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+              (ggtags-mode 1))))
+
+;;____________________________________________________________
 ;; Now, the keys.
 ;; About prefixes:
 ;; * Alt is the best
@@ -281,6 +314,7 @@
 (define-key cua--cua-keys-keymap (kbd "M-v") 'backward-paragraph)
 (global-set-key (kbd "M-n") 'beginning-of-buffer)
 (global-set-key (kbd "M-N") 'end-of-buffer)
+(global-set-key (kbd "C-b") 'ggtags-find-tag-dwim)
 
 ;; Space row
 (global-set-key (kbd "M-<SPC>") 'cua-set-mark) ; ergo
@@ -320,4 +354,5 @@
 ;; fix moving beyond the window
 ;; highlighting git differences like in idea
 ;; tabs?
+;; undo doesn't undo if it requires movement?
 
