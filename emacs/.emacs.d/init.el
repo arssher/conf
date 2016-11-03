@@ -248,10 +248,13 @@
 ;; small and efficient package. Let's try it.
 
 ;; toggle it on and off to ivy-mode command
-(ivy-mode 1)
-;; don't know what these mean, fuck
+(ivy-mode 1) ; enable ivy completion everywhere
+;; add recent visited files (if recentf is on) and bookmarks (which bookmarks?)
+;; to list of buffers
 (setq ivy-use-virtual-buffers t)
+;; display index and total files number in the ivy buffer
 (setq ivy-count-format "(%d/%d) ")
+(setq ivy-wrap t)
 ;;____________________________________________________________
 ;; Now, the keys.
 ;; About prefixes:
@@ -336,6 +339,7 @@
 (global-set-key (kbd "C-b") 'ggtags-find-tag-dwim)
 (global-set-key (kbd "M-B") 'ggtags-prev-mark)
 (global-set-key (kbd "C-M-b") 'ggtags-next-mark)
+(global-set-key (kbd "M-<f7>") 'ggtags-find-reference)
 (require 'ggtags)
 (define-key ggtags-navigation-map (kbd "M-k") 'next-error)
 (define-key ggtags-navigation-map (kbd "M-i") 'previous-error)
