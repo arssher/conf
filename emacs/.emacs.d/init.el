@@ -23,7 +23,8 @@
     drag-stuff ; moving lines and regions
     xcscope ; frontend for cscope
     ggtags ; frontend for gnu global
-    swiper ; contains ivy, a completion frontend
+    swiper ; contains ivy, a completion frontend, and best search ever
+    projectile ; for managing projects
     )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
@@ -255,6 +256,17 @@
 ;; display index and total files number in the ivy buffer
 (setq ivy-count-format "(%d/%d) ")
 (setq ivy-wrap t)
+
+
+;;____________________________________________________________
+;; Project management
+
+;; turn on projectile
+;; Right now I plan to use it only for two things: switching between header and
+;; src, and, perhaps, quick project switching (basically, it just lets me avoid
+;; typing full path to the project)
+(projectile-mode)
+
 ;;____________________________________________________________
 ;; Now, the keys.
 ;; About prefixes:
@@ -307,7 +319,6 @@
 (global-set-key (kbd "C-d") 'duplicate-line)
 (global-set-key (kbd "M-f") 'delete-forward-char) ; ergo
 (global-set-key (kbd "C-f") 'swiper) ; ergo
-(global-set-key (kbd "M-F") 'occur) ; like grep
 (global-set-key (kbd "M-g") 'kill-line) ; kill the rest of the line; ergo
 (global-set-key (kbd "M-G") '(lambda () (interactive) (kill-line 0))) ; kill the line up to the cursor, ergo
 (global-set-key (kbd "M-h") 'move-beginning-of-line) ; ergo
@@ -340,6 +351,9 @@
 (global-set-key (kbd "M-B") 'ggtags-prev-mark)
 (global-set-key (kbd "C-M-b") 'ggtags-next-mark)
 (global-set-key (kbd "M-<f7>") 'ggtags-find-reference)
+(global-set-key (kbd "M-F") 'ggtags-grep) ; grepping the project
+(global-set-key (kbd "C-n") 'ggtags-find-file) ; similar to idea
+(global-set-key (kbd "M-R") 'ggtags-query-replace) ; similar to idea
 (require 'ggtags)
 (define-key ggtags-navigation-map (kbd "M-k") 'next-error)
 (define-key ggtags-navigation-map (kbd "M-i") 'previous-error)
@@ -350,6 +364,11 @@
 ;; next-line/previous-line, in overall we don't have to remap it. However,
 ;; concrete M-i mapping is occupied by ivy itself, to it is necessary
 (define-key ivy-minibuffer-map (kbd "M-i") 'ivy-previous-line)
+
+;; projectile:
+;; switching between header and .c
+(global-set-key (kbd "C-M-n") 'projectile-find-other-file)
+(global-set-key (kbd "M-O") 'projectile-switch-project)
 
 
 ;;____________________________________________________________
