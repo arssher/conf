@@ -16,7 +16,6 @@
 
 (defvar required-packages
   '(auctex
-    move-text ; to move lines and regions
     desktop+ ; to save sessionsq
     neotree ; project tree
     dash ; required by all-icons (used for neat icons in neotree)
