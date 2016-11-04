@@ -19,9 +19,16 @@ $PGIDIR/bin/initdb -D $PGIDIR/data
 #echo "fsync = off" >> $PGIDIR/data/postgresql.conf
 #echo "autovacuum = off" >> $PGIDIR/data/postgresql.conf
 
-#echo "log_min_messages = debug5" >> $PGIDIR/data/postgresql.conf
-#echo "shared_preload_libraries = '$libdir/llvm_pg'" >> $PGIDIR/data/postgresql.conf
-
+# disable parallelism
+echo "max_parallel_workers_per_gather = 0" >> $PGIDIR/data/postgresql.conf
+echo "log_min_messages = debug5" >> $PGIDIR/data/postgresql.conf
+if [ "$LLVM_EXT_INSTALL" = true ]; then
+  echo "Installing llvm extension..."
+  cd $LLVM_EXT_DIR && make -j4 BACKEND_FILE_LIMIT=15 && make install
+  echo "shared_preload_libraries = '\$libdir/llvm_pg'" >> $PGIDIR/data/postgresql.conf
+else
+  echo "LLVM extension will not be installed"  
+fi
 							      
 echo '' > $PGIDIR/data/logfile				      
 							      
@@ -32,5 +39,5 @@ echo "local replication all trust" >> $PGIDIR/data/pg_hba.conf
 #$PGIDIR/bin/pg_ctl -w -D $PGIDIR/data start
 $PGIDIR/bin/pg_ctl -w -D $PGIDIR/data -l $PGIDIR/data/logfile start
 $PGIDIR/bin/createdb `whoami`
-$PGIDIR/bin/psql -c "create table test(k int primary key, v text);"
+$PGIDIR/bin/psql < "${script_dir}/postgres_common/test_query.sql"
 
