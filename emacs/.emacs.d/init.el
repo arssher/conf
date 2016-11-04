@@ -351,7 +351,8 @@
 (global-set-key (kbd "C-M-b") 'ggtags-next-mark)
 (global-set-key (kbd "M-<f7>") 'ggtags-find-reference)
 (global-set-key (kbd "M-F") 'ggtags-grep) ; grepping the project
-(global-set-key (kbd "C-n") 'ggtags-find-file) ; similar to idea
+(global-set-key (kbd "C-S-N") 'ggtags-find-file) ; similar to idea
+(global-set-key (kbd "C-n") 'ggtags-find-reference) ; similar to idea
 (global-set-key (kbd "M-R") 'ggtags-query-replace) ; similar to idea
 (require 'ggtags)
 (define-key ggtags-navigation-map (kbd "M-k") 'next-error)
