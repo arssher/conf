@@ -23,7 +23,7 @@ fi
 
 if [ `echo "$PROCS" | wc -w` -eq 1 ]
 then
-    exec gdb $PGIDIR/bin/postgres -silent "$PROCS"
+    exec gdb -tui $PGIDIR/bin/postgres -silent "$PROCS"
 else
-    exec gdb $PGIDIR/bin/postgres -silent
+    exec gdb -tui $PGIDIR/bin/postgres -silent
 fi
