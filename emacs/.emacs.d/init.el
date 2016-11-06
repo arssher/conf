@@ -95,7 +95,7 @@
 ;;______________________________________________________________
 ;; Windows and frames
 ;; maximize frame function, see
-;; http://stackoverflow.com/questions/9248996/how-to-toggle-fullscreen-with-emacs-as-default 
+;; http://stackoverflow.com/questions/9248996/how-to-toggle-fullscreen-with-emacs-as-default
 (defun switch-fullscreen nil
   (interactive)
   (let* ((modes '(nil maximized))
@@ -266,6 +266,28 @@
 ;; typing full path to the project)
 (projectile-mode)
 
+
+;;____________________________________________________________
+;; Identation
+
+;; Load Postgre code style
+(require 'postgres-style)
+
+;; seems that this is a better way to change C settings, see
+;; http://stackoverflow.com/questions/7404547/change-emacs-c-style-not-working
+;; don't know why default-style didn't worked
+(defun my-c-mode-hook ()
+  (c-set-style "postgresql"))
+(add-hook 'c-mode-common-hook 'my-c-mode-hook)
+
+(setq c-default-style
+      '((java-mode . "java")
+        (awk-mode . "awk")
+        (other . "gnu")))
+
+;; show trailing whitespaces
+(setq show-trailing-whitespace 1)
+
 ;;____________________________________________________________
 ;; Now, the keys.
 ;; About prefixes:
@@ -276,12 +298,15 @@
 ;; * Ctrl Shift doesn't work in terminals, avoid it for important keys!
 ;; * Ctrl Alt Shift -- I reserved for system apps
 
+;; Basic, global keys
+
 ;; The F keys row
 (global-set-key [f1] help-map) ; help prefix
 (global-set-key [f6] 'desktop+-create) ; save desktop
 (global-set-key [f7] 'desktop+-load) ; load saved desktop
 (global-set-key [f8] 'neotree-toggle) ; show and hide neotree
-(define-key global-map [f11] 'switch-fullscreen)
+(global-set-key [f9] 'whitespace-mode) ; toggle show whitespace
+(global-set-key [f11] 'switch-fullscreen)
 (global-set-key [f12] 'dired-omit-mode) ; show and hide hidden files in dired
 ;; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
 (global-set-key [M-insert] '(lambda() (interactive) (load-file "~/.emacs.d/init.el")))
@@ -345,7 +370,7 @@
 (windmove-default-keybindings 'meta)
 
 ;; Now mode-specific bindings
-;; ggtags:
+;; ggtags: TODO enable them only in C mode
 (global-set-key (kbd "C-b") 'ggtags-find-tag-dwim)
 (global-set-key (kbd "M-B") 'ggtags-prev-mark)
 (global-set-key (kbd "C-M-b") 'ggtags-next-mark)
@@ -405,4 +430,3 @@
 ;; highlighting git differences like in idea
 ;; tabs?
 ;; undo doesn't undo if it requires movement?
-
