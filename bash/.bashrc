@@ -18,7 +18,12 @@ source ~/.bash_scripts/aliases.sh
 # Sets the size to "unlimited".
 # http://stackoverflow.com/questions/9457233/unlimited-bash-history
 export HISTFILESIZE=
-export HISTSIZE=
+# I would unset it, meaning 'eternal', but then gdb will not write history at
+# all, see
+# http://unix.stackexchange.com/questions/162820/gdb-up-arrow-doesnt-work
+# so just setting it to a big value
+# (and this is true even though I have set history size -1 in ~/.gdbinit)
+export HISTSIZE=10000000
 export HISTTIMEFORMAT="[%F %T] "
 # erase duplicates
 export HISTCONTROL=ignoreboth:erasedups
