@@ -10,11 +10,19 @@ set trace-commands on
 set logging file /home/ars/.gdb_log
 set logging on
 
-# save history of unlimited size, always remove duplicates, write always to
-# ~/.gdb_history
+# save history of unlimited size, write always to ~/.gdb_history
 set history save on
-set history size -1
+set history size unlimited
 set history filename ~/.gdb_history
 
 # script for postgres internals pretty-printing
 source ~/.gdb/gdbpg.py
+
+# aliases
+define fc
+  focus next
+end
+document fc
+Focus next
+end
+
