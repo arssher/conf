@@ -22,7 +22,7 @@ export HISTFILESIZE=
 # all, see
 # http://unix.stackexchange.com/questions/162820/gdb-up-arrow-doesnt-work
 # so just setting it to a big value
-# (and this is true even though I have set history size -1 in ~/.gdbinit)
+# (and this is true even though I have set history size unlimited in ~/.gdbinit)
 export HISTSIZE=10000000
 export HISTTIMEFORMAT="[%F %T] "
 # erase duplicates
@@ -51,3 +51,8 @@ log_bash_persistent_history()
 }
 PROMPT_COMMAND="log_bash_persistent_history; $PROMT_COMMAND"
 
+# Map right alt to behave as ctrl. Seems to be working.
+setxkbmap -option ctrl:ralt_rctrl
+# TODO: check the following:
+# logger "setting altgr -> ctrl"
+# DISPLAY=:0 XDG_RUNTIME_DIR=/run/user/$(id -u) setxkbmap -option ctrl:ralt_rctrl
