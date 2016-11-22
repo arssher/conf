@@ -1,0 +1,25 @@
+# This file controls the behaviour of line input editing for
+# programs that use the GNU Readline library.  Existing
+# programs include FTP, Bash, and GDB.
+#
+# You can re-read the inputrc file with C-x C-r.
+# Lines beginning with '#' are comments.
+
+set editing-mode emacs
+
+# qwerty row
+"\eu": backward-word
+"\ei": previous-history
+"\eo": forward-word
+
+# the home row
+"\ed": backward-delete-char
+"\ef": delete-char
+"\eg": kill-line
+"\eG": backward-kill-line
+"\eh": beginning-of-line
+"\eH": end-of-line
+"\ej": backward-char
+"\ek": next-history
+"\el": forward-char
+
