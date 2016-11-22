@@ -374,10 +374,10 @@
 (global-set-key (kbd "C-b") 'ggtags-find-tag-dwim)
 (global-set-key (kbd "M-B") 'ggtags-prev-mark)
 (global-set-key (kbd "C-M-b") 'ggtags-next-mark)
-(global-set-key (kbd "M-<f7>") 'ggtags-find-reference)
+(global-set-key (kbd "M-<f7>") 'ggtags-find-reference) ; idea
 (global-set-key (kbd "M-F") 'ggtags-grep) ; grepping the project
 (global-set-key (kbd "C-S-N") 'ggtags-find-file) ; similar to idea
-(global-set-key (kbd "C-n") 'ggtags-find-reference) ; similar to idea
+(global-set-key (kbd "C-n") 'ggtags-find-definition) ; similar to idea
 (global-set-key (kbd "M-R") 'ggtags-query-replace) ; similar to idea
 (require 'ggtags)
 (define-key ggtags-navigation-map (kbd "M-k") 'next-error)
@@ -394,6 +394,14 @@
 ;; switching between header and .c
 (global-set-key (kbd "C-M-n") 'projectile-find-other-file)
 (global-set-key (kbd "M-O") 'projectile-switch-project)
+
+;; shell-like modes:
+;; we don't need moving up and down in the shells, let them scroll history
+;; commands instead:
+(define-key comint-mode-map (kbd "M-i") 'comint-previous-input)
+(define-key comint-mode-map (kbd "M-k") 'comint-next-input)
+;; we don't need replace either, let it do command search as always:
+(define-key comint-mode-map (kbd "C-r") 'comint-history-isearch-backward-regexp)
 
 
 ;;____________________________________________________________
@@ -428,5 +436,6 @@
 ;; cycle buffers?
 ;; fix moving beyond the window
 ;; highlighting git differences like in idea
-;; tabs?
 ;; undo doesn't undo if it requires movement?
+;; spelling correction
+;; ivy can't open file with name being a substing of the existing
