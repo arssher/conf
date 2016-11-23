@@ -8,6 +8,8 @@
 set editing-mode emacs
 
 # qwerty row
+"\ee": backward-kill-word
+"\er": kill-word
 "\eu": backward-word
 "\ei": previous-history
 "\eo": forward-word
