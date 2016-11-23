@@ -1,7 +1,6 @@
-;; provides a comment command like jetbrains idea's
-;; WARN: Currently it works only when transient-mark-mode is on
-
 (defun comment-idea ()
+"Provides a comment command like jetbrains idea's.
+WARN: Currently it works only when transient-mark-mode is on."
   (interactive)
   (if (not transient-mark-mode)
     (message "Error: comment-idea is not supported with transient-mark mode off")
@@ -30,9 +29,9 @@
   )
 )
 
-;; duplicate line, see
-;; http://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs
 (defun duplicate-line()
+"Duplicate line, see
+http://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs"
   (interactive)
   (move-beginning-of-line 1)
   (kill-line)

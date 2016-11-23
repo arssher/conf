@@ -42,10 +42,12 @@
       (package-install p))))
 
 ;; add to load path all packages under static_packages.
-;; TODO: subdirs will not be added! deal with it.
+;; NOTE: subdirs will not be added!
 ;; for now I will include every multifile package manually
 ;; We will put packages not found in repos here.
 (add-to-list 'load-path "~/.emacs.d/static_packages/")
+;; Yes, this is an example of multifile package, so we are forced
+;; to add it manually
 (add-to-list 'load-path "~/.emacs.d/static_packages/all-the-icons.el")
 
 ;;____________________________________________________________
@@ -83,7 +85,7 @@
 ;; (next-line) will insert a newline at the end of the buffer
 ;; (setq next-line-add-newlines t)
 ;; CUA things
-(cua-mode t) ; It will make usual C-c C-v copypasting work, but I will try to avoid them for now.
+(cua-mode t) ; It will make usual C-c C-v copypasting work.
 (setq cua-keep-region-after-copy t) ; well, keep region after copy
 
 (setq drag-stuff-modifier '(meta shift))
@@ -287,6 +289,13 @@
 
 ;; show trailing whitespaces
 (setq show-trailing-whitespace 1)
+
+
+;;____________________________________________________________
+;; GDB stuff
+(require 'my-gdb-stuff)
+;; (load "my-gdb-stuff.el") ;; for debugging, no pun intended
+
 
 ;;____________________________________________________________
 ;; Now, the keys.
