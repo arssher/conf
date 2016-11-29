@@ -87,6 +87,11 @@
 (savehist-mode 1)
 (setq savehist-file "~/.emacs_history")
 
+;; show in C-x b recently opened files
+(require 'recentf)
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
+
 ;;_________________________________________________
 ;; Text processing
 (transient-mark-mode 1) ; Highlight the region when the mark is active
@@ -306,6 +311,11 @@
 
 ;; enable flychecker TODO
 ;; (add-hook 'after-init-hook #'global-flycheck-mode)
+
+;; highlight changed lines
+(require 'diff-hl-flydiff)
+(global-diff-hl-mode t)
+(diff-hl-flydiff-mode t) ; even when they are not saved yet
 
 
 ;;____________________________________________________________
