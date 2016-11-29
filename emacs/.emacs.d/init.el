@@ -24,7 +24,8 @@
     ggtags ; frontend for gnu global
     swiper ; contains ivy, a completion frontend, and best search ever
     projectile ; for managing projects
-    )
+    flycheck ; live syntax checking
+   )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
 
@@ -76,8 +77,15 @@
 (setq desktop-load-locked-desktop "ask"
       desktop-restore-frames      t) ; save windows layout; works only since 24.4
 
-;; autoreload all files from disk
+;; autoreload all files from disk, by default every 5 seconds
 (global-auto-revert-mode 1)
+;; and remote files too
+(setq auto-revert-remote-files t)
+
+;; save command history
+;; TODO: does it work with all needed commands?
+(savehist-mode 1)
+(setq savehist-file "~/.emacs_history")
 
 ;;_________________________________________________
 ;; Text processing
@@ -266,6 +274,8 @@
 ;; Right now I plan to use it only for two things: switching between header and
 ;; src, and, perhaps, quick project switching (basically, it just lets me avoid
 ;; typing full path to the project)
+;; Now there is another feature which I use: regexp replacing in the project,
+;; I couldn't get it to work in ggtags.
 (projectile-mode)
 
 
@@ -292,9 +302,19 @@
 
 
 ;;____________________________________________________________
+;; Syntax checking and other checks on the fly
+
+;; enable flychecker TODO
+;; (add-hook 'after-init-hook #'global-flycheck-mode)
+
+
+;;____________________________________________________________
 ;; GDB stuff
 (require 'my-gdb-stuff)
 ;; (load "my-gdb-stuff.el") ;; for debugging, no pun intended
+
+;; enable showing variable value on mouseover
+(gud-tooltip-mode t)
 
 
 ;;____________________________________________________________
@@ -377,6 +397,12 @@
 ;; M-S-arrows move lines and words, it is set before loading drug-stuff
 ;; enable switching windows with M-arrows
 (windmove-default-keybindings 'meta)
+;; enlarge and shring active window with C-arrows
+(global-set-key (kbd "<C-up>") 'shrink-window)
+(global-set-key (kbd "<C-down>") 'enlarge-window)
+(global-set-key (kbd "<C-left>") 'shrink-window-horizontally)
+(global-set-key (kbd "<C-right>") 'enlarge-window-horizontally)
+
 
 ;; Now mode-specific bindings
 ;; ggtags: TODO enable them only in C mode
@@ -387,7 +413,6 @@
 (global-set-key (kbd "M-F") 'ggtags-grep) ; grepping the project
 (global-set-key (kbd "C-S-N") 'ggtags-find-file) ; similar to idea
 (global-set-key (kbd "C-n") 'ggtags-find-definition) ; similar to idea
-(global-set-key (kbd "M-R") 'ggtags-query-replace) ; similar to idea
 (require 'ggtags)
 (define-key ggtags-navigation-map (kbd "M-k") 'next-error)
 (define-key ggtags-navigation-map (kbd "M-i") 'previous-error)
@@ -403,6 +428,7 @@
 ;; switching between header and .c
 (global-set-key (kbd "C-M-n") 'projectile-find-other-file)
 (global-set-key (kbd "M-O") 'projectile-switch-project)
+(global-set-key (kbd "M-R") 'projectile-replace-regexp)
 
 ;; shell-like modes:
 ;; we don't need moving up and down in the shells, let them scroll history
@@ -433,7 +459,6 @@
 ;; fix highlight matching ()
 ;; save tree in desktop+?
 ;; save remote files in desktop+?
-;; autorevert remote files?
 ;; tail messages toggle instead of enable/disable; or better disable when active,
 ;;   enable when leaving
 ;; check kbd escaping
@@ -448,3 +473,4 @@
 ;; undo doesn't undo if it requires movement?
 ;; spelling correction
 ;; ivy can't open file with name being a substing of the existing
+;; smartparens
