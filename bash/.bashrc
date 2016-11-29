@@ -12,9 +12,9 @@ fi
 
 source ~/.bash_scripts/aliases.sh
 
-# Eternal bash history. It is not reread after every command, so every terminal have it's own history.
-# To search all commands, including typed in other terminals, see Bendersky's addition below.
-# ---------------------
+# Eternal bash history. It is not reread after every command, so every terminal
+# have it's own history.  To search all commands, including typed in other
+# terminals, see Bendersky's addition below.
 # Sets the size to "unlimited".
 # http://stackoverflow.com/questions/9457233/unlimited-bash-history
 export HISTFILESIZE=
@@ -27,7 +27,8 @@ export HISTSIZE=10000000
 export HISTTIMEFORMAT="[%F %T] "
 # erase duplicates
 export HISTCONTROL=ignoreboth:erasedups
-# Change the file location because certain bash sessions truncate .bash_history file upon close.
+# Change the file location because certain bash sessions truncate .bash_history
+# file upon close.
 # http://superuser.com/questions/575479/bash-history-truncated-to-500-lines-on-each-login
 export HISTFILE=~/.bash_eternal_history
 # Force prompt to write history after every command.
