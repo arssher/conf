@@ -44,6 +44,9 @@ done
 #     rm -rf $PGDIR
 # fi
 
+# clean old installation, without that build might fail
+cp $PGSDIR && make clean
+
 mkdir -p $PGDIR
 cd $PGDIR
 
