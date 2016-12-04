@@ -4,9 +4,10 @@ set -e
 show_help() {
     cat <<EOF
     Usage: bash ${0##*/} [-l | -r]
+
     Install Postgres built in \$PGDIR. Then create a cluster in 'data' folder
-    inside \$PGIDIR, i.e. installation directory, apply some configs,
-    possibly install extensions and create some test data.
+    inside \$PGIDIR, i.e. installation directory, create table `whoami`, apply
+    some configs, possibly install extensions and create some test data.
 
     -h display this help and exit
     -l build and install llvm extension. \$LLVM_EXT_DIR must point to
@@ -48,7 +49,7 @@ while getopts "lrh" opt; do # the result will be stored in $opt
 done
 
 cd $PGDIR
-pkill -9 postgres
+pkill -9 postgres || true
 make -j4 install
 
 rm -rf $PGIDIR/data
