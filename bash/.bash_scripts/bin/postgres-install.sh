@@ -69,7 +69,7 @@ echo "max_parallel_workers_per_gather = 0" >> $PGIDIR/data/postgresql.conf
 echo "log_min_messages = debug5" >> $PGIDIR/data/postgresql.conf
 
 # install LLVM extension, if needed.
-if [ "install_llvm_extension" = true ]; then
+if [ "$install_llvm_extension" = true ]; then
   echo "Installing llvm extension..."
   cd $LLVM_EXT_DIR && make -j4 BACKEND_FILE_LIMIT=15 && make install
   echo "shared_preload_libraries = '\$libdir/llvm_pg'" >> $PGIDIR/data/postgresql.conf
