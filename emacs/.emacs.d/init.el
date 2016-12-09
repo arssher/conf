@@ -378,8 +378,11 @@
 (global-set-key (kbd "M-c") 'forward-paragraph)
 ;; cua is shadowing keys, http://stackoverflow.com/questions/34057023/how-do-you-rebind-a-key-set-by-cua-mode-in-emacs
 (define-key cua--cua-keys-keymap (kbd "M-v") 'backward-paragraph)
+(global-set-key (kbd "M-b") 'ivy-switch-buffer)
 (global-set-key (kbd "M-n") 'beginning-of-buffer)
 (global-set-key (kbd "M-N") 'end-of-buffer)
+(global-set-key (kbd "C-,") 'previous-buffer)
+(global-set-key (kbd "C-.") 'next-buffer)
 
 ;; Space row
 (global-set-key (kbd "M-<SPC>") 'cua-set-mark) ; ergo
@@ -459,10 +462,8 @@
 ;; goto definition, goto file in project, etc
 ;; go back?
 ;; cycle windows?
-;; cycle buffers?
 ;; wrap long lines without touching the file
 ;; undo doesn't undo if it requires movement (like in idea)?
 ;; spelling correction
 ;; ivy can't open file with name being a substing of the existing
 ;; smartparens
-;; back to normal font
