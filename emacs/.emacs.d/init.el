@@ -26,6 +26,7 @@
     projectile ; for managing projects
     flycheck ; live syntax checking
     ace-window ; quick window switching from abo-abo
+    undo-tree ; replace default undo/redo system
    )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
@@ -83,6 +84,10 @@
 ;; and remote files too
 (setq auto-revert-remote-files t)
 
+;; replace standard undo/redo system with undo-tree package
+(require 'undo-tree)
+(global-undo-tree-mode)
+
 ;; save command history
 ;; TODO: does it work with all needed commands?
 (savehist-mode 1)
@@ -125,6 +130,10 @@
 (setq neo-theme (if window-system 'icons 'arrow))
 ;; neo tree ignore list
 (setq neo-hidden-regexp-list '("^\\." "\\.cs\\.meta$" "\\.pyc$" "~$" "^#.*#$" "\\.elc$" "\\.o$" "\\.so$"))
+
+;; scroll 1 line while moving off the visible region
+(setq scroll-step            1
+      scroll-conservatively  10000)
 
 (require 'my-windows-frames-funcs)
 ;; (load "my-windows-frames-funcs.el") ;; for debugging
@@ -347,7 +356,7 @@
 (global-set-key (kbd "H-i") 'my-scroll-down-one)
 (global-set-key (kbd "M-i") 'previous-line) ; ergo
 (global-set-key (kbd "M-I") 'drag-stuff-up)
-(global-set-key (kbd "M-o") 'forward-word) ; ergo
+(global-set-key (kbd "M-o") 'forward-word) ; ergoq
 (global-set-key (kbd "C-o") 'find-file) ; ergo
 (global-set-key (kbd "M-p") 'recenter-top-bottom) ; ergo
 
@@ -375,6 +384,8 @@
 (global-set-key (kbd "<S-return>") 'end-of-line-and-indented-new-line)
 
 ;; The zxcv row:
+(global-set-key (kbd "C-z") 'undo-tree-undo)
+(global-set-key (kbd "C-S-z") 'undo-tree-redo)
 (global-set-key (kbd "M-c") 'forward-paragraph)
 ;; cua is shadowing keys, http://stackoverflow.com/questions/34057023/how-do-you-rebind-a-key-set-by-cua-mode-in-emacs
 (define-key cua--cua-keys-keymap (kbd "M-v") 'backward-paragraph)
