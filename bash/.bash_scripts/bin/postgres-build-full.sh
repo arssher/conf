@@ -19,6 +19,7 @@ EOF
     exit 0
 }
 
+
 script_dir=`dirname "$(readlink -f "$0")"`
 source "$script_dir"/postgres_common/postgres_common.sh
 
@@ -53,7 +54,9 @@ done
 # Clean old installation, if it exists
 # Without that, build might fail or old setting might slip through
 if [ -d "$PGDIR" ]; then
-    cd $PGDIR && make distclean
+    # || true because it will fail if it is a clean postgres (configure was never
+    # run)
+    cd $PGDIR && make distclean || true
 fi
 
 mkdir -p $PGDIR
@@ -61,9 +64,9 @@ cd $PGDIR
 
 # run configure
 if [ "$fullspeed" = true ]; then
-    CFLAGS="-O2" $PGSDIR/configure --prefix=$PGIDIR
+    CFLAGS="-O2" "$PGSDIR/configure" --prefix="$PGIDIR"
 else
-    CFLAGS="-O0" $PGSDIR/configure --prefix=$PGIDIR --enable-tap-tests --enable-cassert --enable-debug
+    CFLAGS="-O1" "$PGSDIR/configure" --prefix="$PGIDIR" --enable-tap-tests --enable-cassert --enable-debug
 fi
 
 # run make
@@ -73,6 +76,7 @@ if [ -z "$target" ]; then
 else
     make -j4 "$target"
 fi
+echo "Postgres at $PGSDIR successfully built"
 
 # run tests, if needed
 if [ "$run_tests" = true ]; then
