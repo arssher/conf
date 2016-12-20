@@ -36,7 +36,7 @@ export HISTFILE=~/.bash_eternal_history
 PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 
 
-# Log all commands to ~/.persistent_history and search it with phgrep. 
+# Log all commands to ~/.persistent_history and search it with phgrep.
 log_bash_persistent_history()
 {
   [[
@@ -51,6 +51,10 @@ log_bash_persistent_history()
   fi
 }
 PROMPT_COMMAND="log_bash_persistent_history; $PROMT_COMMAND"
+
+# use emacs as an editor everywhere
+export VISUAL=emacs
+export EDITOR="$VISUAL"
 
 # Map right alt to behave as ctrl. Seems to be working.
 setxkbmap -option ctrl:ralt_rctrl
