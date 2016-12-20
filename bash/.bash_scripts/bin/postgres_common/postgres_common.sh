@@ -10,9 +10,11 @@ if [ -z "${PGIDIR+set}" ]; then
     exit 1
 fi
 
-PGSMakefile=`readlink -f $PGDIR/Makefile` || true
-if [ -n "${PGSMakefile}" ]; then
-    export PGSDIR=$(dirname $PGSMakefile)
+if [ -z "${PGSDIR}" ]; then
+    PGSMakefile=`readlink -f $PGDIR/Makefile` || true
+    if [ -n "${PGSMakefile}" ]; then
+	export PGSDIR=$(dirname $PGSMakefile)
+    fi
 fi
 
 if [ -z "${PGSDIR}" ]; then
