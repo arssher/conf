@@ -61,8 +61,7 @@ make -j4 install
 # install LLVM extension, if needed.
 if [ "$install_llvm_extension" = true ]; then
   echo "Installing llvm extension..."
-  cd $LLVM_EXT_DIR && make -j4 BACKEND_FILE_LIMIT=15 && make install
-  echo "shared_preload_libraries = '\$libdir/llvm_pg'" >> "$PGDTADIR"/postgresql.conf
+  cd $LLVM_EXT_DIR && make mostlyclean && make -j4 BACKEND_FILE_LIMIT=15 && make install
 else
   echo "LLVM extension will not be installed"
 fi
@@ -70,8 +69,7 @@ fi
 # install reverse_executor extension, if needed.
 if [ "$install_re_extension" = true ]; then
   echo "Installing reversed executor extension..."
-  cd $RE_EXT_DIR && make -j4 && make install
-  echo "shared_preload_libraries = '\$libdir/reverse_executor_test'" >> "$PGDTADIR"/postgresql.conf
+  cd $RE_EXT_DIR && make clean && make -j4 && make install
 else
   echo "Reversed executor extension will not be installed"
 fi
@@ -107,6 +105,16 @@ echo '' > "$PGDTADIR"/logfile
 echo "host all all 0.0.0.0/0 trust" >> "$PGDTADIR"/pg_hba.conf
 echo "host replication all 0.0.0.0/0 trust" >> "$PGDTADIR"/pg_hba.conf
 echo "local replication all trust" >> "$PGDTADIR"/pg_hba.conf
+
+# add LLVM ext to config, if needed.
+if [ "$install_llvm_extension" = true ]; then
+  echo "shared_preload_libraries = '\$libdir/llvm_pg'" >> "$PGDTADIR"/postgresql.conf
+fi
+
+# add reverse ext to config, if needed.
+if [ "$install_re_extension" = true ]; then
+  echo "shared_preload_libraries = '\$libdir/reverse_executor_test'" >> "$PGDATADIR"/postgresql.conf
+fi
 
 #$PGIDIR/bin/pg_ctl -w -D "$PGDTADIR" start
 $PGIDIR/bin/pg_ctl -w -D "$PGDTADIR" -l "$PGDTADIR"/logfile start
