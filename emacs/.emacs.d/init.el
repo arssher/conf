@@ -53,6 +53,9 @@
 ;; to add it manually
 (add-to-list 'load-path "~/.emacs.d/static_packages/all-the-icons.el")
 
+;; Load custom functions for which I have not found their own file yet
+(require 'my-misc)
+
 ;;____________________________________________________________
 ;; Visual things, colours, fonts, etc
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
@@ -60,6 +63,7 @@
 ;; font size, in px*10
 (set-face-attribute 'default nil :height 140)
 (set-face-attribute 'default t :font "Ubuntu Mono")
+(toggle-scroll-bar -1)
 
 ;;____________________________________________________________
 ;; Backup things
@@ -113,7 +117,7 @@
 (cua-mode t) ; It will make usual C-c C-v copypasting work.
 (setq cua-keep-region-after-copy t) ; well, keep region after copy
 
-(setq drag-stuff-modifier '(meta shift))
+;; (setq drag-stuff-modifier '(meta shift))
 (drag-stuff-mode t) ; move lines and regions
 
 (require 'my-text-processing)
@@ -132,8 +136,10 @@
 (setq neo-hidden-regexp-list '("^\\." "\\.cs\\.meta$" "\\.pyc$" "~$" "^#.*#$" "\\.elc$" "\\.o$" "\\.so$"))
 
 ;; scroll 1 line while moving off the visible region
-(setq scroll-step            1
-      scroll-conservatively  10000)
+;; with it, all jumps end up at the last line of file, very inconvenient,
+;; so I disable it until I deal with it.
+;; (setq scroll-step            1
+      ;; scroll-conservatively  10000)
 
 (require 'my-windows-frames-funcs)
 ;; (load "my-windows-frames-funcs.el") ;; for debugging
@@ -195,7 +201,7 @@
 ;; ???
 (setq TeX-output-view-style
       (quote
-       (("^pdf$" "." "okulaar %o")
+       (("^pdf$" "." "okular %o")
         ("^html?$" "." "iceweasel %o"))))
 
 
@@ -304,6 +310,32 @@
 
 
 ;;____________________________________________________________
+;; Make the keys work with russian layout
+(defun reverse-input-method (input-method)
+  "Build the reverse mapping of single letters from INPUT-METHOD."
+  (interactive
+   (list (read-input-method-name "Use input method (default current): ")))
+  (if (and input-method (symbolp input-method))
+      (setq input-method (symbol-name input-method)))
+  (let ((current current-input-method)
+        (modifiers '(nil (control) (meta) (control meta))))
+    (when input-method
+      (activate-input-method input-method))
+    (when (and current-input-method quail-keyboard-layout)
+      (dolist (map (cdr (quail-map)))
+        (let* ((to (car map))
+               (from (quail-get-translation
+                      (cadr map) (char-to-string to) 1)))
+          (when (and (characterp from) (characterp to))
+            (dolist (mod modifiers)
+              (define-key local-function-key-map
+                (vector (append mod (list from)))
+                (vector (append mod (list to)))))))))
+    (when input-method
+      (activate-input-method current))))
+(reverse-input-method "russian-computer")
+
+;;____________________________________________________________
 ;; Now, the keys.
 ;; About prefixes:
 ;; * Alt is the best
@@ -320,12 +352,14 @@
 
 ;; The F keys row
 (global-set-key [f1] help-map) ; help prefix
+(global-set-key [f2] 'dired-omit-mode) ; show and hide hidden files in dired
+(global-set-key [f5] 'revert-buffer-no-confirm)
 (global-set-key [f6] 'desktop+-create) ; save desktop
 (global-set-key [f7] 'desktop+-load) ; load saved desktop
 (global-set-key [f8] 'neotree-toggle) ; show and hide neotree
 (global-set-key [f9] 'whitespace-mode) ; toggle show whitespace
-(global-set-key [f11] 'switch-fullscreen)
-(global-set-key [f12] 'dired-omit-mode) ; show and hide hidden files in dired
+(global-set-key [f11] 'toggle-frame-fullscreen)
+(global-set-key [f12] 'toggle-frame-maximized)
 ;; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
 (global-set-key [M-insert] '(lambda() (interactive) (load-file "~/.emacs.d/init.el")))
 ;; TODO: save init.el automatically before reloading
@@ -345,7 +379,7 @@
 (global-set-key (kbd "C-w") 'kill-this-buffer) ; ergo
 (global-set-key (kbd "M-e") 'backward-kill-word) ; ergo
 (global-set-key (kbd "M-r") 'kill-word) ; ergo
-(global-set-key (kbd "C-M-r") 'revert-buffer)
+(global-set-key (kbd "C-M-r") 'revert-buffer-no-confirm)
 (global-set-key (kbd "C-r") 'query-replace)
 (global-set-key (kbd "C-y") 'smart-kill-whole-line)
 (global-set-key (kbd "M-u") 'backward-word) ; ergo
@@ -356,7 +390,7 @@
 (global-set-key (kbd "H-i") 'my-scroll-down-one)
 (global-set-key (kbd "M-i") 'previous-line) ; ergo
 (global-set-key (kbd "M-I") 'drag-stuff-up)
-(global-set-key (kbd "M-o") 'forward-word) ; ergoq
+(global-set-key (kbd "M-o") 'forward-word) ; ergo
 (global-set-key (kbd "C-o") 'find-file) ; ergo
 (global-set-key (kbd "M-p") 'recenter-top-bottom) ; ergo
 
@@ -397,7 +431,7 @@
 
 ;; Space row
 (global-set-key (kbd "M-<SPC>") 'cua-set-mark) ; ergo
-;; M-S-arrows move lines and words, it is set before loading drug-stuff
+;; M-S-arrows move lines and words, it is set before loading drag-stuff
 ;; enable switching windows with M-arrows
 (windmove-default-keybindings 'meta)
 ;; enlarge and shring active window with C-arrows
@@ -441,6 +475,9 @@
 ;; we don't need replace either, let it do command search as always:
 (define-key comint-mode-map (kbd "C-r") 'comint-history-isearch-backward-regexp)
 
+;; Disable C-d in c-mode by default, we need it for duplicating lines
+(eval-after-load "c-mode"
+  '(define-key zencoding-mode-keymap (kbd "C-d") nil))
 
 ;;____________________________________________________________
 
@@ -478,3 +515,4 @@
 ;; spelling correction
 ;; ivy can't open file with name being a substing of the existing
 ;; smartparens
+;; read http://pages.sachachua.com/.emacs.d/Sacha.html

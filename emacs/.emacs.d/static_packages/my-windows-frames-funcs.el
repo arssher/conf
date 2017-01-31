@@ -1,19 +1,3 @@
-;; maximize frame function, see
-;; http://stackoverflow.com/questions/9248996/how-to-toggle-fullscreen-with-emacs-as-default
-(defun switch-fullscreen nil
-"maximize frame function, see
-http://stackoverflow.com/questions/9248996/how-to-toggle-fullscreen-with-emacs-as-default"
-  (interactive)
-  (let* ((modes '(nil maximized))
-         (cm (cdr (assoc 'fullscreen (frame-parameters) ) ) )
-         (next (cadr (member cm modes) ) ) )
-    (modify-frame-parameters
-     (selected-frame)
-     (list (cons 'fullscreen next)))))
-
-(message "my-windows-frames-funcs loaded")
-(provide 'my-windows-frames-funcs)
-
 ;; functions for adding window on right or below
 (defun my-split-root-window (size direction)
   (split-window (frame-root-window)
@@ -54,4 +38,7 @@ http://stackoverflow.com/questions/9248996/how-to-toggle-fullscreen-with-emacs-a
   (interactive)
   (scroll-down 1)
   (move-to-window-line 0)
-)
+  )
+
+(message "my-windows-frames-funcs loaded")
+(provide 'my-windows-frames-funcs)
