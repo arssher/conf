@@ -265,14 +265,17 @@
 
 
 ;;____________________________________________________________
-;; Identation
+;; Coding styles
 
-;; Load Postgre code style
-(require 'postgres-style)
+;; Load Postgres code style
+(require 'coding-styles)
 
 ;; seems that this is a better way to change C settings, see
 ;; http://stackoverflow.com/questions/7404547/change-emacs-c-style-not-working
-;; don't know why default-style didn't worked
+;; don't know why default-style didn't worked.
+;; Aha, now I think I know why. Style modes are buffer-local, so it is better
+;; to set them when the mode is actually loaded.
+;; To temporary switch the style, run c-set-style (C-c .)
 (defun my-c-mode-hook ()
   (c-set-style "postgresql"))
 (add-hook 'c-mode-common-hook 'my-c-mode-hook)
@@ -334,28 +337,7 @@
 
 ;;____________________________________________________________
 ;; Make the keys work with russian layout
-(defun reverse-input-method (input-method)
-  "Build the reverse mapping of single letters from INPUT-METHOD."
-  (interactive
-   (list (read-input-method-name "Use input method (default current): ")))
-  (if (and input-method (symbolp input-method))
-      (setq input-method (symbol-name input-method)))
-  (let ((current current-input-method)
-        (modifiers '(nil (control) (meta) (control meta))))
-    (when input-method
-      (activate-input-method input-method))
-    (when (and current-input-method quail-keyboard-layout)
-      (dolist (map (cdr (quail-map)))
-        (let* ((to (car map))
-               (from (quail-get-translation
-                      (cadr map) (char-to-string to) 1)))
-          (when (and (characterp from) (characterp to))
-            (dolist (mod modifiers)
-              (define-key local-function-key-map
-                (vector (append mod (list from)))
-                (vector (append mod (list to)))))))))
-    (when input-method
-      (activate-input-method current))))
+(require 'my-misc) ;; 'requires' are idempotent, you know
 (reverse-input-method "russian-computer")
 
 ;;____________________________________________________________
