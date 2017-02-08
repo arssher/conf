@@ -64,7 +64,8 @@ cd $PGDIR
 
 # run configure
 if [ "$fullspeed" = true ]; then
-    CFLAGS="-O2" "$PGSDIR/configure" --prefix="$PGIDIR"
+    # since debug symbols doesn't affect perfomance, include them too
+    CFLAGS="-O2" "$PGSDIR/configure" --prefix="$PGIDIR" --enable-debug
 else
     CFLAGS="-O1" "$PGSDIR/configure" --prefix="$PGIDIR" --enable-tap-tests --enable-cassert --enable-debug
 fi
