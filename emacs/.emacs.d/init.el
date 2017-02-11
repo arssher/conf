@@ -48,6 +48,8 @@
 ;; NOTE: subdirs will not be added!
 ;; for now I will include every multifile package manually
 ;; We will put packages not found in repos here.
+;; If you want to quickly reload the library you are editing, use load-library
+;; function.
 (add-to-list 'load-path "~/.emacs.d/static_packages/")
 ;; Yes, this is an example of multifile package, so we are forced
 ;; to add it manually
@@ -319,6 +321,12 @@
 ;; 				  "/home/ars/postgres/reverse_executor_test_extension/src/include"
 ;; 				  ))
 ;; ))
+
+;; Force emacs to take local vars needed for flycheck as safe with any
+;; value; probably it is not very secure, but much more handy
+(put 'flycheck-clang-include-path 'safe-local-variable (lambda (xx) t))
+(put 'flycheck-clang-args 'safe-local-variable (lambda (xx) t))
+(put 'flycheck-gcc-include-path 'safe-local-variable (lambda (xx) t))
 
 ;; highlight changed lines
 (require 'diff-hl-flydiff)
