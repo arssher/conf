@@ -41,6 +41,12 @@ http://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emac
   (yank)
 )
 
+(defun select-line()
+  "Dummy function to copy current line into the kill ring using cua"
+  (interactive)
+  (kill-ring-save (line-beginning-position) (line-end-position))
+)
+
 (defun end-of-line-and-indented-new-line ()
   (interactive)
   (end-of-line)
