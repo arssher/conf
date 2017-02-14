@@ -320,6 +320,9 @@
 ;; 				  "/home/ars/tmp/tmp/postgresql_build/src/include"
 ;; 				  "/home/ars/postgres/reverse_executor_test_extension/src/include"
 ;; 				  ))
+;;  ;; for some reason headers don't include postgres.h which leads to a lot of
+;;  ;; errors in them
+;;  (flycheck-gcc-args . ("-include" "postgres.h"))
 ;; ))
 
 ;; Force emacs to take local vars needed for flycheck as safe with any
@@ -327,6 +330,7 @@
 (put 'flycheck-clang-include-path 'safe-local-variable (lambda (xx) t))
 (put 'flycheck-clang-args 'safe-local-variable (lambda (xx) t))
 (put 'flycheck-gcc-include-path 'safe-local-variable (lambda (xx) t))
+(put 'flycheck-gcc-args 'safe-local-variable (lambda (xx) t))
 
 ;; highlight changed lines
 (require 'diff-hl-flydiff)
@@ -365,7 +369,10 @@
 
 ;; The F keys row
 (global-set-key [f1] help-map) ; help prefix
+(global-set-key (kbd "<f1> j") 'info-apropos) ; search for string in all manuals
 (global-set-key [f2] 'dired-omit-mode) ; show and hide hidden files in dired
+;; enable/disable ivy mode until I deal with excess completing problem
+(global-set-key [f3] 'ivy-mode)
 (global-set-key [f5] 'revert-buffer-no-confirm)
 (global-set-key [f6] 'desktop+-create) ; save desktop
 (global-set-key [f7] 'desktop+-load) ; load saved desktop
@@ -529,3 +536,4 @@
 ;; ivy can't open file with name being a substing of the existing
 ;; smartparens
 ;; read http://pages.sachachua.com/.emacs.d/Sacha.html
+;; check out ivy links
