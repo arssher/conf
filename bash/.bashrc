@@ -56,6 +56,11 @@ PROMPT_COMMAND="log_bash_persistent_history; $PROMT_COMMAND"
 export VISUAL=emacs
 export EDITOR="$VISUAL"
 
+# x4: Postgres uses 4-spaces tab, set up 'less' for displaying it.
+# R option preserves ANSI color escape sequences, i.e. lets to colorize the
+# terminal.
+export LESS=-x4R
+
 # Map right alt to behave as ctrl. Seems to be working.
 setxkbmap -option ctrl:ralt_rctrl
 # TODO: check the following:
