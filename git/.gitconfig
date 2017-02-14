@@ -1,0 +1,9 @@
+[user]
+	email = sher-ars@yandex.ru
+	name = Arseny Sher
+[push]
+	default = matching
+[core]
+	excludesfile = ~/.gitignore
+[diff]
+	external = git-external-diff-postgres.sh
