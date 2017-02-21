@@ -67,7 +67,8 @@ if [ "$fullspeed" = true ]; then
     # since debug symbols doesn't affect perfomance, include them too
     CFLAGS="-O2" "$PGSDIR/configure" --prefix="$PGIDIR" --enable-debug
 else
-    CFLAGS="-O0" "$PGSDIR/configure" --prefix="$PGIDIR" --enable-tap-tests --enable-cassert --enable-debug
+    CFLAGS="-Og -ggdb -fno-omit-frame-pointer" "$PGSDIR/configure" --prefix="$PGIDIR" \
+	  --enable-tap-tests --enable-cassert --enable-debug
 fi
 
 # run make
