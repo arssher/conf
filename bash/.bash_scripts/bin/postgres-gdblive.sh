@@ -9,7 +9,7 @@ if [ $# -eq 0 ]
 then
         PROCS=`ps auxww | \
         grep postgres: | \
-        grep -v -e 'grep postgres:' -e 'postgres: stats' -e 'postgres: writer' -e 'postgres: wal writer' -e 'postgres: checkpointer' -e 'postgres: archiver' -e 'postgres: logger' -e 'postgres: autovacuum' | \
+        grep -v -e 'grep postgres:' -e 'postgres: stats' -e 'postgres: writer' -e 'postgres: wal writer' -e 'postgres: checkpointer' -e 'postgres: archiver' -e 'postgres: logger' -e 'postgres: autovacuum' -e 'grep' | \
         tee /dev/tty | \
         awk '{print $2}'`
 else
