@@ -8,4 +8,4 @@ configs_backup_path="${YANDEXDISK_DIR}/configs/emacs/.emacs.d/"
 cp  ~/.emacs.d/init.el "${configs_backup_path}"
 cp -r ~/.emacs.d/themes "${configs_backup_path}"
 cp -r ~/.emacs.d/static_packages "${configs_backup_path}"
-
+cp  ~/.gnus.el "${configs_backup_path}"
