@@ -79,34 +79,34 @@
 ;; Gnus will try to read auth info from ~/.authinfo file with lines like
 ;; machine imap.yandex.com login sher-ars@yandex.ru password <yourpassword>
 
-;; yandex imap setup
-(add-to-list 'gnus-secondary-select-methods
-	     ;; setup yandex with IMAP. Port and encryption is deduced
-	     ;; automatically
-             '(nnimap "main"
-                      (nnimap-address "imap.yandex.com")
-		      (nnimap-fetch-partial-articles t) ;; should speed up things, not sure whether actually does
-		      ;; not yet dealed with
-                      ; @see http://www.gnu.org/software/emacs/manual/html_node/gnus/Expiring-Mail.html
-                      ;; press 'E' to expire email
-                      ;; (nnmail-expiry-target "nnimap+gmail:[Gmail]/Trash")
-                      (nnmail-expiry-wait 7)
-		      ))
-;; outlook imap setup
-;; (add-to-list 'gnus-secondary-select-methods
-;; 	        '(nnimap "outlook_test"
-;;                    (nnimap-address "imap-mail.outlook.com")
-;;                    (nnimap-server-port 993)
-;;                    (nnimap-stream tls))
-;; 		)
-
-;; ispras imap setup
-(add-to-list 'gnus-secondary-select-methods
-	        '(nnimap "work"
-                   (nnimap-address "mail.ispras.ru")
-                   (nnimap-server-port 993)
-                   (nnimap-stream ssl))
+(setq gnus-secondary-select-methods
+      '(
+	;; yandex imap setup. Port and encryption is deduced
+	;; automatically
+	(nnimap "main"
+		(nnimap-address "imap.yandex.com")
+		(nnimap-fetch-partial-articles t) ;; should speed up things, not sure whether actually does
+		;; not yet dealed with
+		;; @see http://www.gnu.org/software/emacs/manual/html_node/gnus/Expiring-Mail.html
+		;; press 'E' to expire email
+		;; (nnmail-expiry-target "nnimap+gmail:[Gmail]/Trash")
+		;; (nnmail-expiry-wait 7)
+	)
+	;; outlook imap setup
+	;; (nnimap "outlook_test"
+	;; 	(nnimap-address "imap-mail.outlook.com")
+	;; 	(nnimap-server-port 993)
+	;; 	(nnimap-stream tls)
+	;; )
+        ;; ispras imap setup
+	 (nnimap "work"
+		 (nnimap-address "mail.ispras.ru")
+		 (nnimap-server-port 993)
+		 (nnimap-stream ssl)
+	 )
+       )
 )
+
 
 ;; Setup to send email through SMTP
 ;; Again, credentials are read from ~/.authinfo
@@ -144,8 +144,6 @@
 )
 ;; Use main by default
 (choose-smtp-server "main")
-
-
 
 
 ;;____________________________________________________________

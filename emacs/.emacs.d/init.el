@@ -352,6 +352,15 @@
 
 
 ;;____________________________________________________________
+;; Ediff stuff
+
+;; Keep control buffer in the same frame as diff buffers
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
+;; side-by-side representation, yes, that's what they call "horizontal split"
+(setq ediff-split-window-function 'split-window-horizontally)
+
+;;____________________________________________________________
 ;; Make the keys work with russian layout
 (require 'my-misc) ;; 'requires' are idempotent, you know
 (reverse-input-method "russian-computer")
@@ -501,9 +510,20 @@
 ;; we don't need replace either, let it do command search as always:
 (define-key comint-mode-map (kbd "C-r") 'comint-history-isearch-backward-regexp)
 
-;; Disable C-d in c-mode by default, we need it for duplicating lines
-(eval-after-load "c-mode"
-  '(define-key zencoding-mode-keymap (kbd "C-d") nil))
+;; c-mode:
+;; Disable C-d default meaning in c-mode, we need it for duplicating lines
+(defun my-c-mode-config ()
+  (local-set-key (kbd "C-d") nil) ; remove a key
+)
+(add-hook 'c-mode-hook 'my-c-mode-config)
+
+;; Ediff:
+(defun my-ediff-mode-config ()
+  (ediff-setup-keymap) ;; what it does, creates a keymap? Without it doesn't work
+  (define-key ediff-mode-map "i" 'ediff-previous-difference)
+  (define-key ediff-mode-map "k" 'ediff-next-difference)
+)
+(add-hook 'ediff-mode-hook 'my-ediff-mode-config)
 
 ;;____________________________________________________________
 
