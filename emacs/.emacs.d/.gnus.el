@@ -1,22 +1,30 @@
 ;; I will try to use
 ;; https://github.com/redguardtoo/mastering-emacs-in-one-year-guide/blob/master/gnus-guide-en.org
 ;; https://www.emacswiki.org/emacs/GnusGmail#toc2 -- good table with actions
+;; http://www.cataclysmicmutation.com/2010/11/multiple-gmail-accounts-in-gnus -- multiple accounts
 
 ;; Terminology:
 ;; Summary buffer -- buffer with list of mails
 ;; Group buffer -- buffer with list of folders, group~buffer
+;; Subscription -- when you are "subscribed", Gnus shows you unread articles in
+;;   that group. Otherwise it pretends that group doesn't exist, for most
+;;   purposes. Subscribe to groups you read often.
+;;   'U' in group line shows that you are NOT subscribed to this group
 
 ;; Usage:
-;; Group manipulation:
-;; o -- show all groups, I should do it default
-;; u -- subscribe (?) to group at cursor in group buffer
+;; Group manipulations:
+;; o -- show all subscribed groups, whether they have unread mail or not. I
+;; A A -- show ALL groups known to Gnus
+;;   I added this, but seems like A A does the same
+;; u -- subscribe to group at cursor in group buffer
 ;; U -- subscribe to group with given name
 ;; q -- exit
 ;; C-u RET -- while opening group, will load read mail too; perhaps later I will
 ;;   do it by default
 
-;; Message manipulation:
+;; Message manipulations:
 ;; ! -- mark message as important, (!) before letter means exactly that
+;;   marked mails are cached on disk and may be read offline
 ;; M-u -- mark message as unread and unimportant, wtf
 ;; B m -- move message to another folder; it is created if it doesn't exists;
 ;;   it is reported as spam/moved to trash if moved to the corresponding folder
@@ -25,9 +33,17 @@
 ;; N -- next mail
 ;; P -- previous mail
 ;; = -- close currently opened mail
-;; ^ -- load direct parent of current message
-;; A T -- load the whole thread of current message, not yet worksT
 ;; / o -- fetch more articles including unread ones
+
+;; Threads manipulations:
+;; ^ -- load direct parent of current message; use C-u to load more
+;; A R -- load all mails mentioned in the References header of current message;
+;;   if we are lucky, it will load the whole thread. Works relatively fast
+;; A T -- load the whole thread of current message, requires ALL group downloaded
+;; T o -- go to the top of the thread
+;; T h -- hide current thread
+;; T s -- expand show current thread
+;; T H, T S -- the same for all threads
 
 ;; Search:
 ;; G G -- search mails at server side, mark groups with # for it; if cursor
@@ -36,12 +52,19 @@
 ;; / a -- limit by author
 ;; / w -- cancel current limit
 
+;; Sending:
+;; m -- new mail
+
 ;; package for searching mail
 (require 'nnir)
+
+;; don't ask whether I am actually want to exit
+(setq gnus-expert-user t)
 
 ;; Personal information, not related to access
 (setq user-full-name "My Name"
       user-mail-address "username@gmail.com")
+
 
 ;;____________________________________________________________
 ;; Setup access
@@ -58,20 +81,30 @@
 (add-to-list 'gnus-secondary-select-methods
 	     ;; setup yandex with IMAP. Port and encryption is deduced
 	     ;; automatically
-             '(nnimap "yandex"
+             '(nnimap "main"
                       (nnimap-address "imap.yandex.com")
 		      (nnimap-fetch-partial-articles t) ;; should speed up things, not sure whether actually does
 		      ;; not yet dealed with
                       ; @see http://www.gnu.org/software/emacs/manual/html_node/gnus/Expiring-Mail.html
                       ;; press 'E' to expire email
                       ;; (nnmail-expiry-target "nnimap+gmail:[Gmail]/Trash")
-                      (nnmail-expiry-wait 7)))
+                      (nnmail-expiry-wait 7)
+		      ))
+(add-to-list 'gnus-secondary-select-methods
+	        '(nnimap "work"
+                   (nnimap-address "imap-mail.outlook.com")
+                   (nnimap-server-port 993)
+                   (nnimap-stream tls))
+)
 
 ;; Setup to send email through SMTP
-;; (setq message-send-mail-function 'smtpmail-send-it
-      ;; smtpmail-default-smtp-server "smtp.gmail.com"
-      ;; smtpmail-smtp-service 587
-      ;; smtpmail-local-domain "homepc")
+;; Again, credentials are read from ~/.authinfo
+(require 'smtpmail)
+(setq-default message-send-mail-function 'smtpmail-send-it
+	      smtpmail-smtp-server "smtp.yandex.com"
+	      smtpmail-stream-type  'ssl
+	      smtpmail-smtp-service 465
+	      smtpmail-local-domain "fafa")
 
 
 
@@ -89,12 +122,18 @@
 ;; see help for this variable to know what different formatters mean
 (setq gnus-summary-line-format "%U%R%z%D%I%(%[%4L: %-23,23f%]%) %s\n")
 
-;; Also, I prefer to see only the top level message.  If a message has
+;; Show only the top level message.  If a message has
 ;; several replies or is part of a thread, only show the first message.
 ;; `gnus-thread-ignore-subject' will ignore the subject and
 ;; look at 'In-Reply-To:' and 'References:' headers.
-(setq gnus-thread-hide-subtree t)
+;; (setq gnus-thread-hide-subtree t)
 (setq gnus-thread-ignore-subject t)
+
+;; sort threads, see manual
+;; number ~ time when mail arrived
+;; This will show threads with most recent messages first. But each thread
+;; is displayed linearly, so the oldest mail is showed in summary.
+(setq gnus-thread-sort-functions '(gnus-thread-sort-by-most-recent-number))
 
 ;;____________________________________________________________
 ;; What and how to fetch
@@ -102,8 +141,26 @@
 ;; If folder contains more than this-var mails, Gnus will ask how many to load
 ;; and offer this-var by default
 (setq gnus-large-newsgroup 50)
-; Docs says it will use cache, but currently I don't understand how
+
+;; enable caching, by default only ticked and dormant
+;; read related part in the manual, it is pretty clear
 (setq gnus-use-cache t)
+;; Run gnus-cache-generate-active if your change this
+(setq gnus-cache-directory "~/gnus/cache")
+;; Cache everything. Note that in my experience gnus considers caching only
+;; after you have opened a mail; it won't cache just preloaded headers, or
+;; whatever it first loads to show summary
+(setq gnus-cache-enter-articles '(ticked dormant read unread))
+;; and NEVER remove articles from the cache. This is dangerous!
+;; I should consider setting up expiring and remove too old mails from cache
+;; check out ~/gnus/cache dir size
+(setq gnus-cache-remove-articles nil)
+
+;; This should gather threads relying on References header, not on subject
+(setq gnus-summary-thread-gathering-function 'gnus-gather-threads-by-references)
+;; Try to build complete thread for all loaded mails on group entering.
+;; Not see how this works...
+(setq gnus-fetch-old-headers 'some)
 
 
 ;;____________________________________________________________
@@ -115,7 +172,6 @@
 ;; TODO most probably we can unset it only once
 (defun my-gnus-summary-mode-config ()
   "For use in `'gnus-summary-mode-hook'."
-  (message "huemoe")
   (local-set-key (kbd "M-k") nil) ; remove a key
   (local-set-key (kbd "M-i") nil) ; remove a key
   (local-set-key (kbd "M-s") nil) ; remove a key
@@ -124,7 +180,6 @@
 
 (defun my-gnus-group-mode-config ()
   "For use in `'gnus-group-mode-hook'."
-  (message "huemoe")
   (local-set-key (kbd "M-k") nil) ; remove a key
   (local-set-key (kbd "M-i") nil) ; remove a key
 )
