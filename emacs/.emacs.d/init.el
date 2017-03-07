@@ -386,6 +386,7 @@
 (global-set-key [f12] 'toggle-frame-maximized)
 ;; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
 (global-set-key [M-insert] '(lambda() (interactive) (load-file "~/.emacs.d/init.el")))
+(global-set-key (kbd "C-M-<insert>") '(lambda() (interactive) (load-file "~/.gnus.el")))
 ;; TODO: save init.el automatically before reloading
 
 
