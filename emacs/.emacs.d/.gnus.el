@@ -13,14 +13,16 @@
 
 ;; Usage:
 ;; Group manipulations:
-;; o -- show all subscribed groups, whether they have unread mail or not. I
-;; A A -- show ALL groups known to Gnus
-;;   I added this, but seems like A A does the same
+;; q -- exit
+;; M-g -- refresh group
 ;; u -- subscribe to group at cursor in group buffer
 ;; U -- subscribe to group with given name
-;; q -- exit
 ;; C-u RET -- while opening group, will load read mail too; perhaps later I will
 ;;   do it by default
+;; By default, all subscribed groups are showed, regardless have they unread mail or not.
+;; l -- show subscribed groups with unread messages (?)
+;; L --
+;; A A -- show ALL groups known to Gnus
 
 ;; Message manipulations:
 ;; ! -- mark message as important, (!) before letter means exactly that
@@ -32,7 +34,7 @@
 ;;   label, i.e. moves to INBOX, though I didn't check
 ;; N -- next mail
 ;; P -- previous mail
-;; = -- close currently opened mail
+;; =, w -- close currently opened mail
 ;; / o -- fetch more articles including unread ones
 
 ;; Threads manipulations:
@@ -62,9 +64,7 @@
 (setq gnus-expert-user t)
 
 ;; Personal information, not related to access
-(setq user-full-name "My Name"
-      user-mail-address "username@gmail.com")
-
+(setq user-full-name "Arseny Sher")
 
 ;;____________________________________________________________
 ;; Setup access
@@ -78,6 +78,8 @@
 
 ;; Gnus will try to read auth info from ~/.authinfo file with lines like
 ;; machine imap.yandex.com login sher-ars@yandex.ru password <yourpassword>
+
+;; yandex imap setup
 (add-to-list 'gnus-secondary-select-methods
 	     ;; setup yandex with IMAP. Port and encryption is deduced
 	     ;; automatically
@@ -90,43 +92,77 @@
                       ;; (nnmail-expiry-target "nnimap+gmail:[Gmail]/Trash")
                       (nnmail-expiry-wait 7)
 		      ))
+;; outlook imap setup
+;; (add-to-list 'gnus-secondary-select-methods
+;; 	        '(nnimap "outlook_test"
+;;                    (nnimap-address "imap-mail.outlook.com")
+;;                    (nnimap-server-port 993)
+;;                    (nnimap-stream tls))
+;; 		)
+
+;; ispras imap setup
 (add-to-list 'gnus-secondary-select-methods
 	        '(nnimap "work"
-                   (nnimap-address "imap-mail.outlook.com")
+                   (nnimap-address "mail.ispras.ru")
                    (nnimap-server-port 993)
-                   (nnimap-stream tls))
+                   (nnimap-stream ssl))
 )
 
 ;; Setup to send email through SMTP
 ;; Again, credentials are read from ~/.authinfo
+;; To use multiple accounts, for now I will use dirty hack with manual account
+;; switching
 (require 'smtpmail)
-(setq-default message-send-mail-function 'smtpmail-send-it
-	      smtpmail-smtp-server "smtp.yandex.com"
-	      smtpmail-stream-type  'ssl
-	      smtpmail-smtp-service 465
-	      smtpmail-local-domain "fafa")
+(setq message-send-mail-function 'smtpmail-send-it)
+(defun choose-smtp-server (choice)
+   "CHOICE is one of predefined accs to send mail from."
+  (interactive
+    (list (completing-read "Choose acc to send mail: " '("main" "ispras")))
+  )
+  (cond ((string= choice "ispras")
+	 ;; ispras smtp setup
+	 (setq smtpmail-smtp-server "mail.ispras.ru"
+	       smtpmail-stream-type  'starttls
+	       smtpmail-smtp-service 25
+	       ;; just set header, this is used for auth
+	       user-mail-address "sher-ars@ispras.ru"
+	       ;; this is needed to copy sent message to proper 'sent' folder
+	       gnus-message-archive-group "nnimap+work:Sent")
+	 )
+	((string= choice "main")
+	 ;; yandex smtp setup
+	 (setq smtpmail-smtp-server "smtp.yandex.com"
+	       smtpmail-stream-type  'ssl
+	       smtpmail-smtp-service 465
+	       ;; just set header, this is used for auth
+	       user-mail-address "sher-ars@yandex.ru"
+	       ;; this is needed to copy sent message to proper 'sent' folder
+	       gnus-message-archive-group "nnimap+main:Отправленные")
+	)
+  )
+  (message "Sending via %s acc" choice)
+)
+;; Use main by default
+(choose-smtp-server "main")
+
 
 
 
 ;;____________________________________________________________
 ;; What and how to show
 
-;; By default, gnus shows only groups (folders) with unread messages.
-;; This function forces it show everything (?)
-(defun my-gnus-group-list-subscribed-groups ()
-  "List all subscribed groups with or without un-read messages"
-  (interactive)
-  (gnus-group-list-all-groups 5))
+;; By default, gnus shows only subscribed groups (folders) with unread messages.
+;; This forces it always to show all subscribed groups
+(setq gnus-permanently-visible-groups ".*")
 
 ;; How each mail entry looks like,
 ;; see help for this variable to know what different formatters mean
 (setq gnus-summary-line-format "%U%R%z%D%I%(%[%4L: %-23,23f%]%) %s\n")
 
-;; Show only the top level message.  If a message has
-;; several replies or is part of a thread, only show the first message.
+;; Show only the top level message of the thread.
+(setq gnus-thread-hide-subtree t)
 ;; `gnus-thread-ignore-subject' will ignore the subject and
 ;; look at 'In-Reply-To:' and 'References:' headers.
-;; (setq gnus-thread-hide-subtree t)
 (setq gnus-thread-ignore-subject t)
 
 ;; sort threads, see manual
@@ -166,18 +202,7 @@
 ;;____________________________________________________________
 ;; The keys
 
-;; List all the subscribed groups even they contain zero un-read messages
-(define-key gnus-group-mode-map (kbd "o") 'my-gnus-group-list-subscribed-groups)
-
-;; TODO most probably we can unset it only once
-(defun my-gnus-summary-mode-config ()
-  "For use in `'gnus-summary-mode-hook'."
-  (local-set-key (kbd "M-k") nil) ; remove a key
-  (local-set-key (kbd "M-i") nil) ; remove a key
-  (local-set-key (kbd "M-s") nil) ; remove a key
-)
-(add-hook 'gnus-summary-mode-hook 'my-gnus-summary-mode-config)
-
+;; TODO unite common keys?
 (defun my-gnus-group-mode-config ()
   "For use in `'gnus-group-mode-hook'."
   (local-set-key (kbd "M-k") nil) ; remove a key
@@ -185,8 +210,25 @@
 )
 (add-hook 'gnus-group-mode-hook 'my-gnus-group-mode-config)
 
+(defun my-gnus-summary-mode-config ()
+  "For use in `'gnus-summary-mode-hook'."
+  (local-set-key (kbd "M-k") nil) ; remove a key
+  (local-set-key (kbd "M-i") nil) ; remove a key
+  (local-set-key (kbd "M-s") nil) ; remove a key
+  (local-set-key (kbd "w") 'gnus-summary-expand-window)
+)
+(add-hook 'gnus-summary-mode-hook 'my-gnus-summary-mode-config)
+
+(defun my-gnus-article-mode-config()
+  "For use in `'gnus-article-mode-hook'."
+  (local-set-key (kbd "w") 'gnus-summary-expand-window)
+)
+(add-hook 'gnus-article-mode-hook 'my-gnus-summary-mode-config)
+
+
 ;; TODO:
-;; smtp, sending
-;; loading threads properly
-;; multiple accounts
+;; multiple smtp
+;; loading whole thread without loading full group?
+;; restrict cache size
+;; goto bottom of the thread
 ;; IMAP speedup?
