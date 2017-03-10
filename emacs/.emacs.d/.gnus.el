@@ -57,6 +57,9 @@
 ;; Sending:
 ;; m -- new mail
 
+;; Attachments:
+;; K o -- save file. You can also TAB to it and press RET
+
 ;; package for searching mail
 (require 'nnir)
 
@@ -85,7 +88,9 @@
 	;; automatically
 	(nnimap "main"
 		(nnimap-address "imap.yandex.com")
-		(nnimap-fetch-partial-articles t) ;; should speed up things, not sure whether actually does
+		;; Don't download attachments. Run A C to get the full
+		;; message if you use this.
+		;; (nnimap-fetch-partial-articles t)
 		;; not yet dealed with
 		;; @see http://www.gnu.org/software/emacs/manual/html_node/gnus/Expiring-Mail.html
 		;; press 'E' to expire email
@@ -179,7 +184,7 @@
 ;; enable caching, by default only ticked and dormant
 ;; read related part in the manual, it is pretty clear
 (setq gnus-use-cache t)
-;; Run gnus-cache-generate-active if your change this
+;; Run gnus-cache-generate-active and if your change this
 (setq gnus-cache-directory "~/gnus/cache")
 ;; Cache everything. Note that in my experience gnus considers caching only
 ;; after you have opened a mail; it won't cache just preloaded headers, or
