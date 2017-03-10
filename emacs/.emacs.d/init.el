@@ -543,6 +543,7 @@
 ;; we don't need replace either, let it do command search as always:
 (define-key comint-mode-map (kbd "C-r") 'comint-history-isearch-backward-regexp)
 
+
 ;; c-mode:
 ;; Disable C-d default meaning in c-mode, we need it for duplicating lines
 (defun my-c-mode-config ()
@@ -550,13 +551,23 @@
 )
 (add-hook 'c-mode-hook 'my-c-mode-config)
 
+
 ;; Ediff:
+;; keys in files ediff
 (defun my-ediff-mode-config ()
   (ediff-setup-keymap) ;; what it does, creates a keymap? Without it doesn't work
   (define-key ediff-mode-map "i" 'ediff-previous-difference)
   (define-key ediff-mode-map "k" 'ediff-next-difference)
 )
 (add-hook 'ediff-mode-hook 'my-ediff-mode-config)
+
+;; keys in list of files (session group panel)
+(defun my-ediff-meta-buffer-config ()
+  (define-key ediff-meta-buffer-map "i" 'ediff-previous-meta-item)
+  (define-key ediff-meta-buffer-map "k" 'ediff-next-meta-item)
+)
+(add-hook 'ediff-meta-buffer-keymap-setup-hook 'my-ediff-meta-buffer-config)
+
 
 ;; magit:
 (require 'magit)
@@ -570,6 +581,8 @@
 ;; bookmarks mode
 (with-eval-after-load "bookmark"
   (local-set-key (kbd "C-o") nil) ; remove a key
+  (define-key bookmark-bmenu-mode-map (kbd "i") 'previous-line)
+  (define-key bookmark-bmenu-mode-map (kbd "k") 'next-line)
 )
 
 ;;____________________________________________________________
