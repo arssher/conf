@@ -37,6 +37,7 @@
     flycheck ; live syntax checking
     ace-window ; quick window switching from abo-abo
     undo-tree ; replace default undo/redo system
+    magit ; git on steroids
    )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
@@ -78,7 +79,7 @@
 (toggle-scroll-bar -1)
 
 ;;____________________________________________________________
-;; Backup things
+;; Backuping and loading things
 ;; a place where to put backup files
 (setq backup-directory-alist `(("." . "~/.emacs_saves")))
 ;; always backup by copying. TODO: read what that means
@@ -113,6 +114,11 @@
 (require 'recentf)
 (recentf-mode 1)
 (setq recentf-max-menu-items 25)
+
+;; show bookmarks after emacs starts
+(setq inhibit-splash-screen t)
+(bookmark-bmenu-list)
+(switch-to-buffer "*Bookmark List*")
 
 ;;_________________________________________________
 ;; Text processing
@@ -232,8 +238,8 @@
 ;; be capable of anything, but it looks like no one can set it up rightly.
 
 ;; Let's try Cscope with xcscope.el for now.
-(require 'xcscope)
-(cscope-setup)
+;; (require 'xcscope)
+;; (cscope-setup)
 
 ;; Now let's try gnu global
 (add-hook 'c-mode-common-hook
@@ -344,12 +350,12 @@
 
 ;;____________________________________________________________
 ;; GDB stuff
+
 (require 'my-gdb-stuff)
 ;; (load "my-gdb-stuff.el") ;; for debugging, no pun intended
 
 ;; enable showing variable value on mouseover
 (gud-tooltip-mode t)
-
 
 ;;____________________________________________________________
 ;; Ediff stuff
@@ -359,6 +365,33 @@
 
 ;; side-by-side representation, yes, that's what they call "horizontal split"
 (setq ediff-split-window-function 'split-window-horizontally)
+;; Don't ask confirmation on exit, see
+;;http://emacs.stackexchange.com/questions/9322/how-can-i-quit-ediff-immediately-without-having-to-type-y
+(defun disable-y-or-n-p (orig-fun &rest args)
+  (cl-letf (((symbol-function 'y-or-n-p) (lambda (prompt) t)))
+    (apply orig-fun args)))
+(advice-add 'ediff-quit :around #'disable-y-or-n-p)
+
+;; ediff colours with my wombat theme are too bright
+(add-hook 'ediff-load-hook
+          (lambda ()
+            (set-face-background ediff-fine-diff-face-B "#277227") ; dark green
+            (set-face-background ediff-fine-diff-face-A "#681218") ; dark red
+	    (set-face-background ediff-even-diff-face-A "#293035")
+	    (set-face-background ediff-even-diff-face-B "#293035")
+	    (set-face-background ediff-odd-diff-face-A "#161c30")
+	    (set-face-background ediff-odd-diff-face-B "#161c30")
+	    ))
+
+;; A hacky way to restore window configuration after exiting from ediff
+(winner-mode 1)
+(add-hook 'ediff-after-quit-hook-internal 'winner-undo)
+
+(defun tmp ()
+  (interactive)
+  (ediff "/home/ars/postgres/postgresql-reversed/src/backend/executor/nodeHashjoin.c"
+	 "/home/ars/postgres/postgresql-rev-ext-patched/src/backend/executor/nodeHashjoin.c")
+)
 
 ;;____________________________________________________________
 ;; Make the keys work with russian layout
@@ -524,6 +557,20 @@
   (define-key ediff-mode-map "k" 'ediff-next-difference)
 )
 (add-hook 'ediff-mode-hook 'my-ediff-mode-config)
+
+;; magit:
+(require 'magit)
+(global-set-key (kbd "C-x g") 'magit-status)
+(global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
+(define-key magit-status-mode-map "k" 'magit-section-forward)
+(define-key magit-status-mode-map "i" 'magit-section-backward)
+(define-key magit-diff-mode-map "k" 'magit-section-forward)
+(define-key magit-diff-mode-map "i" 'magit-section-backward)
+
+;; bookmarks mode
+(with-eval-after-load "bookmark"
+  (local-set-key (kbd "C-o") nil) ; remove a key
+)
 
 ;;____________________________________________________________
 
