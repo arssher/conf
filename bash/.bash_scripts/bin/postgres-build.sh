@@ -5,7 +5,7 @@ show_help() {
     cat <<EOF
     Usage: bash ${0##*/} [-t target] [-f] [-r]
 
-    Run 'make' from \$PGDIR directory to build Postgres. It must be configured,
+    Run 'make' from \$PGBDIR directory to build Postgres. It must be configured,
     e.g. postgres-build-full.sh run first.
 
     -h display this help and exit
@@ -29,5 +29,5 @@ while getopts ":h" opt; do # the result will be stored in $opt
     esac
 done
 
-cd $PGDIR
+cd $PGBDIR
 make -j4
