@@ -354,6 +354,11 @@
 (require 'my-gdb-stuff)
 ;; (load "my-gdb-stuff.el") ;; for debugging, no pun intended
 
+;; I hate speedbar with gud-watch'ed vars popping up in separate frame.
+;; sometimes this helps opening it in the same frame, but this question needs
+;; to be addressed more seriously
+(require 'sr-speedbar)
+
 ;; enable showing variable value on mouseover
 (gud-tooltip-mode t)
 
@@ -384,14 +389,9 @@
 	    ))
 
 ;; A hacky way to restore window configuration after exiting from ediff
-(winner-mode 1)
-(add-hook 'ediff-after-quit-hook-internal 'winner-undo)
-
-(defun tmp ()
-  (interactive)
-  (ediff "/home/ars/postgres/postgresql-reversed/src/backend/executor/nodeHashjoin.c"
-	 "/home/ars/postgres/postgresql-rev-ext-patched/src/backend/executor/nodeHashjoin.c")
-)
+;; It works badly with magit diff though...
+;; (winner-mode 1)
+;; (add-hook 'ediff-after-quit-hook-internal 'winner-undo)
 
 ;;____________________________________________________________
 ;; Make the keys work with russian layout
@@ -548,6 +548,8 @@
 ;; Disable C-d default meaning in c-mode, we need it for duplicating lines
 (defun my-c-mode-config ()
   (local-set-key (kbd "C-d") nil) ; remove a key
+  (local-set-key (kbd "C-c k") 'flycheck-next-error)
+  (local-set-key (kbd "C-c i") 'flycheck-previous-error)
 )
 (add-hook 'c-mode-hook 'my-c-mode-config)
 
@@ -573,10 +575,9 @@
 (require 'magit)
 (global-set-key (kbd "C-x g") 'magit-status)
 (global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
-(define-key magit-status-mode-map "k" 'magit-section-forward)
-(define-key magit-status-mode-map "i" 'magit-section-backward)
-(define-key magit-diff-mode-map "k" 'magit-section-forward)
-(define-key magit-diff-mode-map "i" 'magit-section-backward)
+(define-key magit-mode-map "k" 'magit-section-forward)
+(define-key magit-mode-map "i" 'magit-section-backward)
+(define-key magit-mode-map (kbd "M-n") nil)
 
 ;; bookmarks mode
 (with-eval-after-load "bookmark"
