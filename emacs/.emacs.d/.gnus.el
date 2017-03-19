@@ -59,6 +59,7 @@
 
 ;; Attachments:
 ;; K o -- save file. You can also TAB to it and press RET
+;; X m -- save all attachments matched to regexp
 
 ;; package for searching mail
 (require 'nnir)
@@ -200,6 +201,11 @@
 ;; Try to build complete thread for all loaded mails on group entering.
 ;; Not see how this works...
 (setq gnus-fetch-old-headers 'some)
+
+;;____________________________________________________________
+;; Attachments
+;; This is the default pattern for specifying files to save with X m
+(setq gnus-summary-save-parts-default-mime ".*")
 
 
 ;;____________________________________________________________
