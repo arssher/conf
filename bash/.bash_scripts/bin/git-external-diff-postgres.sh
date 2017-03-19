@@ -18,9 +18,9 @@ new_hash=$(git hash-object "$5")
 # -d produces smaller sets of changes
 [ "$DIFF_OPTS" = "" ] && DIFF_OPTS='-pcd'
 
-echo "diff --git a/$1 b/$1"
-echo "new file mode $7"
-echo "index ${old_hash:0:7}..${new_hash:0:7}"
+# echo "diff --git a/$1 b/$1"
+# echo "new file mode $7"
+# echo "index ${old_hash:0:7}..${new_hash:0:7}"
 
 diff --label a/"$1" --label b/"$1" $DIFF_OPTS "$2" "$5" | colordiff
 
