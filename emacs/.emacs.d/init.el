@@ -72,10 +72,15 @@
 ;;____________________________________________________________
 ;; Visual things, colours, fonts, etc
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-(load-theme 'wombat t) ; current theme
+(load-theme 'wombat-modified t) ; current theme
 ;; font size, in px*10
 (set-face-attribute 'default nil :height 140)
 (set-face-attribute 'default t :font "Ubuntu Mono")
+;; set adequate colors while editing text-based tables
+(add-hook 'table-fixed-width-mode-hook
+	  (lambda ()
+	    (set-face-attribute 'table-cell nil :foreground "#303030" :background "white")
+	    ))
 (toggle-scroll-bar -1)
 
 ;;____________________________________________________________
@@ -553,6 +558,13 @@
 )
 (add-hook 'c-mode-hook 'my-c-mode-config)
 
+
+;; Diff mode
+(define-key diff-mode-map (kbd "M-k") nil)
+(define-key diff-mode-map (kbd "M-n") nil)
+(define-key diff-mode-map (kbd "M-p") nil)
+(define-key diff-mode-map (kbd "C-c k") 'diff-hunk-next)
+(define-key diff-mode-map (kbd "C-c i") 'diff-hunk-prev)
 
 ;; Ediff:
 ;; keys in files ediff
