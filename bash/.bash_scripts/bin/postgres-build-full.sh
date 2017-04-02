@@ -64,7 +64,13 @@ done
 if [ -d "$PGBDIR" ]; then
     # || true because it will fail if it is a clean postgres (configure was never
     # run)
-    cd $PGBDIR && make distclean || true
+    # It is very important to run this target, not distclean or clean!
+    # distclean leaves some files, see
+    # https://www.postgresql.org/message-id/flat/20050620231820.GB8840%40mits.lv#20050620231820.GB8840@mits.lv
+    # this can lead to very hard-to-track errors
+    # And if you have ever built postgres without vpath built, run
+    # ./configure; make maintainer-clean inside it before running this script.
+    cd $PGBDIR && make maintainer-clean || true
 fi
 
 mkdir -p $PGBDIR
@@ -77,7 +83,7 @@ CFLAGS="${CFLAGS} --param large-stack-frame=4096 --param large-stack-frame-growt
     # since debug symbols doesn't affect perfomance, include them in rel mode too
 CONFOPTS="--prefix=${PGIPATH} --enable-debug"
 if [[ "$mode" == d* ]]; then
-    CFLAGS="${CFLAGS} -O0 -ggdb -fno-omit-frame-pointer" \
+    CFLAGS="${CFLAGS} -O0 -ggdb -fno-omit-frame-pointer -Wno-inline" \
 	  "$PGSDIR/configure" $CONFOPTS --enable-tap-tests --enable-cassert
 elif [[ "$mode" == r* ]]; then
     CFLAGS="${CFLAGS} -O2" "$PGSDIR/configure" $CONFOPTS
