@@ -60,6 +60,7 @@
 ;; Attachments:
 ;; K o -- save file. You can also TAB to it and press RET
 ;; X m -- save all attachments matched to regexp
+;; C-c C-m f -- attach file
 
 ;; package for searching mail
 (require 'nnir)
@@ -148,8 +149,8 @@
   )
   (message "Sending via %s acc" choice)
 )
-;; Use main by default
-(choose-smtp-server "main")
+;; Use ispras by default
+(choose-smtp-server "ispras")
 
 
 ;;____________________________________________________________
@@ -184,7 +185,7 @@
 
 ;; enable caching, by default only ticked and dormant
 ;; read related part in the manual, it is pretty clear
-(setq gnus-use-cache t)
+(setq gnus-use-cache nil)
 ;; Run gnus-cache-generate-active and if your change this
 (setq gnus-cache-directory "~/gnus/cache")
 ;; Cache everything. Note that in my experience gnus considers caching only
