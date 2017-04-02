@@ -120,10 +120,10 @@
 (recentf-mode 1)
 (setq recentf-max-menu-items 25)
 
-;; show bookmarks after emacs starts
-(setq inhibit-splash-screen t)
+;; always update bookmarks file
+(setq bookmark-save-flag 1)
+;; load bookmarks
 (bookmark-bmenu-list)
-(switch-to-buffer "*Bookmark List*")
 
 ;;_________________________________________________
 ;; Text processing
@@ -211,15 +211,11 @@
 ;;______________________________________
 (setq TeX-parse-self t) ; enable parse on load.
 (setq TeX-PDF-mode t) ; use pdflatex instead of latex
-(setq TeX-auto-save t) ; enable parse on saVe.
+(setq TeX-auto-save t) ; enable parse on save.
 
 (add-hook 'Latex-mode-hook 'LaTeX-math-mobde)
 
-;; ???
-(setq TeX-output-view-style
-      (quote
-       (("^pdf$" "." "okular %o")
-        ("^html?$" "." "iceweasel %o"))))
+(setq TeX-view-program-selection '((output-pdf "Okular")))
 
 
 ;;____________________________________________________________
@@ -261,7 +257,7 @@
 
 ;; toggle it on and off to ivy-mode command
 (ivy-mode 1) ; enable ivy completion everywhere
-;; add recent visited files (if recentf is on) and bookmarks (which bookmarks?)
+;; add recent visited files (if recentf is on) and bookmarks
 ;; to list of buffers
 (setq ivy-use-virtual-buffers t)
 ;; display index and total files number in the ivy buffer
