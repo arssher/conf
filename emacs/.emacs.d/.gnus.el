@@ -1,4 +1,4 @@
-;; I will try to use
+;; Let's have a look at
 ;; https://github.com/redguardtoo/mastering-emacs-in-one-year-guide/blob/master/gnus-guide-en.org
 ;; https://www.emacswiki.org/emacs/GnusGmail#toc2 -- good table with actions
 ;; http://www.cataclysmicmutation.com/2010/11/multiple-gmail-accounts-in-gnus -- multiple accounts
@@ -58,7 +58,7 @@
 ;; m -- new mail
 
 ;; Attachments:
-;; K o -- save file. You can also TAB to it and press RET
+;; K o -- save file. You can also TAB to it and press RET. N
 ;; X m -- save all attachments matched to regexp
 ;; C-c C-m f -- attach file
 
@@ -81,8 +81,20 @@
 ;; set no primary server, we will always choose some secondary:
 (setq gnus-select-method '(nnnil ""))
 
-;; Gnus will try to read auth info from ~/.authinfo file with lines like
-;; machine imap.yandex.com login sher-ars@yandex.ru password <yourpassword>
+;; By default, Gnus will try to read auth info from ~/.authinfo file with lines
+;; like machine imap.yandex.com login sher-ars@yandex.ru password <yourpassword>
+;; But I decided avoid storing passwords in plaintext using gnupg. I used
+;; instructions here:
+;; https://github.com/kensanata/ggg
+;; In short,
+;; 1) Run gpg --gen-key to generate the key. Install package rng-tools if it
+;;    hangs, waiting for some entropy.
+;; 2) Open in emacs ~/.authinfo.gpg and type the same you used in ~/.authinfo.
+;; 3) Save the file, emacs will automaticlly encrypt it.
+;; Probably typing password every time would be too annoying, for this case
+;; there were some recommendations at the link above. See also
+;; http://stackoverflow.com/questions/25827103/how-to-use-gpg-gpg-agent-especially-for-authinfo-gpg
+(setq nntp-authinfo-file "~/.authinfo.gpg")
 
 (setq gnus-secondary-select-methods
       '(
@@ -111,6 +123,11 @@
 		 (nnimap-server-port 993)
 		 (nnimap-stream ssl)
 	 )
+	 (nnimap "pgpro"
+		 (nnimap-address "imap.postgrespro.ru")
+		 ;; (nnimap-server-port 993)
+		 ;; (nnimap-stream ssl)
+	 )
        )
 )
 
@@ -124,7 +141,7 @@
 (defun choose-smtp-server (choice)
    "CHOICE is one of predefined accs to send mail from."
   (interactive
-    (list (completing-read "Choose acc to send mail: " '("main" "ispras")))
+    (list (completing-read "Choose acc to send mail: " '("main" "ispras" "pgpro")))
   )
   (cond ((string= choice "ispras")
 	 ;; ispras smtp setup
@@ -145,6 +162,14 @@
 	       user-mail-address "sher-ars@yandex.ru"
 	       ;; this is needed to copy sent message to proper 'sent' folder
 	       gnus-message-archive-group "nnimap+main:Отправленные")
+	 )
+	((string= choice "pgpro")
+	 ;; yandex smtp setup
+	 (setq smtpmail-smtp-server "smtp.postgrespro.ru"
+	       ;; just set header, this is used for auth
+	       user-mail-address "a.sher@postgrespro.ru"
+	       ;; this is needed to copy sent message to proper 'sent' folder
+	       gnus-message-archive-group "nnimap+main:Sent")
 	)
   )
   (message "Sending via %s acc" choice)
@@ -185,8 +210,8 @@
 
 ;; enable caching, by default only ticked and dormant
 ;; read related part in the manual, it is pretty clear
-(setq gnus-use-cache nil)
-;; Run gnus-cache-generate-active and if your change this
+(setq gnus-use-cache t)
+;; Run gnus-cache-generate-active if your change this
 (setq gnus-cache-directory "~/gnus/cache")
 ;; Cache everything. Note that in my experience gnus considers caching only
 ;; after you have opened a mail; it won't cache just preloaded headers, or
@@ -200,8 +225,13 @@
 ;; This should gather threads relying on References header, not on subject
 (setq gnus-summary-thread-gathering-function 'gnus-gather-threads-by-references)
 ;; Try to build complete thread for all loaded mails on group entering.
-;; Not see how this works...
+;; I don't see how this works...
 (setq gnus-fetch-old-headers 'some)
+
+;; refresh mail automatically, but only if emacs is idle!
+;; dunno what's the difference between these, seems like first is enough, but
+;; for sure let it be...
+(gnus-demon-add-handler 'gnus-demon-scan-news 1 t)
 
 ;;____________________________________________________________
 ;; Attachments
@@ -235,10 +265,13 @@
 )
 (add-hook 'gnus-article-mode-hook 'my-gnus-summary-mode-config)
 
+;; autocomplete
+(define-key message-mode-map (kbd "<C-SPC>") 'counsel-bbdb-complete-mail)
 
 ;; TODO:
 ;; multiple smtp
 ;; loading whole thread without loading full group?
 ;; restrict cache size
 ;; goto bottom of the thread
-;; IMAP speedup?
+;; yandex IMAP speedup?
+;; agent? https://groups.google.com/forum/#!topic/gnu.emacs.help/EHfatElceHc
