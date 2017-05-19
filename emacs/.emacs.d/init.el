@@ -38,6 +38,8 @@
     ace-window ; quick window switching from abo-abo
     undo-tree ; replace default undo/redo system
     magit ; git on steroids
+    bbdb ; email contacts
+    counsel-bbdb ; interface to it
    )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
@@ -71,6 +73,14 @@
 
 ;;____________________________________________________________
 ;; Visual things, colours, fonts, etc
+
+;; don't show welcome screen
+(setq inhibit-startup-screen t)
+
+;; fullscreen and maximize on startup
+(toggle-frame-fullscreen)
+(toggle-frame-maximized)
+
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 (load-theme 'wombat-modified t) ; current theme
 ;; font size, in px*10
@@ -209,27 +219,37 @@
 ;;______________________________________
 ; Latex stuff
 ;;______________________________________
+
+(require 'my-tex)
+;; (load "my-windows-frames-funcs.el") ;; for debugging
 (setq TeX-parse-self t) ; enable parse on load.
 (setq TeX-PDF-mode t) ; use pdflatex instead of latex
-(setq TeX-auto-save t) ; enable parse on save.
+(setq TeX-auto-save t) ; enable parse on save
 
-(add-hook 'Latex-mode-hook 'LaTeX-math-mobde)
+(setq TeX-view-program-selection '((output-pdf "Okular")) )
 
-(setq TeX-view-program-selection '((output-pdf "Okular")))
+(setq TeX-texify-Show nil)
+
+;; check with lacheck
+;; Right now it doesn't work well with 'listing' listing, so I turning it off
+;; (add-hook 'LaTeX-mode-hook
+	  ;; (lambda ()
+	    ;; (setq flycheck-checker 'tex-lacheck)))
 
 
 ;;____________________________________________________________
 ;; Well, about going to definition, autocompletion, etc
 ;;
 ;; Short review:
-;; Etags & Ctags programs for generating tags -- definitions only.
-;; It seems that there is buit-in support
-;; for etags format in emacs, ctags can also  generate these files
+;; Etags & Ctags programs for generating tags -- definitions only. It seems
+;; that there is buit-in support for etags format in emacs, ctags can also
+;; generate these files
 ;;
-;; GNU Global. Another tagger, more powerful, knows about references. Have it's
-;; own file format. There a bunch of emacs frontends, most notable are ggtags.el
-;; and helm-gtags.el. Global also provides and interface like cscope, so it
-;; can be used instead of it. I don't know cons and pros of this approach yet.
+;; GNU Global. Another tagger, more powerful, knows about references. Has its
+;; own file format. There are a bunch of emacs frontends, most notable are
+;; ggtags.el and helm-gtags.el. Global also provides and interface like cscope,
+;; so it can be used instead of it. I don't know cons and pros of this approach
+;; yet.
 
 ;; Cscope. Another tagger, powerful beast too, knows about references.
 ;; There are again a number of frontends, but the most popular seems to be
@@ -309,6 +329,9 @@
 
 ;; enable flychecker
 (global-flycheck-mode)
+;; disable it for latex, see above
+(setq flycheck-global-modes '(not LaTeX-mode latex-mode))
+
 ;; Here we can disable some checkers.
 ;; It is a buffer-local variable, but using setq-default I set it's value
 ;; globally.
@@ -390,14 +413,60 @@
 	    ))
 
 ;; A hacky way to restore window configuration after exiting from ediff
-;; It works badly with magit diff though...
+;; It works badly with magit diff though, so I will turn it off for now...
 ;; (winner-mode 1)
 ;; (add-hook 'ediff-after-quit-hook-internal 'winner-undo)
+
+
+;;____________________________________________________________
+;; Asm mode basic setup
+(require 'asm-mode)
+(add-hook 'asm-mode-hook (lambda ()
+                           (setq indent-tabs-mode nil) ; use spaces to indent
+                           (electric-indent-mode -1) ; indentation in asm-mode is annoying
+                           (setq tab-stop-list (number-sequence 2 60 2)) ; much better indentation
+			   )
+	  )
 
 ;;____________________________________________________________
 ;; Make the keys work with russian layout
 (require 'my-misc) ;; 'requires' are idempotent, you know
 (reverse-input-method "russian-computer")
+
+
+;;____________________________________________________________
+;; gnus stuff
+
+;; initialize bbdb, as they say in manual.
+(require 'bbdb)
+(bbdb-initialize 'gnus 'message)
+(add-hook 'gnus-startup-hook 'bbdb-insinuate-gnus)
+;; Didn't deal with everything here yet
+(setq
+    bbdb-offer-save 1                        ;; 1 means save-without-asking
+    bbdb-popup-target-lines  1               ;; very small
+    bbdb-dwim-net-address-allow-redundancy t ;; always use full name
+    bbdb-always-add-address t                ;; add new addresses to existing...
+                                             ;; ...contacts automatically
+    bbdb-canonicalize-redundant-nets-p t     ;; x@foo.bar.cx => x@bar.cx
+    bbbd-message-caching-enabled t           ;; be fast
+    bbdb-use-alternate-names t               ;; use AKA
+    bbdb-elided-display t                    ;; single-line addresses
+
+    ;; auto-create addresses from mail
+    bbdb/mail-auto-create-p 'bbdb-ignore-some-messages-hook
+    bbdb-ignore-some-messages-alist ;; don't ask about fake addresses
+    ;; NOTE: there can be only one entry per header (such as To, From)
+    ;; http://flex.ee.uec.ac.jp/texi/bbdb/bbdb_11.html
+
+    '(( "From" . "no.?reply\\|DAEMON\\|daemon\\|facebookmail\\|twitter"))
+)
+
+;; provides gmail2bbdb-import-file function to import vCard Format into bbdb
+(require 'gmail2bbdb)
+
+;; interface to bbdb
+(require 'counsel-bbdb)
 
 ;;____________________________________________________________
 ;; Now, the keys.
@@ -509,6 +578,10 @@
 (global-set-key (kbd "<C-left>") 'shrink-window-horizontally)
 (global-set-key (kbd "<C-right>") 'enlarge-window-horizontally)
 
+;; C-c prefix
+(global-set-key (kbd "C-c k") 'flycheck-next-error)
+(global-set-key (kbd "C-c i") 'flycheck-previous-error)
+
 
 ;; Now mode-specific bindings
 ;; ggtags: TODO enable them only in C mode
@@ -546,11 +619,9 @@
 
 
 ;; c-mode:
-;; Disable C-d default meaning in c-mode, we need it for duplicating lines
 (defun my-c-mode-config ()
-  (local-set-key (kbd "C-d") nil) ; remove a key
-  (local-set-key (kbd "C-c k") 'flycheck-next-error)
-  (local-set-key (kbd "C-c i") 'flycheck-previous-error)
+  ;; Disable C-d default meaning in c-mode, we need it for duplicating lines
+  (local-set-key (kbd "C-d") nil)
 )
 (add-hook 'c-mode-hook 'my-c-mode-config)
 
@@ -587,12 +658,24 @@
 (define-key magit-mode-map "i" 'magit-section-backward)
 (define-key magit-mode-map (kbd "M-n") nil)
 
+
 ;; bookmarks mode
 (with-eval-after-load "bookmark"
   (local-set-key (kbd "C-o") nil) ; remove a key
   (define-key bookmark-bmenu-mode-map (kbd "i") 'previous-line)
   (define-key bookmark-bmenu-mode-map (kbd "k") 'next-line)
-)
+  )
+
+
+;; auctex
+;; compile until needed
+(add-hook 'LaTeX-mode-hook '(lambda () (local-set-key (kbd "C-c C-a") 'TeX-texify)))
+
+
+;; info mode
+(define-key Info-mode-map (kbd "i") 'my-scroll-down-one)
+(define-key Info-mode-map (kbd "k") 'my-scroll-up-one)
+(define-key Info-mode-map (kbd "o") 'Info-index) ; use o for index instead
 
 ;;____________________________________________________________
 
