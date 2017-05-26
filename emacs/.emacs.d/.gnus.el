@@ -12,17 +12,20 @@
 ;;   'U' in group line shows that you are NOT subscribed to this group
 
 ;; Usage:
+;; ^ -- goto server buffer
+;; q -- exit it, returning to group buffer
+
 ;; Group manipulations:
+;; By default, all subscribed groups are showed, regardless have they unread mail or not.
+;; l -- open this default view
+;; L -- show, well, more groups, probably all of them
+;; A A -- show ALL groups known to Gnus
 ;; q -- exit
 ;; M-g -- refresh group
 ;; u -- subscribe to group at cursor in group buffer
 ;; U -- subscribe to group with given name
 ;; C-u RET -- while opening group, will load read mail too; perhaps later I will
 ;;   do it by default
-;; By default, all subscribed groups are showed, regardless have they unread mail or not.
-;; l -- show subscribed groups with unread messages (?)
-;; L --
-;; A A -- show ALL groups known to Gnus
 
 ;; Message manipulations:
 ;; ! -- mark message as important, (!) before letter means exactly that
@@ -58,7 +61,8 @@
 ;; m -- new mail
 
 ;; Attachments:
-;; K o -- save file. You can also TAB to it and press RET. N
+;; K o -- save file. You can also TAB to it and press RET. You can prefix it
+;;        with number N to save N'th attachment
 ;; X m -- save all attachments matched to regexp
 ;; C-c C-m f -- attach file
 
@@ -98,10 +102,11 @@
 
 (setq gnus-secondary-select-methods
       '(
-	;; yandex imap setup. Port and encryption is deduced
-	;; automatically
+	;; yandex imap setup.  automatically
 	(nnimap "main"
 		(nnimap-address "imap.yandex.com")
+		(nnimap-server-port 993)
+		(nnimap-stream ssl)
 		;; Don't download attachments. Run A C to get the full
 		;; message if you use this.
 		;; (nnimap-fetch-partial-articles t)
@@ -169,7 +174,7 @@
 	       ;; just set header, this is used for auth
 	       user-mail-address "a.sher@postgrespro.ru"
 	       ;; this is needed to copy sent message to proper 'sent' folder
-	       gnus-message-archive-group "nnimap+main:Sent")
+	       gnus-message-archive-group "nnimap+pgpro:Sent")
 	)
   )
   (message "Sending via %s acc" choice)
@@ -212,7 +217,7 @@
 ;; read related part in the manual, it is pretty clear
 (setq gnus-use-cache t)
 ;; Run gnus-cache-generate-active if your change this
-(setq gnus-cache-directory "~/gnus/cache")
+(setq gnus-cache-directory "/d/gnus/cache")
 ;; Cache everything. Note that in my experience gnus considers caching only
 ;; after you have opened a mail; it won't cache just preloaded headers, or
 ;; whatever it first loads to show summary
