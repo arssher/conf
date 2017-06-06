@@ -48,5 +48,5 @@ current buffer's, reload dir-locals."
     (when input-method
       (activate-input-method current))))
 
-(message "my-misc loaded")
-(provide 'my-misc)
+(message "ars-misc loaded")
+(provide 'ars-misc)

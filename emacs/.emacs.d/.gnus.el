@@ -69,8 +69,10 @@
 ;; package for searching mail
 (require 'nnir)
 
-;; don't ask whether I am actually want to exit
+;; don't ask whether I actually want to exit
 (setq gnus-expert-user t)
+;; And whether I actually want to delete
+(setq gnus-novice-user nil)
 
 ;; Personal information, not related to access
 (setq user-full-name "Arseny Sher")
@@ -192,7 +194,7 @@
 
 ;; How each mail entry looks like,
 ;; see help for this variable to know what different formatters mean
-(setq gnus-summary-line-format "%U%R%z%D%I%(%[%4L: %-23,23f%]%) %s\n")
+(setq gnus-summary-line-format "%U%R%z%N %D%I%(%[%4L: %-23,23f%]%) %s\n")
 
 ;; Show only the top level message of the thread.
 (setq gnus-thread-hide-subtree t)
@@ -200,11 +202,20 @@
 ;; look at 'In-Reply-To:' and 'References:' headers.
 (setq gnus-thread-ignore-subject t)
 
-;; sort threads, see manual
-;; number ~ time when mail arrived
+;; How to sort the threads themselves
+;; number ~ time when mail arrived; arrived, well, to my mailbox, probably
 ;; This will show threads with most recent messages first. But each thread
 ;; is displayed linearly, so the oldest mail is showed in summary.
-(setq gnus-thread-sort-functions '(gnus-thread-sort-by-most-recent-number))
+;; (setq gnus-thread-sort-functions '(gnus-thread-sort-by-most-recent-number))
+(setq gnus-thread-sort-functions '(gnus-thread-sort-by-author))
+;; How to sort mails *inside* thread
+;; (setq gnus-sort-gathered-threads-function 'gnus-thread-sort-by-most-recent-number)
+(setq gnus-sort-gathered-threads-function 'gnus-thread-sort-by-most-recent-number)
+
+;; Ideally, I would like to enable threading, but disable sub-threading, i.e
+;; show each thread linearized. I failed to do that in around 30 minutes and
+;; gave up.
+
 
 ;;____________________________________________________________
 ;; What and how to fetch
@@ -227,7 +238,7 @@
 ;; check out ~/gnus/cache dir size
 (setq gnus-cache-remove-articles nil)
 
-;; This should gather threads relying on References header, not on subject
+;; This gathres *loose* threads relying on References header, not on subject
 (setq gnus-summary-thread-gathering-function 'gnus-gather-threads-by-references)
 ;; Try to build complete thread for all loaded mails on group entering.
 ;; I don't see how this works...
@@ -261,6 +272,7 @@
   (local-set-key (kbd "M-i") nil) ; remove a key
   (local-set-key (kbd "M-s") nil) ; remove a key
   (local-set-key (kbd "w") 'gnus-summary-expand-window)
+  (local-set-key (kbd "<delete>") 'gnus-summary-delete-article)
 )
 (add-hook 'gnus-summary-mode-hook 'my-gnus-summary-mode-config)
 
