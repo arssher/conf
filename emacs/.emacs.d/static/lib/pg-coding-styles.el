@@ -13,6 +13,13 @@
 
 ;;; C files
 
+;; In postgres, tabs are used everywhere, i.e. not only for indentation, but
+;; for the alignment too. I will tabify the line everytime it is indented by
+;; Emacs.
+(defun postgres-tabify-after-indent ()
+  (tabify (line-beginning-position) (line-end-position))
+)
+
 ;; Style that matches the formatting used by
 ;; src/tools/pgindent/pgindent.  Many extension projects also use this
 ;; style.
@@ -25,7 +32,11 @@
                                    (statement-case-open . +)))
                (fill-column . 78)
                (indent-tabs-mode . t)
-               (tab-width . 4)))
+               (tab-width . 4)
+	       (c-special-indent-hook . postgres-tabify-after-indent)
+	      )
+)
+
 
 (add-hook 'c-mode-hook
           (defun postgresql-c-mode-hook ()
@@ -64,7 +75,8 @@
 
 (add-hook 'sgml-mode-hook
           (defun postgresql-sgml-mode-hook ()
-             (when (string-match "/postgres\\(ql\\)?/" buffer-file-name)
+             (when (and (buffer-file-name) (string-match "/postgres\\(ql\\)?/"
+             buffer-file-name))
                (setq fill-column 78)
                (setq indent-tabs-mode nil)
                (setq sgml-basic-offset 1))))
@@ -76,5 +88,5 @@
 (add-to-list 'auto-mode-alist '("/postgres\\(ql\\)?/.*Makefile.*" . makefile-gmake-mode))
 (add-to-list 'auto-mode-alist '("/postgres\\(ql\\)?/.*\\.mk\\'" . makefile-gmake-mode))
 
-(message "postgres style loaded")
-(provide 'postgres-style)
+(message "coding styles loaded")
+(provide 'pg-coding-styles)

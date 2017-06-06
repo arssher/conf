@@ -19,5 +19,5 @@ and attach gdb to it. Path to Postgres installation directory must be in $PGIDIR
   )
 )
 
-(message "my-gdb-stuff loaded")
-(provide 'my-gdb-stuff)
+(message "ars-gdb-stuff loaded")
+(provide 'ars-gdb-stuff)

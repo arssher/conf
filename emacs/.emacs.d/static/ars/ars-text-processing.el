@@ -60,5 +60,5 @@ http://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emac
   (kill-whole-line arg)
   (back-to-indentation))
 
-(message "my-text-processing loaded")
-(provide 'my-text-processing)
+(message "ars-text-processing loaded")
+(provide 'ars-text-processing)

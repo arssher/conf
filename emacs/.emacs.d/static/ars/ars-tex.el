@@ -59,5 +59,5 @@ If there is still something left do do start the next latex-command."
 	     (setq TeX-texify-sentinel (process-sentinel proc))
 	     (set-process-sentinel proc 'TeX-texify-sentinel))))))
 
-(message "my-tex loaded")
-(provide 'my-tex)
+(message "ars-tex loaded")
+(provide 'ars-tex)

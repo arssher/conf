@@ -40,5 +40,27 @@
   (move-to-window-line 0)
   )
 
-(message "my-windows-frames-funcs loaded")
-(provide 'my-windows-frames-funcs)
+(defun ars-frame-fullscreen ()
+  "Make selected frame fullscreen"
+  (interactive)
+  (let ((fullscreen (frame-parameter nil 'fullscreen)))
+    (modify-frame-parameters
+     nil `((fullscreen . fullboth) (fullscreen-restore . ,fullscreen)))))
+
+(defun ars-frame-maximized ()
+  "Make selected frame maximized.
+
+If the frame is in fullscreen state, don't change its state, but
+set the frame's `fullscreen-restore' parameter to `maximized', so
+the frame will be maximized after disabling fullscreen state."
+  (interactive)
+  (let ((fullscreen (frame-parameter nil 'fullscreen)))
+    (cond
+     ((memq fullscreen '(fullscreen fullboth))
+      (set-frame-parameter nil 'fullscreen-restore 'maximized))
+     (t
+      (set-frame-parameter nil 'fullscreen 'maximized)))))
+
+
+(message "ars-windows-frames-funcs loaded")
+(provide 'ars-windows-frames-funcs)
