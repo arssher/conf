@@ -2,13 +2,6 @@
 scripts export machine's conf to yandex_disk
 
 
-Start with bash/.bash_scripts/bin/mint_global_import.sh. It does three imports:
- - bash conf
- - mint shortcuts conf
- - emacs conf
- TODO add others
-
-
 Bash conf:
 
   Contains .bashrc and .bash_scripts folder. .bashrc reads file .global_vars, so
@@ -20,17 +13,10 @@ Bash conf:
   added).
 
 
-Mint shorcuts conf:
-
-  Place new shorctcuts to dconf-settings-template.conf, then run
-  ydisk_to_machine.sh, it will install them on the system
-
-
 Emacs conf:
 
   Only init.el file and two dirs -- static_packages and themes -- are backup'ed.
   The rest is the ELPA's business.
-
 
 gdb conf:
 
@@ -40,6 +26,24 @@ gdb conf:
 readline conf:
 
   Contains only .inputrc file with keybindings like in my emacs.
+
+xbindkeys conf:
+
+  Contains only .xbindkeysrc
+
+Things done on fresh Debian install:
+configs/bash/.bash_scripts/bin/bash_ydisk_to_machine.sh
+Now you can run all ydisk_to_machine.sh scripts
+
+sudo apt-get install vim git terminator chromium checkinstall locate openvpn \
+
+sudo apt-get -y build-dep emacs24
+build and install emacs
+sudo apt-get install flex bison libreadline-dev zlib1g-dev jadetex
+
+Important root configs:
+fstab
+network/interfaces
 
 TODO:
 * Deal with terminal -- saving pans and tabs, dir paths?
