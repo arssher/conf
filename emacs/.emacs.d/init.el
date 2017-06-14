@@ -11,7 +11,7 @@
 (add-to-list 'load-path (expand-file-name "static/lib" emacs-d))
 ;; Don't forget to add multifile packages manually
 ;; TODO: just add to load-path every dir under lib/
-(add-to-list 'load-path (expand-file-name "static/lib/all-the-icons.el" emacs-d))
+
 ;; My code
 (add-to-list 'load-path (expand-file-name "static/ars" emacs-d))
 
@@ -44,6 +44,7 @@
 (load-file (concat init-d "dired.el"))
 (load-file (concat init-d "remote.el"))
 (load-file (concat init-d "diff.el"))
+(load-file (concat init-d "gnus.el"))
 
 ;; ide-like features
 (load-file (concat init-d "navigation-and-completion.el"))
@@ -181,13 +182,16 @@
 
 ;; Now mode-specific bindings
 
+;; dired
+(define-key dired-mode-map (kbd "M-s") nil)
+
 ;; ggtags: TODO enable them only in C mode
 (global-set-key (kbd "C-b") 'ggtags-find-tag-dwim)
 (global-set-key (kbd "M-B") 'ggtags-prev-mark)
 (global-set-key (kbd "C-M-b") 'ggtags-next-mark)
 (global-set-key (kbd "M-<f7>") 'ggtags-find-reference) ; idea
 (global-set-key (kbd "M-F") 'ggtags-grep) ; grepping the project
-(global-set-key (kbd "C-S-N") 'ggtags-find-file) ; similar to idea
+(global-set-key (kbd "C-S-N") 'projectile-find-file) ; similar to idea
 (global-set-key (kbd "C-n") 'ggtags-find-definition) ; similar to idea
 (require 'ggtags)
 (define-key ggtags-navigation-map (kbd "M-k") 'next-error)

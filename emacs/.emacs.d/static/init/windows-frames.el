@@ -1,7 +1,7 @@
 ;; Windows and frames
 
 ;; project tree
-(require 'all-the-icons) ; load icons for 'icons regime
+;; (require 'all-the-icons) ; load icons for 'icons regime
 ;; Every time when the neotree window is opened, let it find current file and
 ;; jump to node.
 (setq neo-smart-open t)
