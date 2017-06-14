@@ -1,4 +1,5 @@
-;; Packaging stuff
+;; Packaging stuff and basic things
+
 ;; Here we will keep elpa packages
 (setq package-user-dir
       (expand-file-name "elpa" emacs-d))
@@ -16,8 +17,9 @@
 (defvar required-packages
   '(auctex
     desktop+ ; to save sessions
-    neotree ; project tree
+    all-the-icons ; for neotree, which I actually don't use
     dash ; required by all-icons (used for neat icons in neotree)
+    neotree ; project tree
     drag-stuff ; moving lines and regions
     xcscope ; frontend for cscope
     ggtags ; frontend for gnu global
@@ -46,3 +48,6 @@
   (dolist (p required-packages)
     (when (not (package-installed-p p))
       (package-install p))))
+
+;; don't ask long yes-or-no-p
+(defalias 'yes-or-no-p 'y-or-n-p)

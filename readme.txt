@@ -32,18 +32,29 @@ xbindkeys conf:
   Contains only .xbindkeysrc
 
 Things done on fresh Debian install:
-configs/bash/.bash_scripts/bin/bash_ydisk_to_machine.sh
+set up yandex disk, or (currently) point YANDEXDISK_DIR to dir with 'configs'
+dir
+run configs/bash/.bash_scripts/bin/bash_ydisk_to_machine.sh
 Now you can run all ydisk_to_machine.sh scripts
 
 sudo apt-get install vim git terminator chromium checkinstall locate openvpn \
-
+  linux-tools
 sudo apt-get -y build-dep emacs24
 build and install emacs
 sudo apt-get install flex bison libreadline-dev zlib1g-dev jadetex
+sudo apt-get install xserver-xorg-input-synaptics  # for touchpad scrolling
+or better use libinput?
 
 Important root configs:
 fstab
 network/interfaces
+openvpn
+
+Important home configs not saved here:
+ssh
+fonts
+ydisk
+terminator
 
 TODO:
 * Deal with terminal -- saving pans and tabs, dir paths?
