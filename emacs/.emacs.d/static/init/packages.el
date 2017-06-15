@@ -6,7 +6,6 @@
 
 ;; add package repos
 (setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("marmalade" . "https://marmalade-repo.org/packages/")
                          ("melpa" . "https://melpa.org/packages/")))
 ;; load elpa packages right now because we need package-installed-p,
 ;; see https://www.emacswiki.org/emacs/ELPA

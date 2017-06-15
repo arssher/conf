@@ -37,13 +37,12 @@ dir
 run configs/bash/.bash_scripts/bin/bash_ydisk_to_machine.sh
 Now you can run all ydisk_to_machine.sh scripts
 
-sudo apt-get install vim git terminator chromium checkinstall locate openvpn \
-  linux-tools
+sudo apt-get install vim git terminator chromium checkinstall locate openvpn linux-tools
 sudo apt-get -y build-dep emacs24
 build and install emacs
-sudo apt-get install flex bison libreadline-dev zlib1g-dev jadetex
-sudo apt-get install xserver-xorg-input-synaptics  # for touchpad scrolling
-or better use libinput?
+sudo apt-get install
+flex bison libreadline-dev zlib1g-dev jadetex
+global colordiff
 
 Important root configs:
 fstab
@@ -55,6 +54,7 @@ ssh
 fonts
 ydisk
 terminator
+firefox
 
 TODO:
 * Deal with terminal -- saving pans and tabs, dir paths?
