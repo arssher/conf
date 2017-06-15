@@ -23,6 +23,8 @@
 ;; (cscope-setup)
 
 ;; Now let's try gnu global
+;; Remember that you need GTAGSLIBPATH env var to search external projects,
+;; you can do that in ~/.emacs-local.el
 (add-hook 'c-mode-common-hook
           (lambda ()
             (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)

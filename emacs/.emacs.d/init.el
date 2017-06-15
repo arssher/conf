@@ -57,6 +57,10 @@
 (load-file (concat init-d "latex.el"))
 (load-file (concat init-d "asm.el"))
 
+;; machine-specific stuff, e.g. set environment variables there
+(when (file-exists-p (concat (getenv "HOME") "/.emacs-local.el"))
+  (load-file (concat (getenv "HOME") "/.emacs-local.el")))
+
 
 ;;____________________________________________________________
 ;; Make the keys work with russian layout
