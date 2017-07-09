@@ -11,7 +11,7 @@ show_help() {
 
     -h display this help and exit
     -t target
-       make target, for example, 'world'. By default it is empty.
+       make target, for example, 'install-world'. By default it is 'install'.
     -m <d[ebug] | r[elease] | p[erf]>, 3 choices:
        debug: no optimizations, asserts, etc, default value
        release, turn on optimizations, disable asserts, etc.
@@ -19,17 +19,20 @@ show_help() {
          on old perfs
     -r run regression tests. By default they are not run.
     -s silent make
+
+    Examples:
+    Silencing make, but without losing stderr:
+    PGSDIR=/home/ars/postgres/postgresql PGINAME=vanilla postgres-build-full.sh -s > /dev/null
 EOF
     exit 0
 }
-
 
 script_dir=`dirname "$(readlink -f "$0")"`
 source "$script_dir"/postgres_common/postgres_common.sh
 
 mode="debug"
 run_tests=""
-target=""
+target="install"
 silent=""
 OPTIND=1 # reset opt counter, it is always must be set to 1
 # each symbol is option name; if there is colon after, it has value
@@ -106,5 +109,3 @@ if [ "$run_tests" = true ]; then
     echo '-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-'
     make check
 fi
-
-make -j4 -s install

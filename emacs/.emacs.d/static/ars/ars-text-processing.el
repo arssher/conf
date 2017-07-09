@@ -60,5 +60,24 @@ http://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emac
   (kill-whole-line arg)
   (back-to-indentation))
 
+(defun just-one-space-in-region (beg end)
+  "replace all whitespace in the region with single spaces"
+  (interactive "r")
+  (save-excursion
+    (save-restriction
+      (narrow-to-region beg end)
+      (goto-char (point-min))
+      (while (re-search-forward "\\s-+" nil t)
+        (replace-match " ")))))
+
+(defun smart-open-line-above ()
+  "Insert an empty line above the current line.
+Position the cursor at it's beginning, according to the current mode."
+  (interactive)
+  (move-beginning-of-line nil)
+  (newline-and-indent)
+  (forward-line -1)
+  (indent-according-to-mode))
+
 (message "ars-text-processing loaded")
 (provide 'ars-text-processing)

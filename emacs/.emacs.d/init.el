@@ -56,6 +56,7 @@
 ;; major modes
 (load-file (concat init-d "latex.el"))
 (load-file (concat init-d "asm.el"))
+(load-file (concat init-d "sql.el"))
 
 ;; machine-specific stuff, e.g. set environment variables there
 (when (file-exists-p (concat (getenv "HOME") "/.emacs-local.el"))
@@ -122,6 +123,7 @@
 (global-set-key (kbd "C-r") 'query-replace)
 (global-set-key (kbd "C-y") 'smart-kill-whole-line)
 (global-set-key (kbd "M-u") 'backward-word) ; ergo
+(global-set-key (kbd "C-x C-u") 'upcase-word)
 ;; dirty hack to distinguish TAB and C-i, see
 ;; http://stackoverflow.com/questions/1792326/how-do-i-bind-a-command-to-c-i-without-changing-tab
 ;; accepted answer doesn't work
@@ -131,6 +133,7 @@
 (global-set-key (kbd "M-I") 'drag-stuff-up)
 (global-set-key (kbd "M-o") 'forward-word) ; ergo
 (global-set-key (kbd "C-o") 'find-file) ; ergo
+(global-set-key (kbd "C-S-o") 'smart-open-line-above)
 (global-set-key (kbd "M-p") 'recenter-top-bottom) ; ergo
 
 ;; The home row:
@@ -190,14 +193,16 @@
 (define-key dired-mode-map (kbd "M-s") nil)
 
 ;; ggtags: TODO enable them only in C mode
+(require 'ggtags)
 (global-set-key (kbd "C-b") 'ggtags-find-tag-dwim)
+(global-set-key (kbd "C-S-b") 'ggtags-find-definition)
 (global-set-key (kbd "M-B") 'ggtags-prev-mark)
 (global-set-key (kbd "C-M-b") 'ggtags-next-mark)
 (global-set-key (kbd "M-<f7>") 'ggtags-find-reference) ; idea
 (global-set-key (kbd "M-F") 'ggtags-grep) ; grepping the project
 (global-set-key (kbd "C-S-N") 'projectile-find-file) ; similar to idea
 (global-set-key (kbd "C-n") 'ggtags-find-definition) ; similar to idea
-(require 'ggtags)
+(define-key ggtags-navigation-map (kbd "M-s") nil)
 (define-key ggtags-navigation-map (kbd "M-k") 'next-error)
 (define-key ggtags-navigation-map (kbd "M-i") 'previous-error)
 
@@ -324,3 +329,4 @@
 ;; smartparens
 ;; read http://pages.sachachua.com/.emacs.d/Sacha.html
 ;; check out ivy links
+(put 'upcase-region 'disabled nil)

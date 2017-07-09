@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if [ -z "${PGBDIR+set}" ]; then
-    export PGBDIR="${HOME}/tmp/tmp/postgres_build"
+    export PGBDIR="${HOME}/tmp/tmp/postgresql_build"
     echo "PGBDIR variable with path to Postgres build directory is not defined, setting it to ${PGBDIR}"
 fi
 
