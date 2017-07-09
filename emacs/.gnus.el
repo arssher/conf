@@ -206,8 +206,8 @@
 ;; number ~ time when mail arrived; arrived, well, to my mailbox, probably
 ;; This will show threads with most recent messages first. But each thread
 ;; is displayed linearly, so the oldest mail is showed in summary.
-;; (setq gnus-thread-sort-functions '(gnus-thread-sort-by-most-recent-number))
-(setq gnus-thread-sort-functions '(gnus-thread-sort-by-author))
+(setq gnus-thread-sort-functions '(gnus-thread-sort-by-most-recent-number))
+;; (setq gnus-thread-sort-functions '(gnus-thread-sort-by-author))
 ;; How to sort mails *inside* thread
 ;; (setq gnus-sort-gathered-threads-function 'gnus-thread-sort-by-most-recent-number)
 (setq gnus-sort-gathered-threads-function 'gnus-thread-sort-by-most-recent-number)

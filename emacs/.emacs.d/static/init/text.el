@@ -15,3 +15,7 @@
 
 ;; delete tralining whitespace on save
 (add-to-list 'write-file-functions 'delete-trailing-whitespace)
+
+;; default grep opts
+(require 'grep)
+(grep-apply-setting 'grep-command "grep --color -nH -ir -e")

@@ -25,6 +25,16 @@ current buffer's, reload dir-locals."
         (when (equal default-directory dir))
         (reload-dir-locals-for-current-buffer)))))
 
+(defun find-file-as-root ()
+  "Like `find-file, but automatically edit the file with
+root-privileges (using tramp/sudo), if the file is not writable by
+user."
+  (interactive)
+  (let ((file (read-file-name "Edit as root: ")))
+    (unless (file-writable-p file)
+      (setq file (concat "/sudo:root@localhost:" file)))
+    (find-file file)))
+
 (defun reverse-input-method (input-method)
   "Build the reverse mapping of single letters from INPUT-METHOD."
   (interactive

@@ -23,6 +23,7 @@
 ;; (cscope-setup)
 
 ;; Now let's try gnu global
+(require 'ars-navigation-and-completion)
 ;; Remember that you need GTAGSLIBPATH env var to search external projects,
 ;; you can do that in ~/.emacs-local.el
 (add-hook 'c-mode-common-hook
@@ -39,3 +40,4 @@
 ;; Now there is another feature which I use: regexp replacing in the project,
 ;; I couldn't get it to work in ggtags.
 (projectile-mode 1)
+(setq projectile-completion-system 'ivy)
