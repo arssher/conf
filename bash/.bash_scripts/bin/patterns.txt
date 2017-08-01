@@ -1,0 +1,6 @@
+.*FailedAssertion.*
+.*DEBUG.*SHARDMAN.*
+ .*INFO.*
+ .*ERROR.*\n.*CONTEXT.*\n(^(\t| )+.*\n)*
+ .*FATAL.*
+ .*PANIC.*

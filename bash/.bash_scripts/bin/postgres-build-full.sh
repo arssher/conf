@@ -11,7 +11,7 @@ show_help() {
 
     -h display this help and exit
     -t target
-       make target, for example, 'install-world'. By default it is 'install'.
+       make target, for example, 'install'. By default it is 'install-world'.
     -m <d[ebug] | r[elease] | p[erf]>, 3 choices:
        debug: no optimizations, asserts, etc, default value
        release, turn on optimizations, disable asserts, etc.
@@ -32,7 +32,7 @@ source "$script_dir"/postgres_common/postgres_common.sh
 
 mode="debug"
 run_tests=""
-target="install"
+target="install-world"
 silent=""
 OPTIND=1 # reset opt counter, it is always must be set to 1
 # each symbol is option name; if there is colon after, it has value
@@ -97,10 +97,10 @@ fi
 # run make
 echo '-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-'
 makeopts="${silent} ${target}"
-if [[ -z "${makeopts// }" ]]; then
+if [[ -z "${makeopts}" ]]; then
     make -j4
 else
-    make -j4 "${makeopts// }"
+    make -j4 $makeopts
 fi
 echo "Postgres at ${PGSDIR} successfully built"
 
