@@ -2,5 +2,6 @@
 .*DEBUG.*SHARDMAN.*
  .*INFO.*
  .*ERROR.*\n.*CONTEXT.*\n(^(\t| )+.*\n)*
+ .*ERROR.*\n(.*(HINT|QUERY|CONTEXT).*\n)+(^(\t| )+.*\n)*
  .*FATAL.*
  .*PANIC.*
