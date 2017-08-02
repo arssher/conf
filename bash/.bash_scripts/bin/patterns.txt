@@ -1,7 +1,10 @@
 .*FailedAssertion.*
 .*DEBUG.*SHARDMAN.*
  .*INFO.*
+ .*WARNING*
+ .*ERROR.*\n.*DETAIL.*\n
  .*ERROR.*\n.*CONTEXT.*\n(^(\t| )+.*\n)*
  .*ERROR.*\n(.*(HINT|QUERY|CONTEXT).*\n)+(^(\t| )+.*\n)*
+ .*LOG.*
  .*FATAL.*
  .*PANIC.*
