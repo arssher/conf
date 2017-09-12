@@ -15,6 +15,9 @@ set history save on
 set history size unlimited
 set history filename ~/.gdb_history
 
+# for printing structs
+set print pretty on
+
 # script for postgres internals pretty-printing
 source ~/.gdb/gdbpg.py
 
@@ -25,4 +28,3 @@ end
 document fc
 Focus next
 end
-
