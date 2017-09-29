@@ -44,6 +44,9 @@ sudo apt-get install
 flex bison libreadline-dev zlib1g-dev
 sudo apt-get install docbook docbook-xml docbook-xsl fop libxml2-utils opensp xsltproc
 global colordiff
+python3-venv
+tor
+wajig
 
 Important root configs:
 fstab
@@ -56,6 +59,12 @@ fonts
 ydisk
 terminator
 firefox
+
+How to play midi:
+sudo apt-get install audicious fluid-soundfont-gm
+wajig list-files fluid-soundfont-gm
+And point midi plugin in audicious to listed .sf2 file
+
 
 TODO:
 * Deal with terminal -- saving pans and tabs, dir paths?

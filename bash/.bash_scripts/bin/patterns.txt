@@ -1,5 +1,6 @@
 .*FailedAssertion.*
-.*DEBUG.*SHARDMAN.*
+.*DEBUG.*SHMN.*
+ .*NOTICE.*
  .*INFO.*
  .*WARNING*
  .*ERROR.*\n(.*(HINT|QUERY|DETAIL|CONTEXT).*\n)*(^(\t| )+.*\n)*
