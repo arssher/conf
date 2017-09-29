@@ -169,3 +169,9 @@ setxkbmap -option ctrl:ralt_rctrl
 # TODO: check the following:
 # logger "setting altgr -> ctrl"
 # DISPLAY=:0 XDG_RUNTIME_DIR=/run/user/$(id -u) setxkbmap -option ctrl:ralt_rctrl
+
+# always dump core
+ulimit -c unlimited
+
+# for ec2.py
+export EC2_INI_PATH=/etc/ansible/ec2.ini

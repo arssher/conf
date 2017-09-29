@@ -81,7 +81,7 @@ cd $PGBDIR
 # opts for proper inlining
 CFLAGS="${CFLAGS} -std=c99 -Wno-unused-function"
 CFLAGS="${CFLAGS} --param large-stack-frame=4096 --param large-stack-frame-growth=100000"
-    # since debug symbols doesn't affect perfomance, include them in rel mode too
+# since debug symbols doesn't affect perfomance, include them in rel mode too
 CONFOPTS="--prefix=${PGIPATH} --enable-debug"
 if [[ "$mode" == d* ]]; then
     CFLAGS="${CFLAGS} -O0 -ggdb -fno-omit-frame-pointer -Wno-inline" \
