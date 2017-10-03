@@ -101,8 +101,11 @@ fi
 # My stuff
 # ------------------------------------------------------------
 
-export YANDEXDISK_DIR=`cat ~/.config/yandex-disk/config.cfg | grep "dir=" | sed 's/dir=\"\(.*\)\"/\1/'`
-export CONFPATH="${YANDEXDISK_DIR}/configs"
+if [ -x "$(command -v yandex-disk)" ]; then
+    export YANDEXDISK_DIR=`cat ~/.config/yandex-disk/config.cfg | grep "dir=" | sed 's/dir=\"\(.*\)\"/\1/'`
+    export CONFPATH="${YANDEXDISK_DIR}/configs"
+fi
+
 PATH=$PATH:~/.bash_scripts/bin # TODO: perhaps check if it is already added?
 export LC_ALL="en_US.UTF-8"
 
@@ -165,8 +168,10 @@ export EDITOR="$VISUAL"
 # terminal.
 export LESS=-x4R
 
-# Map right alt to behave as ctrl. Doesn't work
-setxkbmap -option ctrl:ralt_rctrl
+# Map right alt to behave as ctrl. Doesn't work in X
+if [ -x "$(command -v setxkbmap)" ]; then
+    setxkbmap -option ctrl:ralt_rctrl
+fi;
 # TODO: check the following:
 # logger "setting altgr -> ctrl"
 # DISPLAY=:0 XDG_RUNTIME_DIR=/run/user/$(id -u) setxkbmap -option ctrl:ralt_rctrl

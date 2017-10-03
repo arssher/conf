@@ -2,7 +2,7 @@
 
 set -e
 
-echo "Copying everything to the machine..."
+echo "Copying conf at ${CONFPATH} to the machine..."
 
 script_dir=`dirname "$(readlink -f "$0")"`
 cd "${script_dir}"
