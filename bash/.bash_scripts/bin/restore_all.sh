@@ -8,5 +8,7 @@ script_dir=`dirname "$(readlink -f "$0")"`
 cd "${script_dir}"
 
 for restore_script in restore_*.sh; do
-    "${script_dir}/${restore_script}"
+    if [ "${restore_script}" != "restore_all.sh" ]; then
+	"${script_dir}/${restore_script}"
+    fi;
 done;
