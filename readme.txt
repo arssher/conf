@@ -1,5 +1,6 @@
-"to machine" scripts install yandex disk conf onto the machine, "to disk"
-scripts export machine's conf to yandex_disk
+"restore" scripts install ${CONFPATH} conf onto the machine, "backup"
+scripts export machine's conf to ${CONFPATH}.
+.bashrc here sets CONFPATH to ${YANDEXDISK_DIR}/configs.
 
 
 Bash conf:
@@ -32,10 +33,10 @@ xbindkeys conf:
   Contains only .xbindkeysrc
 
 Things done on fresh Debian install:
-set up yandex disk, or (currently) point YANDEXDISK_DIR to dir with 'configs'
-dir
-run configs/bash/.bash_scripts/bin/bash_ydisk_to_machine.sh
-Now you can run all ydisk_to_machine.sh scripts
+set up yandex disk, or point CONFPATH to dir with cloned repo.
+cd conf
+run ${CONFPATH}/bash/.bash_scripts/bin/bash_ydisk_to_machine.sh
+Now you can run all restore*.sh scripts
 
 sudo apt-get install vim git terminator chromium checkinstall locate openvpn linux-tools
 sudo apt-get -y build-dep emacs24

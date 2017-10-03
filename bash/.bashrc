@@ -102,6 +102,7 @@ fi
 # ------------------------------------------------------------
 
 export YANDEXDISK_DIR=`cat ~/.config/yandex-disk/config.cfg | grep "dir=" | sed 's/dir=\"\(.*\)\"/\1/'`
+export CONFPATH="${YANDEXDISK_DIR}/configs"
 PATH=$PATH:~/.bash_scripts/bin # TODO: perhaps check if it is already added?
 export LC_ALL="en_US.UTF-8"
 
@@ -172,6 +173,3 @@ setxkbmap -option ctrl:ralt_rctrl
 
 # always dump core
 ulimit -c unlimited
-
-# for ec2.py
-export EC2_INI_PATH=/etc/ansible/ec2.ini

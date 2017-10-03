@@ -5,5 +5,5 @@
  .*WARNING*
  .*ERROR.*\n(.*(HINT|QUERY|DETAIL|CONTEXT).*\n)*(^(\t| )+.*\n)*
  .*LOG.*
- .*FATAL.*
+ .*FATAL.*\n(.*(HINT|QUERY|DETAIL|CONTEXT).*\n)*(^(\t| )+.*\n)*
  .*PANIC.*
