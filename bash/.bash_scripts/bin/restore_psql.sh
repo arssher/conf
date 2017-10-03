@@ -4,5 +4,5 @@ set -e
 
 echo "Copying psql files to the machine..."
 
-psql_backup_path="${YANDEXDISK_DIR}/configs/psql"
+psql_backup_path="${CONFPATH}/psql"
 cp ${psql_backup_path}/.psqlrc ~/

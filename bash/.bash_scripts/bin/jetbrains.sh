@@ -30,7 +30,7 @@ update_env_var() {
 }
 
 # check if JETBRAINS_DIR variable is present
-if [ -z ${JETBRAINS_DIR+x} ]; then 
+if [ -z ${JETBRAINS_DIR+x} ]; then
   echo "JETBRAINS_DIR variable is unset, exiting"
   exit 1
 fi
@@ -65,5 +65,5 @@ rm "${targzfilename}"
 update_env_var "${name}" "${foldername}"
 
 #update shortcuts
-cd "${YANDEXDISK_DIR}/configs/mint_shortcuts"
-bash "${YANDEXDISK_DIR}/configs/mint_shortcuts/ydisk_to_machine.sh"
+cd "${CONFPATH}/mint_shortcuts"
+bash "${CONFPATH}/mint_shortcuts/ydisk_to_machine.sh"

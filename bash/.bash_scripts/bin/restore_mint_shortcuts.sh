@@ -3,7 +3,7 @@
 #This folder contains linux mint custom keybindings.
 #See http://10pm.ca/blog/p/export-and-import-keyboard-shortcuts-on-linux-mint-17-and-17-1/ for details.
 
-configs_backup_path="${YANDEXDISK_DIR}/configs/mint_shortcuts"
+configs_backup_path="${CONFPATH}/mint_shortcuts"
 echo "Copying keybindings to the machine..."
 echo "ydir=${YANDEXDISK_DIR}, iname=${IDEA_BIN} and pname=${PYCHARM_BIN}, cname=${CLION_BIN}"
 
