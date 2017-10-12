@@ -8,15 +8,19 @@ import os
 import random
 from subprocess import check_output
 
-if len(sys.argv) < 3:
-   sys.stderr.write(format("Usage: {0} <num_of_keys> <table_name> [psql_opts]\n",
-                os.path.basename(__file__)))
+if len(sys.argv) < 4:
+   sys.stderr.write("Usage: {pathman_gen_keys.py} <num_of_keys> <table_name> <maxkey> [psql_opts]\n")
    sys.exit(1)
 
 num_of_keys = int(sys.argv[1])
 sys.stderr.write("num of keys: {}\n".format(num_of_keys))
 table_name = sys.argv[2]
-psql_opts = sys.argv[3]
+maxkey = int(sys.argv[3])
+if len(sys.argv) >= 5:
+   psql_opts = sys.argv[4]
+else:
+   psql_opts = ""
+
 
 total_parts = int(check_output(
    "psql -qtA {0} -c \"select count(*) from pathman_partition_list where parent = '{1}'::regclass\"".format(psql_opts, table_name), shell=True))
@@ -35,7 +39,7 @@ sys.stderr.write("part ids are {}\n".format(part_ids))
 
 key_count = 0
 while key_count != num_of_keys:
-   potential_key = random.randint(1, 2147483647)
+   potential_key = random.randint(1, maxkey)
    target_part = int(check_output(
       """
       psql -qtA {} -c "select get_hash_part_idx(hashint4({}), {})"
