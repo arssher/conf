@@ -1,9 +1,3 @@
 .*FailedAssertion.*
 .*DEBUG.*SHMN.*
- .*NOTICE.*
- .*INFO.*
- .*WARNING*
- .*ERROR.*\n(.*(HINT|QUERY|DETAIL|CONTEXT).*\n)*(^(\t| )+.*\n)*
- .*LOG.*
- .*FATAL.*\n(.*(HINT|QUERY|DETAIL|CONTEXT).*\n)*(^(\t| )+.*\n)*
- .*PANIC.*
+ .*(NOTICE|INFO|LOG|WARNING|ERROR|FATAL|PANIC).*\n(.*(HINT|QUERY|DETAIL|CONTEXT).*\n)*(^(\t| )+.*\n)*

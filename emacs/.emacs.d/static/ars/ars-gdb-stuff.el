@@ -21,20 +21,38 @@ and attach gdb to it. Path to Postgres installation directory must be in $PGIDIR
   )
   )
 
-(defun shardmaster-gdblive()
-"Attach to shardmaster bgw"
+(defun pg-shardlord-gdblive()
+"Attach to shardlor bgw"
   (interactive)
-  (setq shardmaster-pid (shell-command-to-string
+  (setq shardlord-pid (shell-command-to-string
 "ps auxww | \
- grep 'postgres: bgworker: shardmaster' | \
+ grep 'postgres: bgworker: shardlord' | \
  awk '{print $2}' | head -1 | tr -d '\n'
 "
                  )
   )
-  (if (string= "" shardmaster-pid)
-      (message "%s" "shardmaster not found gdb will not start")
-      (message "%s%s%s" "Found shardmaster with pid" shardmaster-pid ", running gdb...")
-      (gdb (concat "gdb -i=mi --silent " pgpath " " shardmaster-pid))
+  (if (string= "" shardlord-pid)
+      (message "%s" "shardlord not found gdb will not start")
+      (message "%s%s%s" "Found shardlord with pid" shardlord-pid ", running gdb...")
+      (gdb (concat "gdb -i=mi --silent " pgpath " " shardlord-pid))
+      )
+  )
+
+(defun pg-apply-worker-gdblive()
+"Attach to apply worker bgw"
+  (interactive)
+  (setq apply-worker-pid (shell-command-to-string
+"ps aux | \
+ grep -v -e 'grep' | \
+ grep 'postgres: bgworker: logical replication worker for subscription' | \
+ awk '{print $2}' | head -1 | tr -d '\n'
+"
+                 )
+  )
+  (if (string= "" apply-worker-pid)
+      (message "%s" "apply worker not found, gdb will not start")
+      (message "%s%s%s" "Found apply worker with pid" apply-worker-pid ", running gdb...")
+      (gdb (concat "gdb -i=mi --silent " pgpath " " apply-worker-pid))
       )
   )
 
