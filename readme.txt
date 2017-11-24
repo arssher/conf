@@ -48,6 +48,12 @@ global colordiff
 python3-venv
 tor
 wajig
+# additional pg deps
+vim sudo strace build-essential git screen gdb \
+libwww-perl perl perl-modules libperl-dev libipc-run-perl tcl-dev \
+libedit-dev libssl-dev zlib1g-dev libpam0g-dev libxml2-dev \
+krb5-multidev libldap2-dev python-dev bison flex xsltproc gettext \
+libicu-dev libkrb5-dev libxslt-dev pkgconf libzstd-dev
 
 Important root configs:
 fstab
@@ -69,3 +75,6 @@ And point midi plugin in audicious to listed .sf2 file
 
 TODO:
 * Deal with terminal -- saving pans and tabs, dir paths?
+
+How to disable Alt+left mouse windows move
+http://forums.odforce.net/topic/28501-linux-disable-alt-left-mouse-button/

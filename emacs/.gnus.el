@@ -182,7 +182,7 @@
   (message "Sending via %s acc" choice)
 )
 ;; Use ispras by default
-(choose-smtp-server "ispras")
+(choose-smtp-server "pgpro")
 
 
 ;;____________________________________________________________

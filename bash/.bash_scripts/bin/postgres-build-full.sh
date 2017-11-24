@@ -67,15 +67,21 @@ done
 # It is very important to run this target, not distclean or clean!
 # distclean leaves some files, see
 # https://www.postgresql.org/message-id/flat/20050620231820.GB8840%40mits.lv#20050620231820.GB8840@mits.lv
-cd "${PGSDIR}" && ./configure && make maintainer-clean
+
+# || true because it will fail if it is a clean postgres
+cd "${PGSDIR}" && make maintainer-clean || true
 if [ -d "$PGBDIR" ]; then
     # || true because it will fail if it is a clean postgres (configure was never
     # run)
     cd $PGBDIR && make maintainer-clean || true
 fi
 
-mkdir -p $PGBDIR
-cd $PGBDIR
+if ! [[ ${PGBDIR} -ef ${PGSDIR} ]]; then
+    echo "VPATH build"
+    rm -rf $PGBDIR && mkdir -p $PGBDIR && cd $PGBDIR
+else
+    echo "usual build"
+fi
 
 # run configure
 # opts for proper inlining
@@ -83,8 +89,18 @@ CFLAGS="${CFLAGS} -std=c99 -Wno-unused-function"
 CFLAGS="${CFLAGS} --param large-stack-frame=4096 --param large-stack-frame-growth=100000"
 # since debug symbols doesn't affect perfomance, include them in rel mode too
 CONFOPTS="--prefix=${PGIPATH} --enable-debug"
+if grep -q "PGPRO_VERSION" "${PGSDIR}/src/include/pg_config.h.in"; then
+    :
+    # seems like we are building pgpro
+    CONFOPTS="${CONFOPTS} --enable-nls \
+	--with-openssl --with-perl --with-tcl --with-python \
+	--with-gssapi --with-includes=/usr/include/gssglue \
+	--with-libxml --with-libxslt --with-ldap \
+	--with-icu --with-zstd"
+fi
 if [[ "$mode" == d* ]]; then
-    CFLAGS="${CFLAGS} -O0 -ggdb -fno-omit-frame-pointer -Wno-inline" \
+    # ggdb3 makes gdb aware of macros
+    CFLAGS="${CFLAGS} -O0 -ggdb3 -fno-omit-frame-pointer -Wno-inline" \
 	  "$PGSDIR/configure" $CONFOPTS --enable-tap-tests --enable-cassert
 elif [[ "$mode" == r* ]]; then
     CFLAGS="${CFLAGS} -O2" "$PGSDIR/configure" $CONFOPTS
