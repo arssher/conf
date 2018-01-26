@@ -178,3 +178,7 @@ fi;
 
 # always dump core
 ulimit -c unlimited
+
+# beatiful git log as `git log`
+git config --global alias.lg "log --color --graph --abbrev-commit
+           --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset'"
