@@ -27,3 +27,7 @@
 ;; It works badly with magit diff though, so I will turn it off for now...
 ;; (winner-mode 1)
 ;; (add-hook 'ediff-after-quit-hook-internal 'winner-undo)
+
+;; overwrite buggy diff-hunk-text
+(require 'ars-diff)
+(advice-add 'diff-hunk-text :override 'diff-hunk-text-fixed)

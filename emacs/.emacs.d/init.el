@@ -31,8 +31,8 @@
 ;; Load custom functions for which I have not found their own file yet
 (require 'ars-misc)
 
-
 ;;________________________________________________
+;; Load init files
 (defvar init-d (concat emacs-d "static/init/"))
 
 ;; general
@@ -52,6 +52,7 @@
 (load-file (concat init-d "code-style.el"))
 (load-file (concat init-d "fly.el"))
 (load-file (concat init-d "dbg.el"))
+(load-file (concat init-d "magit.el"))
 
 ;; major modes
 (load-file (concat init-d "latex.el"))
@@ -91,6 +92,7 @@
 (global-set-key [f2] 'dired-omit-mode) ; show and hide hidden files in dired
 ;; enable/disable ivy mode until I deal with excess completing problem
 (global-set-key [f3] 'ivy-mode)
+(global-set-key [f4] 'toggle-remove-whitespace-on-save)
 (global-set-key [f5] 'revert-buffer-no-confirm)
 (global-set-key [f6] 'desktop+-create) ; save desktop
 (global-set-key [f7] 'desktop+-load) ; load saved desktop
@@ -235,7 +237,6 @@
 ;; we don't need replace either, let it do command search as always:
 (define-key comint-mode-map (kbd "C-r") 'comint-history-isearch-backward-regexp)
 
-
 ;; c-mode:
 (defun my-c-mode-config ()
   ;; Disable C-d default meaning in c-mode, we need it for duplicating lines
@@ -248,6 +249,7 @@
 (define-key diff-mode-map (kbd "M-k") nil)
 (define-key diff-mode-map (kbd "M-n") nil)
 (define-key diff-mode-map (kbd "M-p") nil)
+(define-key diff-mode-map (kbd "M-h") nil)
 (define-key diff-mode-map (kbd "C-c k") 'diff-hunk-next)
 (define-key diff-mode-map (kbd "C-c i") 'diff-hunk-prev)
 
@@ -267,7 +269,6 @@
 )
 (add-hook 'ediff-meta-buffer-keymap-setup-hook 'my-ediff-meta-buffer-config)
 
-
 ;; magit:
 (require 'magit)
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -275,7 +276,7 @@
 (define-key magit-mode-map "k" 'magit-section-forward)
 (define-key magit-mode-map "i" 'magit-section-backward)
 (define-key magit-mode-map (kbd "M-n") nil)
-
+(define-key magit-mode-map (kbd "M-k") 'magit-discard)
 
 ;; bookmarks mode
 (with-eval-after-load "bookmark"
@@ -284,16 +285,21 @@
   (define-key bookmark-bmenu-mode-map (kbd "k") 'next-line)
 )
 
-
 ;; auctex
 ;; compile until needed
 (add-hook 'LaTeX-mode-hook '(lambda () (local-set-key (kbd "C-c C-a") 'TeX-texify)))
-
 
 ;; info mode
 (define-key Info-mode-map (kbd "i") 'my-scroll-down-one)
 (define-key Info-mode-map (kbd "k") 'my-scroll-up-one)
 (define-key Info-mode-map (kbd "o") 'Info-index) ; use o for index instead
+
+;; Markdown
+(with-eval-after-load "markdown-mode"
+  (define-key markdown-mode-map (kbd "M-h") nil)
+  (define-key markdown-mode-map (kbd "M-n") nil)
+  (define-key markdown-mode-map (kbd "M-p") nil)
+)
 
 ;;____________________________________________________________
 

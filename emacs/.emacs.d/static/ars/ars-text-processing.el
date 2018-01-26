@@ -79,5 +79,13 @@ Position the cursor at it's beginning, according to the current mode."
   (forward-line -1)
   (indent-according-to-mode))
 
+(defun toggle-remove-whitespace-on-save ()
+  (interactive)
+  (if (member 'delete-trailing-whitespace write-file-functions)
+    (progn (setq write-file-functions (remove 'delete-trailing-whitespace write-file-functions)) (message "removing whitespaces on save disabled"))
+    (add-to-list 'write-file-functions 'delete-trailing-whitespace)
+    (message "removing whitespaces on save enabled"))
+)
+
 (message "ars-text-processing loaded")
 (provide 'ars-text-processing)
