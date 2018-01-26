@@ -45,3 +45,6 @@
 
 ;; show trailing whitespaces
 (setq show-trailing-whitespace 1)
+
+;; never pop-up GUI file selector
+(setq use-file-dialog nil)
