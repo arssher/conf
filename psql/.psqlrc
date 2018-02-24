@@ -1,4 +1,4 @@
-\set PROMPT1 '%M:%> %n@%/:%p%R%[%# '
+\set PROMPT1 '%M:%> %n@%/:%p%R%# '
 
 \set HISTSIZE -1
 

@@ -199,9 +199,9 @@
 (global-set-key (kbd "C-b") 'ggtags-find-tag-dwim)
 (global-set-key (kbd "C-S-b") 'ggtags-find-definition)
 (global-set-key (kbd "M-B") 'ggtags-prev-mark)
-(global-set-key (kbd "C-M-b") 'ggtags-next-mark)
+(global-set-key (kbd "M-F") 'ggtags-next-mark)
 (global-set-key (kbd "M-<f7>") 'ggtags-find-reference) ; idea
-(global-set-key (kbd "M-F") 'ggtags-grep) ; grepping the project
+(global-set-key (kbd "C-M-g") 'ggtags-grep) ; grepping the project
 (global-set-key (kbd "C-S-N") 'projectile-find-file) ; similar to idea
 (global-set-key (kbd "C-n") 'ggtags-find-definition) ; similar to idea
 (define-key ggtags-navigation-map (kbd "M-s") nil)

@@ -9,4 +9,4 @@ else
     log=/tmp/shmn.log
 fi
 
-pcregrep -M -f "${script_dir}/patterns.txt" "${log}"
+pcregrep --recursive -M -f "${script_dir}/patterns.txt" "${log}"
