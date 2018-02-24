@@ -33,8 +33,8 @@ pkill -9 postgres || true
 for pgnum in "${pgnums[@]}"; do
     rm -rf "/tmp/data${pgnum}"
     initdb -D "/tmp/data${pgnum}"
-    echo "shared_preload_libraries='pg_pathman'" >> "/tmp/data${pgnum}/postgresql.conf"
-    echo "wal_level=logical" >> "/tmp/data${pgnum}/postgresql.conf"
+    cp ~/tmp/tmp/postgresql.conf "/tmp/data${pgnum}/postgresql.conf"
     port=$((5432 + $pgnum))
+    rm -rf /tmp/shmn.log
     pg_ctl -o "-p ${port}"  -D "/tmp/data${pgnum}" -l /tmp/shmn.log restart
 done

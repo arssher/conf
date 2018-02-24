@@ -40,7 +40,6 @@ if [ -n "$force_color_prompt" ]; then
 	color_prompt=
     fi
 fi
-
 if [ "$color_prompt" = yes ]; then
     if [[ ${EUID} == 0 ]] ; then
         PS1='${debian_chroot:+($debian_chroot)}\[\033[01;31m\]\h\[\033[01;34m\] \W \$\[\033[00m\] '
@@ -182,3 +181,13 @@ ulimit -c unlimited
 # beatiful git log as `git log`
 git config --global alias.lg "log --color --graph --abbrev-commit
            --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset'"
+
+# Use virtualenvwrapper, if it is available
+if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
+      source /usr/local/bin/virtualenvwrapper.sh
+fi
+
+# quickly switch pg currently in use by outraging PATH
+function pg_workon {
+    PATH="${HOME}/postgres/install/${1}/bin:${PATH}"
+}
