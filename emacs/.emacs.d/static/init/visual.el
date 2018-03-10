@@ -26,8 +26,10 @@
 (global-linum-mode t) ; show line numbers
 (setq column-number-mode t) ; show column number
 
-(toggle-scroll-bar -1)
-(tool-bar-mode -1)
+(if (display-graphic-p)
+        (progn
+	  (toggle-scroll-bar -1)
+	  (tool-bar-mode -1)))
 (menu-bar-mode -1)
 
 ;; ruler at 80

@@ -4,9 +4,13 @@
 (setq package-user-dir
       (expand-file-name "elpa" emacs-d))
 
-;; add package repos
-(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")))
+;; add package repos; use ssl if available
+(setq package-archives nil)
+(let* ((proto (if (gnutls-available-p) "https" "http")))
+  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
+  (add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")) t)
+  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t))
+
 ;; load elpa packages right now because we need package-installed-p,
 ;; see https://www.emacswiki.org/emacs/ELPA
 (setq package-enable-at-startup nil)
@@ -15,7 +19,6 @@
 
 (defvar required-packages
   '(auctex
-    desktop+ ; to save sessions
     all-the-icons ; for neotree, which I actually don't use
     dash ; required by all-icons (used for neat icons in neotree)
     neotree ; project tree
