@@ -1,0 +1,51 @@
+[global_config]
+[keybindings]
+  broadcast_all = None
+  broadcast_group = None
+  broadcast_off = None
+  close_term = None
+  cycle_next = <Alt>s
+  cycle_prev = None
+  edit_terminal_title = None
+  help = None
+  layout_launcher = None
+  next_tab = <Primary>Tab
+  prev_tab = <Primary><Shift>Tab
+  switch_to_tab_1 = <Primary>1
+  switch_to_tab_2 = <Primary>2
+  switch_to_tab_3 = <Primary>3
+  switch_to_tab_4 = <Primary>4
+  switch_to_tab_5 = <Primary>5
+  switch_to_tab_6 = <Primary>6
+  switch_to_tab_7 = <Primary>7
+  switch_to_tab_8 = <Primary>8
+  switch_to_tab_9 = <Primary>9
+[layouts]
+  [[default]]
+    [[[child1]]]
+      parent = window0
+      type = Terminal
+    [[[window0]]]
+      parent = ""
+      type = Window
+  [[custom]]
+    [[[child0]]]
+      order = 0
+      parent = ""
+      position = 0:0
+      size = 1600, 850
+      type = Window
+    [[[terminal1]]]
+      command = -m
+      order = 0
+      parent = child0
+      profile = default
+      type = Terminal
+[plugins]
+[profiles]
+  [[default]]
+    cursor_color = "#aaaaaa"
+    font = Ubuntu Mono 14
+    icon_bell = False
+    show_titlebar = False
+    use_system_font = False

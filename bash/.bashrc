@@ -191,3 +191,9 @@ fi
 function pg_workon {
     PATH="${HOME}/postgres/install/${1}/bin:${PATH}"
 }
+
+# remove core & tmp files
+function rmc {
+    rm -rf /tmp/tmp*
+    rm -rf /tmp/core*
+}
