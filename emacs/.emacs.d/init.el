@@ -2,6 +2,10 @@
 ;; See how to build it in Ubuntu here:
 ;; http://ubuntuhandbook.org/index.php/2014/10/emacs-24-4-released-install-in-ubuntu-14-04/
 
+
+;; We do this ourselves later, but package.el insists we should have it.
+;; (package-initialize)
+
 (defvar emacs-d
   (file-name-directory
    (file-chase-links load-file-name))
@@ -129,8 +133,10 @@
 ;; dirty hack to distinguish TAB and C-i, see
 ;; http://stackoverflow.com/questions/1792326/how-do-i-bind-a-command-to-c-i-without-changing-tab
 ;; accepted answer doesn't work
-(define-key input-decode-map (kbd "C-i") (kbd "H-i"))
-(global-set-key (kbd "H-i") 'my-scroll-down-one)
+(if (display-graphic-p)
+    (progn
+      (define-key input-decode-map (kbd "C-i") (kbd "H-i"))
+      (global-set-key (kbd "H-i") 'my-scroll-down-one)))
 (global-set-key (kbd "M-i") 'previous-line) ; ergo
 (global-set-key (kbd "M-I") 'drag-stuff-up)
 (global-set-key (kbd "M-o") 'forward-word) ; ergo
@@ -218,7 +224,6 @@
 ;; projectile:
 ;; switching between header and .c
 (global-set-key (kbd "C-M-n") 'projectile-find-other-file)
-(global-set-key (kbd "M-O") 'projectile-switch-project)
 (global-set-key (kbd "M-R") 'projectile-replace-regexp)
 
 
