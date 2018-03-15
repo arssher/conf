@@ -22,6 +22,9 @@ new_hash=$(git hash-object "$5")
 # echo "new file mode $7"
 # echo "index ${old_hash:0:7}..${new_hash:0:7}"
 
-diff --label a/"$1" --label b/"$1" $DIFF_OPTS "$2" "$5" | colordiff
-
+if ! [ -x "$(command -v colordiff)" ]; then
+	diff --label a/"$1" --label b/"$1" $DIFF_OPTS "$2" "$5"
+else
+	diff --label a/"$1" --label b/"$1" $DIFF_OPTS "$2" "$5" | colordiff
+fi
 exit 0

@@ -164,6 +164,7 @@
 (global-set-key (kbd "M-l") 'forward-char) ; ergo
 (global-set-key (kbd "C-l") 'goto-line) ; ergo
 (global-set-key (kbd "C-;") 'comment-idea)
+(global-set-key (kbd "M-;") 'comment-idea)
 ;; idea's shift-enter, defined in my-text-processing.el
 (global-set-key (kbd "<S-return>") 'end-of-line-and-indented-new-line)
 
