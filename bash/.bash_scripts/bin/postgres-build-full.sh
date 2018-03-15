@@ -87,7 +87,7 @@ fi
 # opts for proper inlining
 CFLAGS="${CFLAGS} -std=c99 -Wno-unused-function"
 CFLAGS="${CFLAGS} --param large-stack-frame=4096 --param large-stack-frame-growth=100000"
-# since debug symbols doesn't affect perfomance, include them in rel mode too
+# since debug symbols don't affect perfomance, include them in rel mode too
 CONFOPTS="--prefix=${PGIPATH} --enable-debug"
 if grep -q "PGPRO_VERSION" "${PGSDIR}/src/include/pg_config.h.in"; then
     :
@@ -112,12 +112,9 @@ fi
 
 # run make
 echo '-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-'
-makeopts="${silent} ${target}"
-if [[ -z "${makeopts}" ]]; then
-    make -j4
-else
-    make -j4 $makeopts
-fi
+numcores=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | tail -1`
+makeopts="-j ${numcores} ${silent} ${target}"
+make -j $numcores $makeopts
 echo "Postgres at ${PGSDIR} successfully built"
 
 # run tests, if needed
