@@ -3,7 +3,7 @@ set -e
 
 show_help() {
     cat <<EOF
-    Usage: bash ${0##*/} [-t target] [-f] [-r]
+    Usage: bash ${0##*/} [-t target] [-m mode] [-r] [-e <ext,ext,...>] [-s]
 
     Configure and build Postgres, found in \$PGSDIR, with prefix
     (installation path) \$PGIDIR/\$PGINAME, using \$PGBDIR as a build directory.
@@ -19,6 +19,7 @@ show_help() {
        perf: like release, but with frame pointers not omitted to get callstacks
          on old perfs
     -r run regression tests. By default they are not run.
+    -e comma separated-list of extensions in contrib/ to 'install'
     -s silent make
 
     Examples:
@@ -35,10 +36,11 @@ mode="debug"
 run_tests=""
 target="install-world"
 silent=""
+extensions=""
 OPTIND=1 # reset opt counter, it is always must be set to 1
 # each symbol is option name; if there is colon after, it has value
 # the first colon would mean non-silent mode (error reporting)
-while getopts "m:ht:s" opt; do # the result will be stored in $opt
+while getopts "m:ht:se:" opt; do # the result will be stored in $opt
     case $opt in
 	h) # bracket is a part of case syntax, you know
 	    show_help
@@ -55,6 +57,9 @@ while getopts "m:ht:s" opt; do # the result will be stored in $opt
 	    ;;
 	s)
 	    silent="-s"
+	    ;;
+	e)
+	    extensions=$OPTARG
 	    ;;
 	\?) # match '?'
 	    show_help >&2
@@ -111,12 +116,22 @@ else
     echo "Wrong mode"
 fi
 
+# purge installation directory to avoid stale files (e.g. extensions) left there
+rm -rf ${PGIPATH} && mkdir -p ${PGIPATH}
+
 # run make
 echo '-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-'
 numcores=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | tail -1`
 makeopts="-j ${numcores} ${silent} ${target}"
-make -j $numcores $makeopts
+make $makeopts
 echo "Postgres at ${PGSDIR} successfully built"
+
+# build & install extensions, if needed
+extensions_arr=(${extensions//,/ }) # convert ',' to spaces and build the array
+for ext in "${extensions_arr[@]}"; do
+    cd contrib/$ext && make -j $silent $numcores install && cd ..
+    echo "Extension $ext build & installed"
+done
 
 # run tests, if needed
 if [ "$run_tests" = true ]; then
