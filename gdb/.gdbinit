@@ -7,7 +7,7 @@ set logging off
 # well, without that, logging will not work
 # https://sourceware.org/bugzilla/show_bug.cgi?id=14584
 set trace-commands on
-set logging file /home/ars/.gdb_log
+set logging file ~/.gdb_log
 set logging on
 
 # save history of unlimited size, write always to ~/.gdb_history
