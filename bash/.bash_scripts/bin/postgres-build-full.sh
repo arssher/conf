@@ -89,12 +89,17 @@ else
     echo "usual build"
 fi
 
+# musl setup
+export CC=/usr/local/musl/bin/musl-gcc
+export CFLAGS="${CFLAGS} -no-pie"
+CONFOPTS="${CONFOPTS} --without-zlib"
+
 # run configure
 # opts for proper inlining
-CFLAGS="${CFLAGS} -std=c99 -Wno-unused-function"
-CFLAGS="${CFLAGS} --param large-stack-frame=4096 --param large-stack-frame-growth=100000"
+export CFLAGS="${CFLAGS} -std=c99 -Wno-unused-function"
+export CFLAGS="${CFLAGS} --param large-stack-frame=4096 --param large-stack-frame-growth=100000"
 # since debug symbols don't affect perfomance, include them in rel mode too
-CONFOPTS="--prefix=${PGIPATH} --enable-debug"
+CONFOPTS="${CONFOPTS} --prefix=${PGIPATH} --enable-debug"
 if grep -q "PGPRO_VERSION" "${PGSDIR}/src/include/pg_config.h.in"; then
     :
     # seems like we are building pgpro
@@ -130,7 +135,7 @@ echo "Postgres at ${PGSDIR} successfully built"
 extensions_arr=(${extensions//,/ }) # convert ',' to spaces and build the array
 for ext in "${extensions_arr[@]}"; do
     cd contrib/$ext && make -j $silent $numcores install && cd ..
-    echo "Extension $ext build & installed"
+    echo "Extension $ext built & installed"
 done
 
 # run tests, if needed
