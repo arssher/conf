@@ -1,17 +1,49 @@
 #!/bin/bash
 
 # adapted from https://poormansprofiler.org/ for flamegraph.pl
-# example:
-# poormansprofiler.sh > poor.stacks
-# flamegraph.pl --color=yellow --title="Poor man's flamegraph" < poor.stacks > poor.svg
+
+show_help() {
+    cat <<EOF
+    Usage:
+      poormansprofiler.sh [-n <nsamples>] [-s <sleeptime>] <-p pid> > poor.stacks
+      flamegraph.pl --color=yellow --title="Poor man's flamegraph" < poor.stacks > poor.svg
+      It is recommended to run gdb-add-index.sh to decrease gdb start up time.
+EOF
+    exit 0
+}
 
 nsamples=20
 sleeptime=1
 pid=`ps aux | grep '[p]ostgres: ars' | tail -n 1 | awk '{print $2}'`
 
+OPTIND=1 # reset opt counter, it is always must be set to 1
+# each symbol is option name; if there is colon after, it has value
+# the first colon would mean silent mode (e.g. suppress illegal option -- p)
+while getopts ":p:n:s:" opt; do # the result will be stored in $opt
+    case $opt in
+	h) # bracket is a part of case syntax, you know
+	    show_help
+	    exit 0
+	    ;;
+	p)
+	    pid=$OPTARG
+	    ;;
+	n)
+	    nsamples=$OPTARG
+	    ;;
+	s)
+	    sleeptime=$OPTARG
+	    ;;
+	\?) # match '?'
+	    show_help >&2
+	    exit 1
+	    ;;
+    esac
+done
+
 for x in $(seq 1 $nsamples)
   do
-    gdb -ex "set pagination 0" -ex "thread apply all bt" -batch -p $pid
+    gdb -nx -ex "set pagination 0" -ex "thread apply all bt" -batch -p $pid
     sleep $sleeptime
   done | \
 awk '
