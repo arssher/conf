@@ -90,9 +90,9 @@ else
 fi
 
 # musl setup
-export CC=/usr/local/musl/bin/musl-gcc
-export CFLAGS="${CFLAGS} -no-pie"
-CONFOPTS="${CONFOPTS} --without-zlib"
+# export CC=/usr/local/musl/bin/musl-gcc
+# export CFLAGS="${CFLAGS} -no-pie"
+# CONFOPTS="${CONFOPTS} --without-zlib"
 
 # run configure
 # opts for proper inlining

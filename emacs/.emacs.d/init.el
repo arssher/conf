@@ -63,6 +63,10 @@
 (load-file (concat init-d "asm.el"))
 (load-file (concat init-d "sql.el"))
 
+;; mail; load only mu4e is installed
+(add-to-list 'load-path (format "%s/opt/share/emacs/site-lisp/mu4e" (getenv "HOME")))
+(when (require 'mu4e nil 'noerror) (load-file (concat init-d "mail.el")))
+
 ;; machine-specific stuff, e.g. set environment variables there
 (when (file-exists-p (concat (getenv "HOME") "/.emacs-local.el"))
   (load-file (concat (getenv "HOME") "/.emacs-local.el")))
