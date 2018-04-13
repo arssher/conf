@@ -74,9 +74,6 @@
 ;; And whether I actually want to delete
 (setq gnus-novice-user nil)
 
-;; Personal information, not related to access
-(setq user-full-name "Arseny Sher")
-
 ;;____________________________________________________________
 ;; Setup access
 ;; Gnus has a single "primary" select method and multiple "secondary" select
@@ -105,7 +102,7 @@
 (setq gnus-secondary-select-methods
       '(
 	;; yandex imap setup.  automatically
-	(nnimap "main"
+	(nnimap "yandex"
 		(nnimap-address "imap.yandex.com")
 		(nnimap-server-port 993)
 		(nnimap-stream ssl)
@@ -125,11 +122,6 @@
 	;; 	(nnimap-stream tls)
 	;; )
         ;; ispras imap setup
-	 (nnimap "work"
-		 (nnimap-address "mail.ispras.ru")
-		 (nnimap-server-port 993)
-		 (nnimap-stream ssl)
-	 )
 	 (nnimap "pgpro"
 		 (nnimap-address "imap.postgrespro.ru")
 		 ;; (nnimap-server-port 993)
@@ -137,52 +129,6 @@
 	 )
        )
 )
-
-
-;; Setup to send email through SMTP
-;; Again, credentials are read from ~/.authinfo
-;; To use multiple accounts, for now I will use dirty hack with manual account
-;; switching
-(require 'smtpmail)
-(setq message-send-mail-function 'smtpmail-send-it)
-(defun choose-smtp-server (choice)
-   "CHOICE is one of predefined accs to send mail from."
-  (interactive
-    (list (completing-read "Choose acc to send mail: " '("main" "ispras" "pgpro")))
-  )
-  (cond ((string= choice "ispras")
-	 ;; ispras smtp setup
-	 (setq smtpmail-smtp-server "mail.ispras.ru"
-	       smtpmail-stream-type  'starttls
-	       smtpmail-smtp-service 25
-	       ;; just set header, this is used for auth
-	       user-mail-address "sher-ars@ispras.ru"
-	       ;; this is needed to copy sent message to proper 'sent' folder
-	       gnus-message-archive-group "nnimap+work:Sent")
-	 )
-	((string= choice "main")
-	 ;; yandex smtp setup
-	 (setq smtpmail-smtp-server "smtp.yandex.com"
-	       smtpmail-stream-type  'ssl
-	       smtpmail-smtp-service 465
-	       ;; just set header, this is used for auth
-	       user-mail-address "sher-ars@yandex.ru"
-	       ;; this is needed to copy sent message to proper 'sent' folder
-	       gnus-message-archive-group "nnimap+main:Отправленные")
-	 )
-	((string= choice "pgpro")
-	 ;; yandex smtp setup
-	 (setq smtpmail-smtp-server "smtp.postgrespro.ru"
-	       ;; just set header, this is used for auth
-	       user-mail-address "a.sher@postgrespro.ru"
-	       ;; this is needed to copy sent message to proper 'sent' folder
-	       gnus-message-archive-group "nnimap+pgpro:Sent")
-	)
-  )
-  (message "Sending via %s acc" choice)
-)
-;; Use ispras by default
-(choose-smtp-server "pgpro")
 
 
 ;;____________________________________________________________

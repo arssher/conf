@@ -1,0 +1,189 @@
+# The following systemd unit at /etc/systemd/user/offlineimap.service should
+# work:
+# [Unit]
+# Description=Offlineimap Service
+# Documentation=man:offlineimap(1)
+
+# [Service]
+# ExecStart=/usr/bin/offlineimap -u basic
+# Restart=on-failure
+# RestartSec=60
+# StandardOutput=syslog
+# StandardError=syslog
+# SyslogIdentifier=offlineimap
+
+# [Install]
+# WantedBy=default.target
+
+# With something like the following in /etc/rsyslog.d/offlineimap.conf:
+# if $programname == 'offlineimap' then /home/ars/opt/var/log/offlineimap.log
+
+# Then you can say
+# systemctl --user enable offlineimap.service
+# systemctl --user restart offlineimap.service
+
+[general]
+
+# This variable specifies which accounts are defined. Separate them with commas.
+# Account names should be alphanumeric only. You will need to specify one
+# section per account below. You may not use "general" for an account name.
+#
+# Always use ASCII characters only.
+accounts = yandex, pgpro
+
+# This option stands in the [general] section.
+#
+# Offlineimap can synchronize more than one account at a time. If you want to
+# enable this feature, set the below value to something greater than 1.  To
+# force it to synchronize only one account at a time, set it to 1.
+#
+# NOTE: if you are using autorefresh and have more than one account, you must
+# set this number to be >= to the number of accounts you have; since any given
+# sync run never "finishes" due to a timer, you will never sync your additional
+# accounts if this is 1.
+#
+maxsyncaccounts = 3
+
+# You can give a Python source filename here and all config file
+# python snippets will be evaluated in the context of that file.
+# This allows you to e.g. define helper functions in the Python
+# source file and call them from this config file.  You can find
+# an example of this in the manual.
+#
+# Tilde and environment variable expansions will be performed.
+#
+pythonfile = ~/.offlineimap.py
+
+[Account yandex]
+localrepository = yandex_local
+remoterepository = yandex_remote
+
+# This option stands in the [Account Test] section.
+#
+# You can have Offlineimap continue running indefinitely, automatically syncing
+# your mail periodically.  If you want that, specify how frequently to do that
+# (in minutes) here.  Fractional minutes (ie, 3.25) is allowed.
+#
+# If you want more than one account concurrently synced in this mode, don't
+# forget to set the maxsyncaccounts option accordingly.
+#
+autorefresh = 5
+
+
+# This option stands in the [Account Test] section.
+#
+# OfflineImap can replace a number of full updates by quick synchronizations.
+# This option is ignored if maxage or startdate are used.
+#
+# It only synchronizes a folder if
+#
+#   1) a Maildir folder has changed
+#
+# or
+#
+#   2) if an IMAP folder has received new messages or had messages deleted, ie
+#   it does not update if only IMAP flags have changed.
+#
+# Full updates need to fetch ALL flags for all messages, so this makes quite a
+# performance difference (especially if syncing between two IMAP servers).
+#
+# Specify 0 for never, -1 for always (works even in non-autorefresh mode)
+#
+# A positive integer <n> to do <n> quick updates before doing another full
+# synchronization (requires autorefresh).  Updates are always performed after
+# <autorefresh> minutes, be they quick or full.
+#
+quick = 24
+
+# This option stands in the [Account Test] section.
+#
+# You can specify a pre and post sync hook to execute a external command.  In
+# this case a call to imapfilter to filter mail before the sync process starts
+# and a custom shell script after the sync completes.
+#
+# The pre sync script has to complete before a sync to the account will start.
+#
+#presynchook = imapfilter -c someotherconfig.lua
+# kill mu mu4e might already running, otherwise index will fail
+postsynchook = sh -c 'pkill -2 mu; sleep 1; ~/opt/bin/mu index --maildir /d/mail'
+
+[Repository yandex_local]
+type = Maildir
+localfolders = /d/mail/yandex
+# Need to convert back again to imap encoding
+nametrans = utf82imap
+
+[Repository yandex_remote]
+type = IMAP
+# IMAP uses weird imap4-utf-7 encoding, need to translade folder names
+# accordingly
+nametrans = imap2utf8
+remotehost = imap.yandex.com
+remoteuser = sher-ars
+remotepasseval = get_pass("yandex")
+ssl = yes
+sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+
+# This option stands in the [Repository RemoteExample] section.
+#
+# Offlineimap can use multiple connections to the server in order
+# to perform multiple synchronization actions simultaneously.
+# This may place a higher burden on the server.  In most cases,
+# setting this value to 2 or 3 will speed up the sync, but in some
+# cases, it may slow things down.  The safe answer is 1.  You should
+# probably never set it to a value more than 5.
+#
+maxconnections = 3
+
+# This option stands in the [Repository RemoteExample] section.
+#
+# Offlineimap normally closes IMAP server connections between refreshes if
+# the global option autorefresh is specified.  If you wish it to keep the
+# connection open, set this to true.  If not specified, the default is
+# false.  Keeping the connection open means a faster sync start the
+# next time and may use fewer server resources on connection, but uses
+# more server memory.  This setting has no effect if autorefresh is not set.
+#
+holdconnectionopen = yes
+
+# This option stands in the [Repository RemoteExample] section.
+#
+# In between synchronisations, Offlineimap can monitor mailboxes for new
+# messages using the IDLE command. If you want to enable this, specify here the
+# folders you wish to monitor. IMAP protocol requires a separate connection for
+# each folder monitored in this way, so setting this option will force settings
+# for:
+#
+#  - maxconnections: to be at least the number of folders you give
+#  - holdconnectionopen: to be true
+#  - keepalive: to be 29 minutes unless you specify otherwise
+#  - singlethreadperfolder: to be true
+#
+# The presynchook and postsynchook are executed for each new synchronisation per
+# folder.
+#
+# This feature isn't complete and may well have problems. See the "Known Issues"
+# entry in the manual for more details.
+#
+# This option should return a Python list. For example
+#
+idlefolders = ['INBOX']
+
+[Account pgpro]
+localrepository = pgpro_local
+remoterepository = pgpro_remote
+
+[Repository pgpro_local]
+type = Maildir
+localfolders = /d/mail/pgpro
+
+[Repository pgpro_remote]
+type = IMAP
+remotehost = imap.postgrespro.ru
+remoteuser = a.sher@postgrespro.ru
+remotepasseval = get_pass("pgpro")
+ssl = yes
+sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+maxconnections = 3
+holdconnectionopen = yes
+idlefolders = ['INBOX']
