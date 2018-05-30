@@ -2,12 +2,12 @@
 
 ;; currently not used, just for playing around
 (require 'sql-indent)
-(defvar my-sql-indentation-offsets-alist
-  `((select-clause 0)
-    (insert-clause 0)
-    (delete-clause 0)
-    (update-clause 0)
-    ,@sqlind-default-indentation-offsets-alist))
+;; (defvar my-sql-indentation-offsets-alist
+;;  `((select-clause 0)
+;;    (insert-clause 0)
+;;    (delete-clause 0)
+;;    (update-clause 0)
+;;    ,@sqlind-default-indentation-offsets-alist))
 
 (defun sql-style ()
   (setq indent-tabs-mode nil)
