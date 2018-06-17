@@ -34,6 +34,7 @@
     bbdb ; email contacts
     counsel-bbdb ; interface to it
     markdown-mode ; markdown editing and viewing
+    go-mode ; go support
    )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)

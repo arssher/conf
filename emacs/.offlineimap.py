@@ -115,3 +115,10 @@ def utf82imap(s):
     decoded = s.decode('utf8')
     decoded = inv_nametrans.get(decoded, decoded)
     return decoded.encode('imap4-utf-7')
+
+# filtering happens before nametrans
+def yandex_folderfilter(folder_name):
+    decoded = folder_name.decode('imap4-utf-7')
+    if decoded == u'Спам':
+        return False
+    return True

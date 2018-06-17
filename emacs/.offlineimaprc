@@ -104,8 +104,10 @@ quick = 24
 # The pre sync script has to complete before a sync to the account will start.
 #
 #presynchook = imapfilter -c someotherconfig.lua
-# kill mu mu4e might already running, otherwise index will fail
-postsynchook = sh -c 'pkill -2 mu; sleep 1; ~/opt/bin/mu index --maildir /d/mail'
+# kill mu already running, otherwise index will fail
+# postsynchook = sh -c 'pkill -2 mu; sleep 1; ~/opt/bin/mu index --maildir /d/mail'
+# Well, I don't run mu4e in background, so go right away
+postsynchook = sh -c '~/opt/bin/mu index --maildir /d/mail'
 
 [Repository yandex_local]
 type = Maildir
@@ -118,6 +120,7 @@ type = IMAP
 # IMAP uses weird imap4-utf-7 encoding, need to translade folder names
 # accordingly
 nametrans = imap2utf8
+folderfilter = yandex_folderfilter
 remotehost = imap.yandex.com
 remoteuser = sher-ars
 remotepasseval = get_pass("yandex")
