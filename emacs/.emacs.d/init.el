@@ -262,6 +262,7 @@
 (define-key diff-mode-map (kbd "M-h") nil)
 (define-key diff-mode-map (kbd "C-c k") 'diff-hunk-next)
 (define-key diff-mode-map (kbd "C-c i") 'diff-hunk-prev)
+(define-key diff-mode-map (kbd "C-c C-e") 'diff-ediff)
 
 ;; Ediff:
 ;; keys in files ediff

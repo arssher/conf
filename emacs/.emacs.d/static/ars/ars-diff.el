@@ -82,5 +82,11 @@ char-offset in TEXT."
 	(let ((text (buffer-substring-no-properties (point-min) (point-max))))
 	  (if char-offset (cons text (- (point) (point-min))) text))))))
 
+(defun diff-ediff ()
+  "Run ediff on current files of current hunk"
+  (interactive)
+  (ediff-buffers (car (diff-find-source-location t))
+		 (car (diff-find-source-location nil))))
+
 (message "ars-diff loaded")
 (provide 'ars-diff)

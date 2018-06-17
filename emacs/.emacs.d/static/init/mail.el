@@ -11,8 +11,8 @@
 
 ;; allow for updating mail using 'U' in the main view:
 (setq
-  mu4e-get-mail-command "true"   ;;
-  mu4e-update-interval 300)      ;; update every 5 minutes
+  mu4e-get-mail-command "offlineimap -o"   ;; one-shot
+  mu4e-update-interval nil)
 
 ;; setup some handy shortcuts
 ;; you can quickly switch to your Inbox -- press ``ji''

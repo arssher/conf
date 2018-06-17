@@ -23,11 +23,21 @@
 	    (set-face-background ediff-odd-diff-face-B "#161c30")
 	    ))
 
-;; A hacky way to restore window configuration after exiting from ediff
-;; It works badly with magit diff though, so I will turn it off for now...
-;; (winner-mode 1)
-;; (add-hook 'ediff-after-quit-hook-internal 'winner-undo)
-
 ;; overwrite buggy diff-hunk-text
 (require 'ars-diff)
 (advice-add 'diff-hunk-text :override 'diff-hunk-text-fixed)
+
+;; Restore window layout, see https://emacs.stackexchange.com/questions/7482/restoring-windows-and-layout-after-an-ediff-session
+(defvar ediff-last-windows nil
+  "Last ediff window configuration.")
+
+(defun ediff-restore-windows ()
+  "Restore window configuration to `ediff-last-windows'."
+  (set-window-configuration ediff-last-windows)
+  (remove-hook 'ediff-after-quit-hook-internal
+               'ediff-restore-windows))
+
+(defadvice ediff-buffers (around ediff-restore-windows activate)
+  (setq ediff-last-windows (current-window-configuration))
+  (add-hook 'ediff-after-quit-hook-internal 'ediff-restore-windows)
+  ad-do-it)
