@@ -35,6 +35,7 @@
     counsel-bbdb ; interface to it
     markdown-mode ; markdown editing and viewing
     go-mode ; go support
+    sql-indent ; sql indent
    )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
