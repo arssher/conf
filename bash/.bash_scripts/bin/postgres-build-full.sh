@@ -134,7 +134,7 @@ echo "Postgres at ${PGSDIR} successfully built"
 # build & install extensions, if needed
 extensions_arr=(${extensions//,/ }) # convert ',' to spaces and build the array
 for ext in "${extensions_arr[@]}"; do
-    cd contrib/$ext && make -j $silent $numcores install && cd ..
+    cd contrib/$ext && make $silent -j $numcores install && cd ..
     echo "Extension $ext built & installed"
 done
 

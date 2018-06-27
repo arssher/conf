@@ -30,10 +30,19 @@ fi
 offset=0
 find "${path}" -type d | while read d; do
     echo "Processing $d"
-    find "${d}" -type f | sort | while read f; do
+    find "${d}" -type f -maxdepth 1 | sort | while read f; do
 	modtime=$(date --date "${offset} hours")
 	echo "Setting mod time of file $f to $modtime"
 	touch -d "${modtime}" "${f}"
 	let "offset=offset+1"
     done
+    echo "Moving files to and fro"
+    mkdir -p /tmp/tmp/tmp
+    find "${d}" -type f -maxdepth 1 | sort | while read f; do
+	mv "${f}" /tmp/tmp/tmp/
+    done
+    find /tmp/tmp/tmp/ -type f -maxdepth 1 | sort | while read f; do
+	mv "${f}" "${d}"
+    done
+    rm -rf /tmp/tmp/tmp
 done

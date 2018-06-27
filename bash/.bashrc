@@ -141,7 +141,6 @@ export HISTFILE=~/.bash_eternal_history
 # http://superuser.com/questions/20900/bash-history-loss
 PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 
-
 # Log all commands to ~/.persistent_history and search it with phgrep.
 log_bash_persistent_history()
 {
@@ -196,4 +195,10 @@ function pg_workon {
 function rmc {
     rm -rf /tmp/tmp*
     rm -rf /tmp/core*
+    rm -rf /tmp/tgsn_*
 }
+
+# Disable XON/XOFF flow control so we can use Ctrl-s for searching forward. See
+# https://wiki.archlinux.org/index.php/readline
+# https://unix.stackexchange.com/questions/12107/how-to-unfreeze-after-accidentally-pressing-ctrl-s-in-a-terminal
+stty -ixon -ixoff
