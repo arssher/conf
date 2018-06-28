@@ -280,6 +280,10 @@
 )
 (add-hook 'ediff-meta-buffer-keymap-setup-hook 'my-ediff-meta-buffer-config)
 
+;; gdb
+(require 'ars-gdb-stuff)
+(global-set-key (kbd "C-c C-g") 'gdb-core)
+
 ;; magit:
 (require 'magit)
 (global-set-key (kbd "C-x g") 'magit-status)

@@ -29,6 +29,7 @@
       (concat
        "Best regards,\n"
        "Arseny Sher\n"))
+(setq mu4e-compose-dont-reply-to-self t)
 
  (setq mu4e-contexts
     `( ,(make-mu4e-context
