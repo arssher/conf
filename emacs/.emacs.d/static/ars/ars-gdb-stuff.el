@@ -62,5 +62,21 @@ and attach gdb to it. Path to Postgres installation directory must be in $PGIDIR
   (gdb (concat "gdb -i=mi --silent " pgpath " "
 	       (read-string "Enter process pid:"))))
 
+(defun gdb-core()
+  "Debug core file, extracting executable path from it. Core file name is expected
+  like sudo sysctl -w kernel.core_pattern=/tmp/core_{%E}_%p"
+  (interactive)
+  (let* (
+	 (core-path (expand-file-name (read-file-name "Core path:")))
+	 (exec-path (subst-char-in-string ?! ?/
+		     (car (split-string
+			   (car (cdr (split-string core-path "{")))
+			   "}"))))
+
+	 )
+    (message "cmd is %s" (concat "gdb -i=mi --silent " exec-path " " core-path))
+    (gdb (concat "/usr/bin/gdb -i=mi --silent " exec-path " " core-path))
+    ))
+
 (message "ars-gdb-stuff loaded")
 (provide 'ars-gdb-stuff)
