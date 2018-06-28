@@ -67,7 +67,7 @@ and attach gdb to it. Path to Postgres installation directory must be in $PGIDIR
   like sudo sysctl -w kernel.core_pattern=/tmp/core_{%E}_%p"
   (interactive)
   (let* (
-	 (core-path (expand-file-name (read-file-name "Core path:")))
+	 (core-path (expand-file-name (read-file-name "Core path:" "/tmp/")))
 	 (exec-path (subst-char-in-string ?! ?/
 		     (car (split-string
 			   (car (cdr (split-string core-path "{")))
