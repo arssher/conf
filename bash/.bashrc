@@ -99,6 +99,9 @@ fi
 
 # My stuff
 # ------------------------------------------------------------
+# There are a lot of bullshit above setting PS; let's just have name, host and
+# pwd:
+
 
 if [ -x "$(command -v yandex-disk)" ]; then
     export YANDEXDISK_DIR=`cat ~/.config/yandex-disk/config.cfg | grep "dir=" | sed 's/dir=\"\(.*\)\"/\1/'`
@@ -189,6 +192,9 @@ fi
 # quickly switch pg currently in use by outraging PATH
 function pg_workon {
     PATH="${HOME}/postgres/install/${1}/bin:${PATH}"
+}
+function pg_norsu_workon {
+    PATH="${HOME}/tmp/tmp/norsu/${1}/bin/:${PATH}"
 }
 
 # remove core & tmp files
