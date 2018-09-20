@@ -98,8 +98,13 @@ fi
 # opts for proper inlining
 export CFLAGS="${CFLAGS} -std=c99 -Wno-unused-function"
 export CFLAGS="${CFLAGS} --param large-stack-frame=4096 --param large-stack-frame-growth=100000"
+
+# various stuff
+# export CPPFLAGS="-DCLOBBER_CACHE_ALWAYS"
+# export CPPFLAGS="${CPPFLAGS} -DOPTIMIZER_DEBUG"
+
 # since debug symbols don't affect perfomance, include them in rel mode too
-CONFOPTS="${CONFOPTS} --prefix=${PGIPATH} --enable-debug"
+CONFOPTS="${CONFOPTS} --prefix=${PGIPATH} --enable-debug --enable-depend"
 if grep -q "PGPRO_VERSION" "${PGSDIR}/src/include/pg_config.h.in"; then
     :
     # seems like we are building pgpro
@@ -125,6 +130,7 @@ fi
 rm -rf ${PGIPATH} && mkdir -p ${PGIPATH}
 
 # run make
+export COPT='-Werror' # see the 'installation from source' doc
 echo '-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-'
 numcores=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | tail -1`
 makeopts="-j ${numcores} ${silent} ${target}"

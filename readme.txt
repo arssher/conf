@@ -48,16 +48,15 @@ build and install emacs
 sudo apt-get install
 flex bison libreadline-dev zlib1g-dev
 sudo apt-get install docbook docbook-xml docbook-xsl fop libxml2-utils opensp xsltproc
-global colordiff
-python3-venv
-tor
-wajig
+global colordiff python3-venv tor wajig
 # additional pg deps
-vim sudo strace build-essential git screen gdb \
+vim sudo strace build-essential git gdb \
 libwww-perl perl perl-modules libperl-dev libipc-run-perl tcl-dev \
 libedit-dev libssl-dev zlib1g-dev libpam0g-dev libxml2-dev \
 krb5-multidev libldap2-dev python-dev bison flex xsltproc gettext \
-libicu-dev libkrb5-dev libxslt-dev pkgconf libzstd-dev
+libicu-dev libkrb5-dev libxslt-dev pkgconf libzstd-dev \
+libdbi-perl libdbd-pg-perl \
+resolvconf
 
 
 Important root configs:
