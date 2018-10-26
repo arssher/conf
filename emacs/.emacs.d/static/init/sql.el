@@ -17,4 +17,5 @@
   ;; (setq sqlind-indentation-offsets-alist
              ;; my-sql-indentation-offsets-alist))
 
-(add-hook 'sql-mode-hook 'sql-style)
+;; currently it is just horrible, disable it
+;; (add-hook 'sql-mode-hook 'sql-style)

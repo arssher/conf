@@ -117,6 +117,7 @@
 ;; The digits row
 (global-set-key (kbd "\C-x4") 'my-split-root-window-below)
 (global-set-key (kbd "\C-x5") 'my-split-root-window-right)
+(global-set-key (kbd "\C-x9") 'delete-frame)
 ;; reset scaling
 (global-set-key (kbd "C-0") (lambda () (interactive) (text-scale-increase 0)))
 (global-set-key (kbd "C-=") 'text-scale-increase)
