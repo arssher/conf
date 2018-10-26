@@ -20,3 +20,6 @@
 
 ;; always tail *Messages* buffer
 (tail-messages-enable)
+
+;; maximize frame on start-up
+(add-to-list 'default-frame-alist '(fullscreen . maximized))

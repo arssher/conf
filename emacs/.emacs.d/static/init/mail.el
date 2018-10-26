@@ -1,3 +1,8 @@
+;; I need:
+;; * threading
+;; * Ability to goto thread of current message
+;; * powerful search, e.g. search only threads
+
 ;; load mu4e
 (require 'mu4e)
 
@@ -29,7 +34,9 @@
       (concat
        "Best regards,\n"
        "Arseny Sher\n"))
+
 (setq mu4e-compose-dont-reply-to-self t)
+(setq mu4e-compose-in-new-frame t)
 
  (setq mu4e-contexts
     `( ,(make-mu4e-context
