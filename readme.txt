@@ -30,6 +30,7 @@ readline conf:
 
 xbindkeys conf:
 
+  That's what currently is used for keybindings.
   Contains only .xbindkeysrc
 
 terminator conf:
@@ -56,8 +57,9 @@ libedit-dev libssl-dev zlib1g-dev libpam0g-dev libxml2-dev \
 krb5-multidev libldap2-dev python-dev bison flex xsltproc gettext \
 libicu-dev libkrb5-dev libxslt-dev pkgconf libzstd-dev \
 libdbi-perl libdbd-pg-perl \
-resolvconf
+resolvconf xcalib
 
+sudo pip install virtualenvwrapper
 
 Important root configs:
 fstab
@@ -66,7 +68,7 @@ openvpn
 
 Important home configs not saved here:
 ssh
-fonts
+fonts, appearance -- can be dumped with dconf
 ydisk
 firefox
 
@@ -74,11 +76,6 @@ How to play midi:
 sudo apt-get install audicious fluid-soundfont-gm
 wajig list-files fluid-soundfont-gm
 And point midi plugin in audicious to listed .sf2 file
-
-sudo pip install virtualenvwrapper
-
-TODO:
-* Deal with terminal -- saving pans and tabs, dir paths?
 
 How to disable Alt+left mouse windows move
 http://forums.odforce.net/topic/28501-linux-disable-alt-left-mouse-button/

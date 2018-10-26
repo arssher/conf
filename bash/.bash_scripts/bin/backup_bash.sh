@@ -2,7 +2,7 @@
 
 set -e
 
-echo "Copying bash files to the yandex disk..."
+echo "Copying bash files to the yandex disk at ${CONFPATH}/bash..."
 
 bashfiles_backup_path="${CONFPATH}/bash"
 rm -rf ${bashfiles_backup_path}/.bash_scripts
