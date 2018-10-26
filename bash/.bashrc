@@ -104,7 +104,7 @@ fi
 
 
 if [ -x "$(command -v yandex-disk)" ]; then
-    export YANDEXDISK_DIR=`cat ~/.config/yandex-disk/config.cfg | grep "dir=" | sed 's/dir=\"\(.*\)\"/\1/'`
+    export YANDEXDISK_DIR=`cat ~/.config/yandex-disk/config.cfg | grep "dir=" | sed 's/dir=\"\(.*\)\"/\1/' | grep -E -v '^#.*'`
     export CONFPATH="${YANDEXDISK_DIR}/configs"
 fi
 

@@ -38,13 +38,16 @@ else
     pgnums=( "$@" )
 fi
 
-pkill -9 postgres || true
+# pkill -9 postgres || true
 for pgnum in "${pgnums[@]}"; do
     echo "Running pgum ${pgnum}"
+    port=$((5432 + $pgnum))
+    # kill existing instance on this port
+    existing_pid=$(ps aux | grep "[p]ostgres -p ${port}" | awk '{print $2}')
+    kill -SIGQUIT $existing_pid || true
     rm -rf "/tmp/data${pgnum}"
     initdb -D "/tmp/data${pgnum}"
     cp "${conf_path}" "/tmp/data${pgnum}/postgresql.conf"
-    port=$((5432 + $pgnum))
     rm -rf "/tmp/postgresql_${port}.log"
     pg_ctl -o "-p ${port}"  -D "/tmp/data${pgnum}" -l "/tmp/postgresql_${port}.log" restart
 done

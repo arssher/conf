@@ -102,6 +102,8 @@ export CFLAGS="${CFLAGS} --param large-stack-frame=4096 --param large-stack-fram
 # various stuff
 # export CPPFLAGS="-DCLOBBER_CACHE_ALWAYS"
 # export CPPFLAGS="${CPPFLAGS} -DOPTIMIZER_DEBUG"
+export PYTHON=/usr/bin/python3
+# CONFOPTS="${CONFOPTS} --with-python"
 
 # since debug symbols don't affect perfomance, include them in rel mode too
 CONFOPTS="${CONFOPTS} --prefix=${PGIPATH} --enable-debug --enable-depend"
