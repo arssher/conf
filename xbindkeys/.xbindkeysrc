@@ -46,7 +46,7 @@
 "emacs"
   Mod4 + e
 
-"terminator --maximise"
+"terminator --maximise --fullscreen"
   Mod4 + t
 
 "firefox"
@@ -54,6 +54,9 @@
 
 "chromium"
   Mod4 + c
+
+"switch_background.sh"
+  Mod4 + b
 
 # Examples of commands:
 
