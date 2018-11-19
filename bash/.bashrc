@@ -204,6 +204,13 @@ function rmc {
     rm -rf /tmp/tgsn_*
 }
 
+function stophp {
+    pkill stolon-keeper || true
+    pkill stolon-sentinel || true
+    pkill -9 postgres || true
+    pkill etcd || true
+}
+
 # Disable XON/XOFF flow control so we can use Ctrl-s for searching forward. See
 # https://wiki.archlinux.org/index.php/readline
 # https://unix.stackexchange.com/questions/12107/how-to-unfreeze-after-accidentally-pressing-ctrl-s-in-a-terminal
