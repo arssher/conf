@@ -352,3 +352,4 @@
 ;; read http://pages.sachachua.com/.emacs.d/Sacha.html
 ;; check out ivy links
 (put 'upcase-region 'disabled nil)
+(put 'downcase-region 'disabled nil)
