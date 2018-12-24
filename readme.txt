@@ -38,10 +38,15 @@ terminator conf:
   Contains only terminator conf
 
 Things done on fresh Debian install:
-set up yandex disk, or point CONFPATH to dir with cloned repo.
+sudo apt-get update
+sudo apt-get install git vim xbindkeys terminator
+set up yandex disk, or point CONFPATH to dir with cloned repo, e.g.
+git clone https://github.com/arssher/conf.git
+export CONFPATH=$HOME/conf
 cd conf
-run ${CONFPATH}/bash/.bash_scripts/bin/bash_ydisk_to_machine.sh
-Now you can run all restore*.sh scripts
+run ${CONFPATH}/bash/.bash_scripts/bin/restore_all.sh
+Install Ubuntu fonts, or terminator & emacs will complain.
+Configure caps lock and layout switchover (mate-keyboard-properties).
 
 sudo apt-get install vim git terminator chromium checkinstall locate openvpn linux-tools
 sudo apt-get -y build-dep emacs24
