@@ -1,3 +1,8 @@
+if [ -f ~/.global_vars ]; then
+      source ~/.global_vars
+      # echo "global vars loaded"
+fi
+
 # ------------------------------------------------------------
 # Stuff from default .bashrc
 
@@ -133,6 +138,8 @@ export HISTFILESIZE=
 # so just setting it to a big value
 # (and this is true even though I have set history size unlimited in ~/.gdbinit)
 export HISTSIZE=10000000
+# note that timestamps in HISTFILE are encoded in bash's own format, and
+# human-readable timestamps are shown only with 'history' builtin.
 export HISTTIMEFORMAT="[%F %T] "
 # erase duplicates
 export HISTCONTROL=ignoreboth:erasedups
@@ -143,8 +150,17 @@ export HISTFILE=~/.bash_eternal_history
 # Force prompt to write history after every command.
 # http://superuser.com/questions/20900/bash-history-loss
 PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+# XXX people often add the following
+# shopt -s histappend
+# which means 'when writing to history file, append, not replace',
+# https://www.gnu.org/software/bash/manual/html_node/Bash-History-Facilities.html
+# They try to avoid losing history from parallel shells this way: with default
+# settings, last closed wins and saves all history existing before it was started
+# + its own history, the rest is essentially dropped. However, with `history -a`
+# after each command this is not needed. Moreover, I suspect with histappend
+# history will be duplicated on each save, but need to check that
 
-# Log all commands to ~/.persistent_history and search it with phgrep.
+# also log all commands to ~/.persistent_history and search it with phgrep.
 log_bash_persistent_history()
 {
   [[

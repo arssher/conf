@@ -124,3 +124,6 @@
   )
   (message "Sending via %s acc" choice)
 )
+
+;; default attachments dir
+(setq mu4e-attachment-dir  "~/postgres/postgresql")
