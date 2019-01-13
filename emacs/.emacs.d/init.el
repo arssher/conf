@@ -199,6 +199,8 @@
 ;; C-c prefix
 (global-set-key (kbd "C-c k") 'flycheck-next-error)
 (global-set-key (kbd "C-c i") 'flycheck-previous-error)
+;; sql SHOUTING killer
+(global-set-key (kbd "C-c l") 'downcase-word)
 
 
 ;; Now mode-specific bindings

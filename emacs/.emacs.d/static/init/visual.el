@@ -13,6 +13,7 @@
 (set-face-attribute 'default t :font "Ubuntu Mono")
 ;; font size, in px*10
 (set-face-attribute 'default nil :height 140)
+;; (set-face-attribute 'default nil :height 120)
 
 ;; set sane colors while editing text-based tables
 (add-hook 'table-fixed-width-mode-hook
