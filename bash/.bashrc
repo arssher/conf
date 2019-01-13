@@ -174,7 +174,7 @@ log_bash_persistent_history()
     export PERSISTENT_HISTORY_LAST="$command_part"
   fi
 }
-PROMPT_COMMAND="log_bash_persistent_history; $PROMT_COMMAND"
+PROMPT_COMMAND="log_bash_persistent_history; $PROMPT_COMMAND"
 
 # use emacs as an editor everywhere
 export VISUAL=emacs
