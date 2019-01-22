@@ -57,13 +57,14 @@
 (load-file (concat init-d "fly.el"))
 (load-file (concat init-d "dbg.el"))
 (load-file (concat init-d "magit.el"))
+(load-file (concat init-d "go.el"))
 
 ;; major modes
 (load-file (concat init-d "latex.el"))
 (load-file (concat init-d "asm.el"))
 (load-file (concat init-d "sql.el"))
 
-;; mail; load only mu4e is installed
+;; mail; load only if mu4e is installed
 (add-to-list 'load-path (format "%s/opt/share/emacs/site-lisp/mu4e" (getenv "HOME")))
 (when (require 'mu4e nil 'noerror) (load-file (concat init-d "mail.el")))
 
@@ -71,6 +72,9 @@
 (when (file-exists-p (concat (getenv "HOME") "/.emacs-local.el"))
   (load-file (concat (getenv "HOME") "/.emacs-local.el")))
 
+;; source all env vars configured in (non-interfactive) shell
+(when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize))
 
 ;;____________________________________________________________
 ;; Make the keys work with russian layout
@@ -317,7 +321,13 @@
   (define-key markdown-mode-map (kbd "M-h") nil)
   (define-key markdown-mode-map (kbd "M-n") nil)
   (define-key markdown-mode-map (kbd "M-p") nil)
-)
+  )
+
+;; Go
+(add-hook 'go-mode-hook '(lambda ()
+  (local-set-key (kbd "C-b") 'go-guru-definition)
+  (local-set-key (kbd "M-<f7>") 'go-guru-referrers) ; idea
+  ))
 
 ;;____________________________________________________________
 
@@ -353,5 +363,3 @@
 ;; smartparens
 ;; read http://pages.sachachua.com/.emacs.d/Sacha.html
 ;; check out ivy links
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
