@@ -36,6 +36,7 @@
     markdown-mode ; markdown editing and viewing
     go-mode ; go support
     sql-indent ; sql indent
+    exec-path-from-shell ; source shell vars
    )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)

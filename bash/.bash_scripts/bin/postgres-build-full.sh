@@ -7,7 +7,7 @@ show_help() {
 
     Configure and build Postgres, found in \$PGSDIR, with prefix
     (installation path) \$PGIDIR/\$PGINAME, using \$PGBDIR as a build directory.
-    If $PGBDIR is not specified, it is $HOME/tmp/tmp/$PGINAME by defaul.
+    If \$PGBDIR is not specified, it is \$HOME/tmp/tmp/$PGINAME by defaul.
     Then install it.
 
     -h display this help and exit

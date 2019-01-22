@@ -1,3 +1,4 @@
+# do this before we exit in non-interfactive shells!
 if [ -f ~/.global_vars ]; then
       source ~/.global_vars
       # echo "global vars loaded"
