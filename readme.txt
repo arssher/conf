@@ -51,8 +51,7 @@ Configure caps lock and layout switchover (mate-keyboard-properties).
 sudo apt-get install vim git terminator chromium checkinstall locate openvpn linux-tools
 sudo apt-get -y build-dep emacs24
 build and install emacs
-sudo apt-get install
-flex bison libreadline-dev zlib1g-dev
+sudo apt-get install flex bison libreadline-dev zlib1g-dev
 sudo apt-get install docbook docbook-xml docbook-xsl fop libxml2-utils opensp xsltproc
 global colordiff python3-venv tor wajig
 # additional pg deps
