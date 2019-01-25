@@ -326,6 +326,7 @@
 ;; Go
 (add-hook 'go-mode-hook '(lambda ()
   (local-set-key (kbd "C-b") 'go-guru-definition)
+  (local-set-key (kbd "M-B") 'pop-tag-mark)
   (local-set-key (kbd "M-<f7>") 'go-guru-referrers) ; idea
   ))
 
