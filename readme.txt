@@ -62,6 +62,8 @@ krb5-multidev libldap2-dev python-dev bison flex xsltproc gettext \
 libicu-dev libkrb5-dev libxslt-dev pkgconf libzstd-dev \
 libdbi-perl libdbd-pg-perl \
 resolvconf xcalib
+# building tmux
+sudo apt-get install libevent-dev
 
 sudo pip install virtualenvwrapper
 
