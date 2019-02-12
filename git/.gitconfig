@@ -5,5 +5,25 @@
 	default = matching
 [core]
 	excludesfile = ~/.gitignore
-[diff]
-	external = git-external-diff-postgres.sh
+# [diff]
+	# external = git-external-diff-postgres.sh
+[difftool "ediff"]
+cmd = emacs -mm -fs --eval \"(ediff-files \\\"$LOCAL\\\" \\\"$REMOTE\\\")\"
+[difftool "dummydiff"]
+cmd = diff "$LOCAL" "$REMOTE"
+[rebase]
+	autosquash = true
+[alias]
+	lg = log --color --graph --abbrev-commit\n           --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset'
+# no-walk only lists given commits without going to their parents;
+# --tags actually lists commits with tags
+	tags = log --no-walk --tags --pretty='%h %d %s' --decorate=full
+	pullff = pull --no-rebase --ff
+
+[format]
+	suffix = .patch
+	# suffix = -v2.patch
+[merge]
+	ff = false
+[pull]
+	rebase = true
