@@ -2,7 +2,7 @@
 
 set -e
 
-sudo apt-get install libevent-dev
+sudo apt-get install -y libevent-dev xclip
 
 tmux_ver=2.8
 wget -P ~ "https://github.com/tmux/tmux/archive/${tmux_ver}.tar.gz"

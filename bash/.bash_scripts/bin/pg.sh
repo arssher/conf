@@ -4,7 +4,10 @@ set -e
 
 show_help() {
     cat <<EOF
-    Usage: pg.sh [-c confpath] [-p start_port] [pgnum]...
+    Usage: pg.sh [-c confpath] [-p start_port] [-v] [pgnum]...
+
+    -v run postgres under valgrind
+
     For example, pg.sh 0 1
     Use this whenever you need some Postgreses to evaluate things
 EOF
@@ -13,11 +16,12 @@ EOF
 
 conf_path="${HOME}/tmp/postgresql.conf"
 start_port=5432
+use_valgrind="false"
 
 OPTIND=1 # reset opt counter, it is always must be set to 1
 # each symbol is option name; if there is colon after, it has value
 # the first colon would mean non-silent mode (error reporting)
-while getopts "hc:p:" opt; do # the result will be stored in $opt
+while getopts "hc:p:v" opt; do # the result will be stored in $opt
     case $opt in
 	h) # bracket is a part of case syntax, you know
 	    show_help
@@ -28,6 +32,9 @@ while getopts "hc:p:" opt; do # the result will be stored in $opt
 	    ;;
 	p)
 	    start_port=$OPTARG
+	    ;;
+	v)
+	    use_valgrind="true"
 	    ;;
     esac
 done
@@ -58,5 +65,20 @@ for pgnum in "${pgnums[@]}"; do
     initdb -D "/tmp/data${pgnum}"
     cp "${conf_path}" "/tmp/data${pgnum}/postgresql.conf"
     rm -rf "/tmp/postgresql_${port}.log"
-    pg_ctl -o "-p ${port}"  -D "/tmp/data${pgnum}" -l "/tmp/postgresql_${port}.log" restart
+    # 'restart' to be not confused by previous instance, who might not completed
+    # shutdown yet
+    if [[ "${use_valgrind}" == "false" ]]; then
+	pg_ctl -o "-p ${port}"  -D "/tmp/data${pgnum}" -l "/tmp/postgresql_${port}.log" restart
+    else
+	# options are mostly copied from buildfarm client code
+	# track-origin tracks the origin of uninitialised values
+	# read-var-info reads information about variable types and locations from DWARF3 debug info
+	# num-callers is maximum number of entries shown in stack traces that identify program locations.
+	valgrind --tool=memcheck --trace-children=yes --track-origins=yes \
+		 --read-var-info=yes --num-callers=20 --leak-check=no \
+		 --gen-suppressions=all --error-limit=no \
+		 --suppressions="${PGSDIR}/src/tools/valgrind.supp" \
+		 --error-markers=VALGRINDERROR-BEGIN,VALGRINDERROR-END \
+		 pg_ctl -o "-p ${port}"  -D "/tmp/data${pgnum}" -l "/tmp/postgresql_${port}.log" restart
+    fi
 done

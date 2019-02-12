@@ -207,11 +207,23 @@ if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
 fi
 
 # quickly switch pg currently in use by outraging PATH
+# $1 is installation name
+# If $2 is given, it is the source name (under ~/postgres/);
+# otherwise source name is assumed the same as inst name
 function pg_workon {
-    PATH="${HOME}/postgres/install/${1}/bin:${PATH}"
+    export PATH="${HOME}/postgres/install/${1}/bin:${PATH}"
+    if [ -z "${2}" ]; then
+	export PGSDIR="${HOME}/postgres/${1}"
+    else
+	export PGSDIR="${HOME}/postgres/${2}"
+    fi
+    export PGINAME="${1}"
+}
+function pg_re {
+    make -C "${HOME}/tmp/tmp/${CURRPG} -j4 install"
 }
 function pg_norsu_workon {
-    PATH="${HOME}/tmp/tmp/norsu/${1}/bin/:${PATH}"
+    export PATH="${HOME}/tmp/tmp/norsu/${1}/bin/:${PATH}"
 }
 
 # remove core & tmp files

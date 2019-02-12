@@ -7,12 +7,15 @@ show_help() {
 
     Configure and build Postgres, found in \$PGSDIR, with prefix
     (installation path) \$PGIDIR/\$PGINAME, using \$PGBDIR as a build directory.
-    If \$PGBDIR is not specified, it is \$HOME/tmp/tmp/$PGINAME by defaul.
+    If \$PGBDIR is not specified, it is /tmp/\$PGINAME by default.
+    If \$PGIDIR is not specified, it is ~/postgres/install by default.
     Then install it.
+
+    pg_workon in .bashrc makes it easier to use, setting these vars.
 
     -h display this help and exit
     -t target
-       make target, for example, 'install'. By default it is 'install-world'.
+       make target, for example, 'install'. By default it is 'all'.
     -m <d[ebug] | r[elease] | p[erf]>, 3 choices:
        debug: no optimizations, asserts, etc, default value
        release, turn on optimizations, disable asserts, etc.
@@ -21,6 +24,7 @@ show_help() {
     -r run regression tests. By default they are not run.
     -e comma separated-list of extensions in contrib/ to 'install'
     -s silent make
+    -d dry-run: just print dirs and exit
 
     Examples:
     Silencing make, but without losing stderr:
@@ -29,18 +33,16 @@ EOF
     exit 0
 }
 
-script_dir=`dirname "$(readlink -f "$0")"`
-source "$script_dir"/postgres_common/postgres_common.sh
-
 mode="debug"
 run_tests=""
-target="install-world"
+target="all"
 silent=""
 extensions=""
+dry_run="false"
 OPTIND=1 # reset opt counter, it is always must be set to 1
 # each symbol is option name; if there is colon after, it has value
 # the first colon would mean non-silent mode (error reporting)
-while getopts "m:ht:se:" opt; do # the result will be stored in $opt
+while getopts "m:ht:se:d" opt; do # the result will be stored in $opt
     case $opt in
 	h) # bracket is a part of case syntax, you know
 	    show_help
@@ -61,12 +63,26 @@ while getopts "m:ht:se:" opt; do # the result will be stored in $opt
 	e)
 	    extensions=$OPTARG
 	    ;;
+	d)
+	    dry_run="true"
+	    ;;
 	\?) # match '?'
 	    show_help >&2
 	    exit 1
 	    ;;
     esac
 done
+
+if [[ "${target}" =~ ^install.* ]] && [ -z "${PGINAME}" ]; then
+    echo "PGINAME variable with Postgres installation name is not defined, exiting"
+    exit 1
+fi
+script_dir=`dirname "$(readlink -f "$0")"`
+source "$script_dir"/postgres_common/postgres_common.sh
+
+if [[ "${dry_run}" == "true" ]]; then
+    exit 0
+fi
 
 # make sure src and build dirs are absolutely clean, nasty bugs may arise
 # if not doing this
@@ -100,7 +116,15 @@ export CFLAGS="${CFLAGS} -std=c99 -Wno-unused-function"
 export CFLAGS="${CFLAGS} --param large-stack-frame=4096 --param large-stack-frame-growth=100000"
 
 # various stuff
-# export CPPFLAGS="-DCLOBBER_CACHE_ALWAYS"
+
+# enabled automatically with --enable-cassert
+# export CPPFLAGS="${CPPFLAGS} -DCLOBBER_FREED_MEMORY"
+
+# enable valgrind client requests
+export CPPFLAGS="${CPPFLAGS} -DUSE_VALGRIND"
+
+
+# export CPPFLAGS="${CPPFLAGS} -DCLOBBER_CACHE_ALWAYS"
 # export CPPFLAGS="${CPPFLAGS} -DOPTIMIZER_DEBUG"
 export PYTHON=/usr/bin/python3
 # CONFOPTS="${CONFOPTS} --with-python"
@@ -142,7 +166,7 @@ echo "Postgres at ${PGSDIR} successfully built"
 # build & install extensions, if needed
 extensions_arr=(${extensions//,/ }) # convert ',' to spaces and build the array
 for ext in "${extensions_arr[@]}"; do
-    cd contrib/$ext && make $silent -j $numcores install && cd ..
+    cd contrib/$ext && make $silent -j $numcores install && cd ../../
     echo "Extension $ext built & installed"
 done
 
