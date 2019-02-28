@@ -121,7 +121,7 @@ export CFLAGS="${CFLAGS} --param large-stack-frame=4096 --param large-stack-fram
 # export CPPFLAGS="${CPPFLAGS} -DCLOBBER_FREED_MEMORY"
 
 # enable valgrind client requests
-export CPPFLAGS="${CPPFLAGS} -DUSE_VALGRIND"
+# export CPPFLAGS="${CPPFLAGS} -DUSE_VALGRIND"
 
 
 # export CPPFLAGS="${CPPFLAGS} -DCLOBBER_CACHE_ALWAYS"

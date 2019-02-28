@@ -220,10 +220,18 @@ function pg_workon {
     export PGINAME="${1}"
 }
 function pg_re {
-    make -C "${HOME}/tmp/tmp/${CURRPG} -j4 install"
+    make -C "/tmp/${PGINAME}" -j4 install
 }
 function pg_norsu_workon {
     export PATH="${HOME}/tmp/tmp/norsu/${1}/bin/:${PATH}"
+}
+function whichpg {
+    echo "PGSDIR=${PGSDIR}"
+    echo "PGINAME=${PGINAME}"
+    echo "PGBDIR=${PGBIDR}"
+    echo "PGIDIR=${PGIDIR}"
+    echo -n "which pg_ctl "
+    which pg_ctl
 }
 
 # remove core & tmp files
