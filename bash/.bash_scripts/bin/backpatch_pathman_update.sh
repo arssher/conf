@@ -6,7 +6,7 @@
 set -e
 # set -o xtrace # print each line
 
-branches="PGPRO11_DEV PGPRO10_DEV PGPRO9_6_DEV PGPRO9_5"
+branches="PGPRO10_DEV PGPRO9_6_DEV PGPRO9_5"
 
 if [ -z "$TICKET" ]; then
     echo "TICKET not specified"
@@ -21,7 +21,11 @@ for branch in $branches; do
     # trim _DEV branch name ending
     branch_no_dev=${branch%"_DEV"}
     branch_fix="${branch_no_dev}_${TICKET}"
-    git checkout -b "${branch_fix}"
+    # set up tracking, a bit dangerous
+    git checkout "${branch_fix}"
+    git branch -u origin/"${branch_fix}"
+    git pull
+    git merge "${branch}"
     git fetch pg_pathman
     git subtree pull --prefix contrib/pg_pathman pg_pathman master
     # git push origin "${branch_fix}"

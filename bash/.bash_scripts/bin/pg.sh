@@ -61,6 +61,7 @@ for pgnum in "${pgnums[@]}"; do
     existing_pid=$(ps aux | grep "[p]ostgres -p ${port}" | awk '{print $2}')
     echo "killing old pg with pid ${existing_pid}"
     kill -SIGQUIT $existing_pid || true
+    sleep 0.5
     rm -rf "/tmp/data${pgnum}"
     initdb -D "/tmp/data${pgnum}"
     cp "${conf_path}" "/tmp/data${pgnum}/postgresql.conf"
