@@ -4,6 +4,9 @@ set pagination off
 # silently. Again for scripting.
 set breakpoint pending on
 
+# uncomment if you need many watchpoints... good luck
+# set can-use-hw-watchpoints 0
+
 # don't stop on usr signals; pg uses them for intra chatting
 handle SIGUSR1 nostop
 handle SIGUSR2 nostop
@@ -33,6 +36,13 @@ source ~/.gdb/gdbpg.py
 
 # some more my stuff
 source ~/.gdb/quit_if_alone.py
+source ~/.gdb/pg_memctx.py
+
+# import duel module manually, I don't like pip.
+# this will fail if
+# python3 -m pip install arpeggio
+# is not executed
+source ~/.gdb/import_duel.py
 
 # unlimited printing
 set print elements 0
@@ -57,8 +67,9 @@ document offsetof
 offset of field in struct, e.g. offsetof ReorderBufferTXN base_snapshot_node
 end
 
-define berror
-  break elog.c:246
+define pg_berror
+  # break elog.c:246
+  break pg_re_throw
 end
 document pg_berror
 break on postgres ERROR
