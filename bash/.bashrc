@@ -238,7 +238,9 @@ function whichpg {
 function rmc {
     rm -rf /tmp/tmp*
     rm -rf /tmp/core*
+    # testgres
     rm -rf /tmp/tgsn_*
+    rm -rf /tmp/stolon*
 }
 
 function stophp {

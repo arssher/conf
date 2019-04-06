@@ -18,4 +18,4 @@
 
 ;; default grep opts
 (require 'grep)
-(grep-apply-setting 'grep-command "grep --color -nH -ir -e")
+(grep-apply-setting 'grep-command "grep --color -I -nH -ir -e")
