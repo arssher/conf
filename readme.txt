@@ -21,7 +21,7 @@ Emacs conf:
 
 gdb conf:
 
-  Contains only .gdbinit file.
+  Contains .gdbinit file and .gdb dir.
 
 
 readline conf:

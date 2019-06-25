@@ -70,7 +70,15 @@ end
 define pg_berror
   # break elog.c:246
   break pg_re_throw
+  b errfinish if errordata[errordata_stack_depth].elevel == 20
 end
 document pg_berror
 break on postgres ERROR
+end
+
+define pg_bwarn
+  b errfinish if errordata[errordata_stack_depth].elevel == 19
+end
+document pg_berror
+break on postgres WARNING
 end
