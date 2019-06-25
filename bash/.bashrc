@@ -234,6 +234,11 @@ function whichpg {
     which pg_ctl
 }
 
+function mtm_psql {
+    export PGHOST=localhost
+    export PGDATABASE=regression
+}
+
 # remove core & tmp files
 function rmc {
     rm -rf /tmp/tmp*
