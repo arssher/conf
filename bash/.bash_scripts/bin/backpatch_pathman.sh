@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Basic pathman backpatch
 # usage:
 # TICKET=PGPRO-2389 backpatch_pathman.sh
 
