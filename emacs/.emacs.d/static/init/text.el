@@ -1,4 +1,4 @@
-;; Text processing
+;; Text processing  
 
 (transient-mark-mode 1) ; Highlight the region when the mark is active
 ;; (next-line) will insert a newline at the end of the buffer
@@ -14,7 +14,7 @@
 ;; (load "ars-text-processing.el") ;; for debugging
 
 ;; delete tralining whitespace on save
-(add-to-list 'write-file-functions 'delete-trailing-whitespace)
+(add-to-list 'write-file-functions 'ars-delete-trailing-whitespace)
 
 ;; default grep opts
 (require 'grep)

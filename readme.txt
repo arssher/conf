@@ -65,6 +65,9 @@ resolvconf xcalib
 # building tmux
 sudo apt-get install libevent-dev
 
+# building emacs
+sudo apt-get install gnutls-dev checkinstall
+
 sudo pip install virtualenvwrapper
 
 Important root configs:

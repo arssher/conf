@@ -87,5 +87,12 @@ Position the cursor at it's beginning, according to the current mode."
     (message "removing whitespaces on save enabled"))
 )
 
+;; ignore multimaster files
+(defun ars-delete-trailing-whitespace ()
+  (if (not (string-match-p (regexp-quote "contrib/mmts") (buffer-file-name)))
+      (delete-trailing-whitespace)
+  )
+)
+
 (message "ars-text-processing loaded")
 (provide 'ars-text-processing)
