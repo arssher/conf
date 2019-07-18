@@ -2,7 +2,6 @@
 ;; See how to build it in Ubuntu here:
 ;; http://ubuntuhandbook.org/index.php/2014/10/emacs-24-4-released-install-in-ubuntu-14-04/
 
-
 ;; We do this ourselves later, but package.el insists we should have it.
 ;; (package-initialize)
 
