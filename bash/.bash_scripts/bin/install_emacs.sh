@@ -1,15 +1,26 @@
 #!/bin/bash
 
-# installs emacs 25.1 on Ubuntu 14.04. Source repos must be enabled!
+# installs emacs on Ubuntu 14.04. Source repos must be enabled!
 
 set -e
 
 sudo apt-get update
 sudo apt-get -y build-dep emacs24
 
-wget -P ~/Downloads/ http://ftp.gnu.org/gnu/emacs/emacs-25s.3.tar.gz
+link=https://ftp.gnu.org/pub/gnu/emacs/emacs-26.2.tar.gz
+ver=26.2
+wget -P ~/Downloads/ $link
 cd ~/Downloads
 
-tar -xf emacs-25.3.tar.gz
-rm emacs-25.3.tar.gz
-cd emacs-25.3 && ./configure && make -j4 && sudo checkinstall --pkgversion 25.3 --pkgname emacs
+tar -xf emacs-$ver.tar.gz
+rm emacs-$ver.tar.gz
+cd emacs-$ver
+
+numcores=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | tail -1`
+
+# system install
+# ./configure && make -j${numcores} && sudo checkinstall --pkgversion $ver --pkgname emacs
+
+# user install
+./configure --prefix ${HOME}/opt && make -j${numcores} && make install
+echo "export PATH=${HOME}/opt/bin:$PATH" >> ~/.global_vars

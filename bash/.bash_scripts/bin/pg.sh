@@ -15,13 +15,14 @@ EOF
 }
 
 conf_path="${HOME}/tmp/postgresql.conf"
+datadir=/tmp
 start_port=5432
 use_valgrind="false"
 
 OPTIND=1 # reset opt counter, it is always must be set to 1
 # each symbol is option name; if there is colon after, it has value
 # the first colon would mean non-silent mode (error reporting)
-while getopts "hc:p:v" opt; do # the result will be stored in $opt
+while getopts "hc:p:vd:" opt; do # the result will be stored in $opt
     case $opt in
 	h) # bracket is a part of case syntax, you know
 	    show_help
@@ -36,6 +37,8 @@ while getopts "hc:p:v" opt; do # the result will be stored in $opt
 	v)
 	    use_valgrind="true"
 	    ;;
+	d)
+	    datadir=$OPTARG
     esac
 done
 
@@ -62,14 +65,14 @@ for pgnum in "${pgnums[@]}"; do
     echo "killing old pg with pid ${existing_pid}"
     kill -SIGQUIT $existing_pid || true
     sleep 0.5
-    rm -rf "/tmp/data${pgnum}"
-    initdb -D "/tmp/data${pgnum}"
-    cp "${conf_path}" "/tmp/data${pgnum}/postgresql.conf"
-    rm -rf "/tmp/postgresql_${port}.log"
+    rm -rf "${datadir}/data${pgnum}"
+    initdb -D "${datadir}/data${pgnum}"
+    cp "${conf_path}" "${datadir}/data${pgnum}/postgresql.conf"
+    rm -rf "${datadir}/postgresql_${port}.log"
     # 'restart' to be not confused by previous instance, who might not completed
     # shutdown yet
     if [[ "${use_valgrind}" == "false" ]]; then
-	pg_ctl -o "-p ${port}"  -D "/tmp/data${pgnum}" -l "/tmp/postgresql_${port}.log" restart
+	pg_ctl -o "-p ${port}"  -D "${datadir}/data${pgnum}" -l "${datadir}/postgresql_${port}.log" restart
     else
 	# options are mostly copied from buildfarm client code
 	# track-origin tracks the origin of uninitialised values
@@ -80,6 +83,6 @@ for pgnum in "${pgnums[@]}"; do
 		 --gen-suppressions=all --error-limit=no \
 		 --suppressions="${PGSDIR}/src/tools/valgrind.supp" \
 		 --error-markers=VALGRINDERROR-BEGIN,VALGRINDERROR-END \
-		 pg_ctl -o "-p ${port}"  -D "/tmp/data${pgnum}" -l "/tmp/postgresql_${port}.log" restart
+		 pg_ctl -o "-p ${port}"  -D "${datadir}/data${pgnum}" -l "${datadir}/postgresql_${port}.log" restart
     fi
 done
