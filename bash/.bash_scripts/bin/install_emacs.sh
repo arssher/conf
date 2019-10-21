@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# installs emacs on Ubuntu 14.04. Source repos must be enabled!
+# installs emacs on Ubuntu/Debian. Source repos must be enabled!
 
 set -e
 
@@ -18,7 +18,7 @@ cd emacs-$ver
 
 numcores=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | tail -1`
 
-# system install
+# system install (doesn't work because have no idea why)
 # ./configure && make -j${numcores} && sudo checkinstall --pkgversion $ver --pkgname emacs
 
 # user install
