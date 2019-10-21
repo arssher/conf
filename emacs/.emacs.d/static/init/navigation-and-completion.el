@@ -39,5 +39,7 @@
 ;; typing full path to the project)
 ;; Now there is another feature which I use: regexp replacing in the project,
 ;; I couldn't get it to work in ggtags.
+;; better set the var in init.el, but it must be set before loading...
+(setq projectile-keymap-prefix (kbd "C-c p"))
 (projectile-mode 1)
 (setq projectile-completion-system 'ivy)

@@ -40,7 +40,7 @@
 
 (add-hook 'c-mode-hook
           (defun postgresql-c-mode-hook ()
-            (when (string-match "/postgres\\(ql\\)?/" buffer-file-name)
+            (when (string-match "/postgres\\(ql\\)?/" (if buffer-file-name buffer-file-name ""))
               (c-set-style "postgresql")
               ;; Don't override the style we just set with the style in
               ;; `dir-locals-file'.  Emacs 23.4.1 needs this; it is obsolete,

@@ -49,11 +49,15 @@ Install Ubuntu fonts, or terminator & emacs will complain.
 Configure caps lock and layout switchover (mate-keyboard-properties).
 
 sudo apt-get install vim git terminator chromium checkinstall locate openvpn linux-tools
-sudo apt-get -y build-dep emacs24
-build and install emacs
+
+build and install emacs:
+install_emacs.sh
+
 sudo apt-get install flex bison libreadline-dev zlib1g-dev
 sudo apt-get install docbook docbook-xml docbook-xsl fop libxml2-utils opensp xsltproc
-global colordiff python3-venv tor wajig
+sudo apt-get install global colordiff python3-venv tor wajig
+# fast app moving between monitors with move-to-next-monitor
+sudo apt-get install xdotool wmctl
 # additional pg deps
 vim sudo strace build-essential git gdb \
 libwww-perl perl perl-modules libperl-dev libipc-run-perl tcl-dev \

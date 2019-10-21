@@ -79,19 +79,22 @@ Position the cursor at it's beginning, according to the current mode."
   (forward-line -1)
   (indent-according-to-mode))
 
-(defun toggle-remove-whitespace-on-save ()
-  (interactive)
-  (if (member 'delete-trailing-whitespace write-file-functions)
-    (progn (setq write-file-functions (remove 'delete-trailing-whitespace write-file-functions)) (message "removing whitespaces on save disabled"))
-    (add-to-list 'write-file-functions 'delete-trailing-whitespace)
-    (message "removing whitespaces on save enabled"))
-)
-
-;; ignore multimaster files
+;; ignore multimaster and pg test expected files
 (defun ars-delete-trailing-whitespace ()
-  (if (not (string-match-p (regexp-quote "contrib/mmts") (buffer-file-name)))
+  (if (and
+       (not (string-match-p "contrib/mmts" (buffer-file-name)))
+       (not (string-match-p "\\.out\\'" (buffer-file-name)))
+       )
       (delete-trailing-whitespace)
   )
+)
+
+(defun toggle-remove-whitespace-on-save ()
+  (interactive)
+  (if (member 'ars-delete-trailing-whitespace write-file-functions)
+    (progn (setq write-file-functions (remove 'ars-delete-trailing-whitespace write-file-functions)) (message "removing whitespaces on save disabled"))
+    (add-to-list 'write-file-functions 'ars-delete-trailing-whitespace)
+    (message "removing whitespaces on save enabled"))
 )
 
 (message "ars-text-processing loaded")

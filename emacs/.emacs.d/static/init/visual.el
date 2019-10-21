@@ -3,17 +3,40 @@
 ;; don't show welcome screen
 (setq inhibit-startup-screen t)
 
-;; fullscreen and maximize on startup
-(require 'ars-windows-frames-funcs)
-(ars-frame-fullscreen)
-(ars-frame-maximized)
+
+;; Windows and frames
+
+(require 'ars-visual)
+;; (load "ars-windows-frames-funcs.el") ;; for debugging
+;; (ars-frame-fullscreen)
+;; (ars-frame-maximized)
+
+;; maximize frame on start-up, but not make it fullscreen
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
+;; project tree
+;; (require 'all-the-icons) ; load icons for 'icons regime
+;; Every time when the neotree window is opened, let it find current file and
+;; jump to node.
+(setq neo-smart-open t)
+(setq neo-theme (if window-system 'icons 'arrow))
+;; neo tree ignore list
+(setq neo-hidden-regexp-list '("^\\." "\\.cs\\.meta$" "\\.pyc$" "~$" "^#.*#$" "\\.elc$" "\\.o$" "\\.so$"))
+
+;; scroll 1 line while moving off the visible region
+;; with it, all jumps end up at the last line of file, very inconvenient,
+;; so I disable it until I deal with it.
+;; (setq scroll-step            1
+      ;; scroll-conservatively  10000)
+
+;; always tail *Messages* buffer
+(tail-messages-enable)
+
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-(load-theme 'wombat-modified t) ; current theme
 (set-face-attribute 'default t :font "Ubuntu Mono")
-;; font size, in px*10
-(set-face-attribute 'default nil :height 140)
-;; (set-face-attribute 'default nil :height 120)
+;; set theme
+(ars-toggle-theme "dark")
 
 ;; set sane colors while editing text-based tables
 (add-hook 'table-fixed-width-mode-hook
@@ -45,9 +68,6 @@
 (setq show-paren-delay 0)           ; how long to wait?
 (show-paren-mode t)                 ; turn paren-mode on
 (setq show-paren-style 'parenthesis) ; highlight only parenthesis
-
-;; show trailing whitespaces
-(setq show-trailing-whitespace 1)
 
 ;; never pop-up GUI file selector
 (setq use-file-dialog nil)
