@@ -46,7 +46,7 @@
 "emacs"
   Mod4 + e
 
-"terminator --maximise --fullscreen"
+"terminator --maximise"
   Mod4 + t
 
 "firefox"
@@ -57,6 +57,10 @@
 
 "switch_background.sh"
   Mod4 + b
+
+"move-to-next-monitor"
+  Mod4 + m
+
 
 # Examples of commands:
 
