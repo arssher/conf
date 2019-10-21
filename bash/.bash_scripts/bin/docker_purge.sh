@@ -2,12 +2,13 @@
 
 set -e
 
-# remove all containers
+echo "Stopping all containers"
 docker stop $(docker ps -a -q) || true
+echo "Removing all containers"
 docker rm $(docker ps -a -q) || true
 
-# and all temporary images
+echo "Removing all temporary images"
 docker rmi -f $(docker images | tail -n +2 | grep -E -v "pgproee|alpine" | awk '{ print $3 }')
 
-# and all unused networks
+echo "Removing all networks not in use"
 docker network prune --force
