@@ -27,8 +27,9 @@
 
 ;; save command history
 ;; TODO: does it work with all needed commands?
+(setq history-length t) ;; infinite history
+(setq savehist-file "~/.emacs.d/savehist")
 (savehist-mode 1)
-(setq savehist-file "~/.emacs_history")
 
 ;; show in C-x b recently opened files
 (require 'recentf)

@@ -43,7 +43,6 @@
 (load-file (concat init-d "visual.el"))
 (load-file (concat init-d "backup-restore.el"))
 (load-file (concat init-d "text.el"))
-(load-file (concat init-d "windows-frames.el"))
 (load-file (concat init-d "dired.el"))
 (load-file (concat init-d "remote.el"))
 (load-file (concat init-d "diff.el"))
@@ -109,6 +108,7 @@
 (global-set-key [f7] 'desktop+-load) ; load saved desktop
 (global-set-key [f8] 'neotree-toggle) ; show and hide neotree
 (global-set-key [f9] 'whitespace-mode) ; toggle show whitespace
+(global-set-key [f10] 'ars-toggle-theme) ; toggle theme
 (global-set-key [f11] 'toggle-frame-fullscreen)
 (global-set-key [f12] 'toggle-frame-maximized)
 ;; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
