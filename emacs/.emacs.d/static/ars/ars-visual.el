@@ -78,7 +78,8 @@ the frame will be maximized after disabling fullscreen state."
 	   (setq ars-current-theme "dark")
 	   )
 	  ((string= new-theme "light")
-	   (load-theme 'adwaita t)
+	   (load-theme 'adwaita t
+		       )
 	   (set-face-attribute 'default nil :height 200)
 	   (setq ars-current-theme "light")))
    )
