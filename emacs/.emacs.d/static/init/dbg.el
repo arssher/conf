@@ -10,3 +10,6 @@
 
 ;; enable showing variable value on mouseover
 (gud-tooltip-mode t)
+
+;; show the source in neighbour window
+(setq gdb-show-main t)

@@ -68,6 +68,8 @@ libdbi-perl libdbd-pg-perl \
 resolvconf xcalib
 # building tmux
 sudo apt-get install libevent-dev
+# building usbmount
+sudo apt-get install lockfile-progs
 
 # building emacs
 sudo apt-get install gnutls-dev checkinstall

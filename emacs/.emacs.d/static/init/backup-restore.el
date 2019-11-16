@@ -1,4 +1,4 @@
-;; Backuping and restoring things; more precisely, anything that remembers
+;; Backuping and restoring things, generally anything that remembers
 ;; something and later uses it
 
 

@@ -47,10 +47,10 @@
 (load-file (concat init-d "remote.el"))
 (load-file (concat init-d "diff.el"))
 (load-file (concat init-d "gnus.el"))
+(load-file (concat init-d "misc.el"))
 
 ;; ide-like features
 (load-file (concat init-d "navigation-and-completion.el"))
-(load-file (concat init-d "non-code-completion.el"))
 (load-file (concat init-d "code-style.el"))
 (load-file (concat init-d "fly.el"))
 (load-file (concat init-d "dbg.el"))
