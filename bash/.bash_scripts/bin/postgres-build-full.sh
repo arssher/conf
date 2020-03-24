@@ -25,6 +25,7 @@ show_help() {
     -e comma separated-list of extensions in contrib/ to 'install'
     -s silent make
     -d dry-run: just print dirs and exit
+    -c clang: build with clang and glldb
 
     Examples:
     Silencing make, but without losing stderr:
@@ -39,10 +40,11 @@ target="all"
 silent=""
 extensions=""
 dry_run="false"
+use_clang="false"
 OPTIND=1 # reset opt counter, it is always must be set to 1
 # each symbol is option name; if there is colon after, it has value
 # the first colon would mean non-silent mode (error reporting)
-while getopts "m:ht:se:d" opt; do # the result will be stored in $opt
+while getopts "m:ht:se:dc" opt; do # the result will be stored in $opt
     case $opt in
 	h) # bracket is a part of case syntax, you know
 	    show_help
@@ -65,6 +67,9 @@ while getopts "m:ht:se:d" opt; do # the result will be stored in $opt
 	    ;;
 	d)
 	    dry_run="true"
+	    ;;
+	c)
+	    use_clang="true"
 	    ;;
 	\?) # match '?'
 	    show_help >&2
@@ -105,14 +110,28 @@ else
     echo "usual build"
 fi
 
+# run configure
+
 # musl setup
 # export CC=/usr/local/musl/bin/musl-gcc
 # export CFLAGS="${CFLAGS} -no-pie"
 # CONFOPTS="${CONFOPTS} --without-zlib"
 
-# run configure
-# opts for proper inlining
+# basic things
 export CFLAGS="${CFLAGS} -std=c99 -Wno-unused-function"
+
+if [[ "${use_clang}" == "true" ]]; then
+    export CC=clang
+    export CFLAGS="${CFLAGS} -glldb"
+else
+    # ggdb3 makes gdb aware of macros
+    export CFLAGS="${CFLAGS} -ggdb3"
+    # excellent gold provides faster linking, but not sure how it plays along
+    # with clang
+    export CFLAGS="${CFLAGS} -fuse-ld=gold"
+fi
+
+# opts for proper inlining xxx
 export CFLAGS="${CFLAGS} --param large-stack-frame=4096 --param large-stack-frame-growth=100000"
 
 # various stuff
@@ -121,15 +140,19 @@ export CFLAGS="${CFLAGS} --param large-stack-frame=4096 --param large-stack-fram
 # export CPPFLAGS="${CPPFLAGS} -DCLOBBER_FREED_MEMORY"
 
 # enable valgrind client requests
-# export CPPFLAGS="${CPPFLAGS} -DUSE_VALGRIND"
-
+export CPPFLAGS="${CPPFLAGS} -DUSE_VALGRIND"
 
 # export CPPFLAGS="${CPPFLAGS} -DCLOBBER_CACHE_ALWAYS"
 # export CPPFLAGS="${CPPFLAGS} -DOPTIMIZER_DEBUG"
+
+# don't forget to set guc:
+#   trace_locks = true
+# export CPPFLAGS="${CPPFLAGS} -DLOCK_DEBUG"
+
 export PYTHON=/usr/bin/python3
 # CONFOPTS="${CONFOPTS} --with-python"
 
-# since debug symbols don't affect perfomance, include them in rel mode too
+# since debug symbols don't affect performance, include them in rel mode too
 CONFOPTS="${CONFOPTS} --prefix=${PGIPATH} --enable-debug --enable-depend"
 if grep -q "PGPRO_VERSION" "${PGSDIR}/src/include/pg_config.h.in"; then
     :
@@ -141,8 +164,7 @@ if grep -q "PGPRO_VERSION" "${PGSDIR}/src/include/pg_config.h.in"; then
 	--with-icu --with-zstd"
 fi
 if [[ "$mode" == d* ]]; then
-    # ggdb3 makes gdb aware of macros
-    CFLAGS="${CFLAGS} -O0 -ggdb3 -fno-omit-frame-pointer -Wno-inline" \
+    CFLAGS="${CFLAGS} -O0 -fno-omit-frame-pointer -Wno-inline" \
 	  "$PGSDIR/configure" $CONFOPTS --enable-tap-tests --enable-cassert
 elif [[ "$mode" == r* ]]; then
     CFLAGS="${CFLAGS} -O2" "$PGSDIR/configure" $CONFOPTS
@@ -156,7 +178,7 @@ fi
 rm -rf ${PGIPATH} && mkdir -p ${PGIPATH}
 
 # run make
-export COPT='-Werror' # see the 'installation from source' doc
+# export COPT='-Werror' # see the 'installation from source' doc
 echo '-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-'
 numcores=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | tail -1`
 makeopts="-j ${numcores} ${silent} ${target}"

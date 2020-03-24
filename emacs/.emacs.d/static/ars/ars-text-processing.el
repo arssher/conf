@@ -82,8 +82,9 @@ Position the cursor at it's beginning, according to the current mode."
 ;; ignore multimaster and pg test expected files
 (defun ars-delete-trailing-whitespace ()
   (if (and
-       (not (string-match-p "contrib/mmts" (buffer-file-name)))
+       ;; (not (string-match-p "contrib/mmts" (buffer-file-name)))
        (not (string-match-p "\\.out\\'" (buffer-file-name)))
+       (not (string-match-p "\\.diffs\\'" (buffer-file-name)))
        )
       (delete-trailing-whitespace)
   )

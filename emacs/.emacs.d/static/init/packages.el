@@ -33,7 +33,7 @@
     magit ; git on steroids
     bbdb ; email contacts
     counsel-bbdb ; interface to it
-    markdown-mode ; markdown editing and viewing
+    ;; markdown-mode ; markdown editing and viewing
     go-mode ; go support
     sql-indent ; sql indent
     exec-path-from-shell ; source shell vars
