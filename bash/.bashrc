@@ -245,6 +245,8 @@ function rmc {
     rm -rf /tmp/core*
     # testgres
     rm -rf /tmp/tgsn_*
+    rm -rf /tmp/tgsb_*
+    # stolon
     rm -rf /tmp/stolon*
 }
 

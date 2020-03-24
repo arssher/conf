@@ -56,6 +56,7 @@
 (load-file (concat init-d "dbg.el"))
 (load-file (concat init-d "magit.el"))
 (load-file (concat init-d "go.el"))
+(load-file (concat init-d "tla.el"))
 
 ;; major modes
 (load-file (concat init-d "latex.el"))

@@ -50,6 +50,8 @@ Configure caps lock and layout switchover (mate-keyboard-properties).
 
 sudo apt-get install vim git terminator chromium checkinstall locate openvpn linux-tools
 
+# building emacs
+sudo apt-get install gnutls-dev checkinstall
 build and install emacs:
 install_emacs.sh
 
@@ -70,9 +72,9 @@ resolvconf xcalib
 sudo apt-get install libevent-dev
 # building usbmount
 sudo apt-get install lockfile-progs
-
-# building emacs
-sudo apt-get install gnutls-dev checkinstall
+# themes
+# arc theme is fine theme with light and dark variants, requires gnome icons
+sudo apt-get install arc-theme gnome-icon-theme
 
 sudo pip install virtualenvwrapper
 

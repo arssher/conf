@@ -3,6 +3,12 @@
 ;; * Ability to goto thread of current message
 ;; * powerful search, e.g. search only threads
 
+;; to update mu/mu4e,
+;; cd
+;; ./configure --prefix="${HOME}/opt"
+;; make && make install
+;; (init.el adds .el files there to load-path)
+
 ;; load mu4e
 (require 'mu4e)
 
@@ -32,8 +38,7 @@
 (setq user-full-name "Arseny Sher"
       mu4e-compose-signature
       (concat
-       "Best regards,\n"
-       "Arseny Sher\n"))
+       "-- cheers, arseny\n"))
 
 (setq mu4e-compose-dont-reply-to-self t)
 (setq mu4e-compose-in-new-frame t)

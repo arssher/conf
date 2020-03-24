@@ -78,9 +78,9 @@ the frame will be maximized after disabling fullscreen state."
 	   (setq ars-current-theme "dark")
 	   )
 	  ((string= new-theme "light")
-	   (load-theme 'adwaita t
-		       )
-	   (set-face-attribute 'default nil :height 200)
+	   ;; I've experimented with 'eink' theme, but this seems better
+	   (load-theme 'adwaita t)
+	   (set-face-attribute 'default nil :height 220)
 	   (setq ars-current-theme "light")))
    )
 )
