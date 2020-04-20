@@ -5,13 +5,19 @@ set -e
 echo "Forcing wal switch"
 for port in 15432 15433 15434; do
     :
-    psql -d "dbname=regression user=postgres host=127.0.0.1 port=${port} application_name=mtm_admin" -c "select pg_switch_wal()"
+    # psql -d "dbname=regression user=postgres host=127.0.0.1 port=${port} application_name=mtm_admin" -c "select pg_switch_wal()"
 done
 
 echo "Collecing mtm logs..."
 docker logs node1 > logs1 2>&1
 docker logs node2 > logs2 2>&1
 docker logs node3 > logs3 2>&1
+
+# I haven't figured out why, but apparently my local binaries are no good for
+# these cores. Seems better look at them directly in container
+# echo "collecting cores"
+# docker exec node1 sh -c "mkdir /tmp/cores; mv /tmp/core_* /tmp/cores"
+# docker cp node1:/tmp/cores .
 
 cat logs1 | grep -oE 'TXFINISH: MTM.+? [c|a]' | sort | uniq -c > tx1
 cat logs2 | grep -oE 'TXFINISH: MTM.+? [c|a]' | sort | uniq -c > tx2
@@ -38,7 +44,7 @@ cat xtx2_arch xtx2_wal | sort | uniq > xtx2
 cat xtx3_arch xtx3_wal | sort | uniq > xtx3
 
 
-# check out update histories
-for node_id in 1 2 3; do
-    sed --in-place -E -e "s/locally, xid ([[:digit:]]+)/locally, gid MTM-$node_id-\1/" logs${node_id}
-done
+# check out update histories, obsolete stuff which never worked
+# for node_id in 1 2 3; do
+#    sed --in-place -E -e "s/locally, xid ([[:digit:]]+)/locally, gid MTM-$node_id-\1/" logs${node_id}
+# done

@@ -15,7 +15,7 @@ show_help() {
 
     -h display this help and exit
     -t target
-       make target, for example, 'install'. By default it is 'all'.
+       make target, for example, 'install'. By default it is 'install'.
     -m <d[ebug] | r[elease] | p[erf]>, 3 choices:
        debug: no optimizations, asserts, etc, default value
        release, turn on optimizations, disable asserts, etc.
@@ -26,6 +26,7 @@ show_help() {
     -s silent make
     -d dry-run: just print dirs and exit
     -c clang: build with clang and glldb
+    -v valgrind: enable valgrind requests (USE_VALGRIND)
 
     Examples:
     Silencing make, but without losing stderr:
@@ -36,15 +37,16 @@ EOF
 
 mode="debug"
 run_tests=""
-target="all"
+target="install"
 silent=""
 extensions=""
 dry_run="false"
 use_clang="false"
+valgrind_requests="false"
 OPTIND=1 # reset opt counter, it is always must be set to 1
 # each symbol is option name; if there is colon after, it has value
 # the first colon would mean non-silent mode (error reporting)
-while getopts "m:ht:se:dc" opt; do # the result will be stored in $opt
+while getopts "m:ht:se:dcv" opt; do # the result will be stored in $opt
     case $opt in
 	h) # bracket is a part of case syntax, you know
 	    show_help
@@ -70,6 +72,9 @@ while getopts "m:ht:se:dc" opt; do # the result will be stored in $opt
 	    ;;
 	c)
 	    use_clang="true"
+	    ;;
+	v)
+	    valgrind_requests="true"
 	    ;;
 	\?) # match '?'
 	    show_help >&2
@@ -118,7 +123,8 @@ fi
 # CONFOPTS="${CONFOPTS} --without-zlib"
 
 # basic things
-export CFLAGS="${CFLAGS} -std=c99 -Wno-unused-function"
+export CFLAGS="${CFLAGS} -std=c99"
+# export CFLAGS="${CFLAGS} -std=c99 -Wno-unused-function"
 
 if [[ "${use_clang}" == "true" ]]; then
     export CC=clang
@@ -140,7 +146,9 @@ export CFLAGS="${CFLAGS} --param large-stack-frame=4096 --param large-stack-fram
 # export CPPFLAGS="${CPPFLAGS} -DCLOBBER_FREED_MEMORY"
 
 # enable valgrind client requests
-export CPPFLAGS="${CPPFLAGS} -DUSE_VALGRIND"
+if [[ "${valgrind_requests}" == "true" ]]; then
+    export CPPFLAGS="${CPPFLAGS} -DUSE_VALGRIND"
+fi
 
 # export CPPFLAGS="${CPPFLAGS} -DCLOBBER_CACHE_ALWAYS"
 # export CPPFLAGS="${CPPFLAGS} -DOPTIMIZER_DEBUG"
