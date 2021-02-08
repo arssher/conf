@@ -71,3 +71,9 @@
 
 ;; never pop-up GUI file selector
 (setq use-file-dialog nil)
+
+;; I'm quite annoyed by hints popping up on mouse hover, in particular for
+;; ggtags and ediff. It would be probably more accurate to disable them on
+;; case-by-case basic, but let's try shooting from the hip
+(tooltip-mode nil)
+(setq show-help-function nil)

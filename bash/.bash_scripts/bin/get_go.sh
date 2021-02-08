@@ -4,6 +4,7 @@ set -e
 
 # golink="https://dl.google.com/go/go1.11.10.linux-amd64.tar.gz"
 golink="https://dl.google.com/go/go1.12.6.linux-amd64.tar.gz"
+golink="https://golang.org/dl/go1.15.7.linux-amd64.tar.gz"
 goarchive=$(basename -- "${golink}")
 
 echo "Downloading go from ${golink}..."

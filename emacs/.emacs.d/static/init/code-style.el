@@ -13,6 +13,7 @@
   (c-set-style "postgresql"))
 (add-hook 'c-mode-common-hook 'my-c-mode-hook)
 
+;; Do I really need this?
 (setq c-default-style
       '((java-mode . "java")
         (awk-mode . "awk")
