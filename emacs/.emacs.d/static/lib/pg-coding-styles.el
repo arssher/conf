@@ -58,17 +58,19 @@
   (interactive)
   (setq perl-brace-imaginary-offset 0)
   (setq perl-brace-offset 0)
-  (setq perl-continued-brace-offset 4)
-  (setq perl-continued-statement-offset 4)
+  (setq perl-continued-brace-offset -2)
+  (setq perl-continued-statement-offset 2)
   (setq perl-indent-level 4)
   (setq perl-label-offset -2)
   (setq indent-tabs-mode t)
   (setq tab-width 4))
 
+;; It used to be wrapped in
+;;    (when (string-match "/postgres\\(ql\\)?/" buffer-file-name) ...)
+;; but since I code in perl for pg only, set the style unconditionally
 (add-hook 'perl-mode-hook
           (defun postgresql-perl-mode-hook ()
-             (when (string-match "/postgres\\(ql\\)?/" buffer-file-name)
-               (pgsql-perl-style))))
+               (pgsql-perl-style)))
 
 
 ;;; documentation files

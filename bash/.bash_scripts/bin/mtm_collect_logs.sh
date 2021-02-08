@@ -11,7 +11,8 @@ done
 echo "Collecing mtm logs..."
 docker logs node1 > logs1 2>&1
 docker logs node2 > logs2 2>&1
-docker logs node3 > logs3 2>&1
+docker logs node3 > logs3 2>&1 || true # no 3 node in referee mode
+docker logs referee > logs_referee 2>&1 || true # no 3 node in referee mode
 
 # I haven't figured out why, but apparently my local binaries are no good for
 # these cores. Seems better look at them directly in container

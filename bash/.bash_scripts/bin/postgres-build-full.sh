@@ -29,6 +29,10 @@ show_help() {
     -v valgrind: enable valgrind requests (USE_VALGRIND)
 
     Examples:
+    On bf:
+    PGSDIR=~/ars/postgrespro PGBDIR=~/ars/postgrespro PGIDIR=~/ars/install PGINAME=pgpro postgres-build-full -m d
+    Non-vpath:
+    PGSDIR=~/postgres/pgpro PGBDIR=~/postgres/pgpro postgres-build-full.sh -m d
     Silencing make, but without losing stderr:
     PGSDIR=/home/ars/postgres/postgresql PGINAME=vanilla postgres-build-full.sh -s > /dev/null
 EOF
@@ -88,7 +92,25 @@ if [[ "${target}" =~ ^install.* ]] && [ -z "${PGINAME}" ]; then
     exit 1
 fi
 script_dir=`dirname "$(readlink -f "$0")"`
-source "$script_dir"/postgres_common/postgres_common.sh
+
+if [ -z "${PGSDIR}" ]; then
+    echo "PGSDIR variable with path to Postgres sources directory is not defined, exiting"
+    exit 1
+fi
+if [ -z "${PGIDIR+set}" ]; then
+    export PGIDIR="${HOME}/postgres/install"
+    echo "PGIDIR variable with path to Postgres installations is not defined, setting it to ${PGIDIR}"
+fi
+if [ -z "${PGBDIR+set}" ]; then
+    export PGBDIR="/tmp/${PGINAME}"
+    echo "PGBDIR variable with path to Postgres build directory is not defined, setting it to ${PGBDIR}"
+fi
+export PGIPATH="${PGIDIR}/${PGINAME}"
+
+echo
+echo PGSDIR is "$PGSDIR"
+echo PGBDIR is "$PGBDIR"
+echo PGIPATH is "$PGIPATH"
 
 if [[ "${dry_run}" == "true" ]]; then
     exit 0
@@ -134,7 +156,9 @@ else
     export CFLAGS="${CFLAGS} -ggdb3"
     # excellent gold provides faster linking, but not sure how it plays along
     # with clang
-    export CFLAGS="${CFLAGS} -fuse-ld=gold"
+    if command -v gold; then
+	export CFLAGS="${CFLAGS} -fuse-ld=gold"
+    fi
 fi
 
 # opts for proper inlining xxx
@@ -153,15 +177,16 @@ fi
 # export CPPFLAGS="${CPPFLAGS} -DCLOBBER_CACHE_ALWAYS"
 # export CPPFLAGS="${CPPFLAGS} -DOPTIMIZER_DEBUG"
 
-# don't forget to set guc:
+# don't forget to set guc(s) if needed:
 #   trace_locks = true
+#   trace_lwlocks = true
 # export CPPFLAGS="${CPPFLAGS} -DLOCK_DEBUG"
 
 export PYTHON=/usr/bin/python3
 # CONFOPTS="${CONFOPTS} --with-python"
 
 # since debug symbols don't affect performance, include them in rel mode too
-CONFOPTS="${CONFOPTS} --prefix=${PGIPATH} --enable-debug --enable-depend"
+CONFOPTS="${CONFOPTS} --prefix=${PGIPATH} --enable-debug --enable-depend --enable-tap-tests "
 if grep -q "PGPRO_VERSION" "${PGSDIR}/src/include/pg_config.h.in"; then
     :
     # seems like we are building pgpro
@@ -173,7 +198,7 @@ if grep -q "PGPRO_VERSION" "${PGSDIR}/src/include/pg_config.h.in"; then
 fi
 if [[ "$mode" == d* ]]; then
     CFLAGS="${CFLAGS} -O0 -fno-omit-frame-pointer -Wno-inline" \
-	  "$PGSDIR/configure" $CONFOPTS --enable-tap-tests --enable-cassert
+	  "$PGSDIR/configure" $CONFOPTS --enable-cassert
 elif [[ "$mode" == r* ]]; then
     CFLAGS="${CFLAGS} -O2" "$PGSDIR/configure" $CONFOPTS
 elif [[ "$mode" == p* ]]; then
@@ -186,9 +211,9 @@ fi
 rm -rf ${PGIPATH} && mkdir -p ${PGIPATH}
 
 # run make
-# export COPT='-Werror' # see the 'installation from source' doc
+export COPT='-Werror' # see the 'installation from source' doc
 echo '-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-'
-numcores=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | tail -1`
+numcores=$(($(cat /proc/cpuinfo | awk '/^processor/{print $3}' | tail -1) + 1))
 makeopts="-j ${numcores} ${silent} ${target}"
 make $makeopts
 echo "Postgres at ${PGSDIR} successfully built"

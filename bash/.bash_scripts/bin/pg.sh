@@ -79,7 +79,7 @@ for pgnum in "${pgnums[@]}"; do
 	# read-var-info reads information about variable types and locations from DWARF3 debug info
 	# num-callers is maximum number of entries shown in stack traces that identify program locations.
 	valgrind --tool=memcheck --trace-children=yes --track-origins=yes \
-		 --read-var-info=yes --num-callers=20 --leak-check=no \
+		 --read-var-info=yes --num-callers=100 --leak-check=no \
 		 --gen-suppressions=all --error-limit=no \
 		 --suppressions="${PGSDIR}/src/tools/valgrind.supp" \
 		 --error-markers=VALGRINDERROR-BEGIN,VALGRINDERROR-END \

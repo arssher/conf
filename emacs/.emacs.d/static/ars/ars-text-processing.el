@@ -85,6 +85,7 @@ Position the cursor at it's beginning, according to the current mode."
        ;; (not (string-match-p "contrib/mmts" (buffer-file-name)))
        (not (string-match-p "\\.out\\'" (buffer-file-name)))
        (not (string-match-p "\\.diffs\\'" (buffer-file-name)))
+       (not (string-match-p "\\.diff\\'" (buffer-file-name)))
        )
       (delete-trailing-whitespace)
   )

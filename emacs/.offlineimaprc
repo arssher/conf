@@ -126,6 +126,7 @@ remoteuser = sher-ars
 remotepasseval = get_pass("yandex")
 ssl = yes
 sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+auth_mechanisms = LOGIN
 
 # This option stands in the [Repository RemoteExample] section.
 #

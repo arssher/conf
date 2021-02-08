@@ -21,9 +21,9 @@ done
 
 # say, you have big .flac file and .cue mirror listing tracks. This splits big
 # flac into separate tracks.
-for f in *.flac; do
-    cuebreakpoints "${f%.flac}.cue" | shnsplit -o flac "${f}"
-done
+# for f in *.flac; do
+    # cuebreakpoints "${f%.flac}.cue" | shnsplit -o flac "${f}"
+# done
 
-# forget about that, use flacon:
+# forget about that, use flacon (at least if you have cue):
 # http://flacon.github.io/download/
