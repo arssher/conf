@@ -3,3 +3,5 @@
 \set HISTSIZE -1
 
 \set gdb 'SELECT pg_backend_pid() \\g | psql_run_gdb.sh'
+
+\set pgpro_version 'select pgpro_version(); select pgpro_edition(); select pgpro_build();'
