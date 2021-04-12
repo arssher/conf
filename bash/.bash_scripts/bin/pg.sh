@@ -16,6 +16,7 @@ EOF
 
 conf_path="${HOME}/tmp/postgresql.conf"
 datadir=/tmp
+datadir="${HOME}/tmp"
 start_port=5432
 use_valgrind="false"
 

@@ -22,8 +22,8 @@ cmd = diff "$LOCAL" "$REMOTE"
 
 [format]
 	suffix = .patch
-	# suffix = -v2.patch
+	suffix = -v4.patch
 [merge]
-	ff = false
+	# ff = false
 [pull]
-	rebase = true
+	# rebase = true

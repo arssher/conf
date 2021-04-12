@@ -82,3 +82,20 @@ end
 document pg_berror
 break on postgres WARNING
 end
+
+define pg_bassert
+  b ExceptionalCondition
+end
+document pg_bassert
+break on postgres Assert failure
+end
+
+define show_sighandler
+  call malloc(sizeof(struct sigaction))
+  call sigaction($arg0, NULL, $1)
+  print ((struct sigaction *)$1)->sa_sigaction
+end
+document show_sighandler
+show given signal handler
+$arg0 is signal name
+end

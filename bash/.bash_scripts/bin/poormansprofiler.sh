@@ -12,8 +12,8 @@ EOF
     exit 0
 }
 
-nsamples=20
-sleeptime=1
+nsamples=100
+sleeptime=0.1
 pid=`ps aux | grep '[p]ostgres: ars' | tail -n 1 | awk '{print $2}'`
 
 OPTIND=1 # reset opt counter, it is always must be set to 1
@@ -42,7 +42,8 @@ while getopts ":p:n:s:" opt; do # the result will be stored in $opt
 done
 
 for x in $(seq 1 $nsamples)
-  do
+do
+    pid=$(ps aux | grep '[p]ostgres:' | shuf -n 1 | awk '{print $2}')
     gdb -nx -ex "set pagination 0" -ex "thread apply all bt" -batch -p $pid
     sleep $sleeptime
   done | \

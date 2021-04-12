@@ -235,7 +235,7 @@ function whichpg {
 }
 
 function mtm_psql {
-    export PGHOST=127.0.0.2
+    export PGHOST=127.0.0.1
     export PGDATABASE=regression
 }
 

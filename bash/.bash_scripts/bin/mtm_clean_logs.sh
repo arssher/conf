@@ -2,4 +2,4 @@
 
 set -e
 
-rm -rf logs* tx* txc* xtx* cores t.log
+rm -rf logs* tx* txc* xtx* cores

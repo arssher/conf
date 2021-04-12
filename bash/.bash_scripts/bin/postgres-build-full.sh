@@ -180,7 +180,13 @@ fi
 # don't forget to set guc(s) if needed:
 #   trace_locks = true
 #   trace_lwlocks = true
-# export CPPFLAGS="${CPPFLAGS} -DLOCK_DEBUG"
+export CPPFLAGS="${CPPFLAGS} -DLOCK_DEBUG"
+
+# gcc sanitizer
+# had to install libubsan1 and
+#   sudo sysctl -w vm.overcommit_memory=1
+# for that
+# export CPPFLAGS="${CPPFLAGS} -fsanitize=address -fsanitize=undefined -fno-sanitize-recover -fno-sanitize=alignment -fstack-protector" LDFLAGS='-fsanitize=address -fsanitize=undefined -static-libasan'
 
 export PYTHON=/usr/bin/python3
 # CONFOPTS="${CONFOPTS} --with-python"
