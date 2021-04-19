@@ -39,44 +39,20 @@ terminator conf:
 
 Things done on fresh Debian install:
 sudo apt-get update
-sudo apt-get install git vim xbindkeys terminator
+sudo apt-get install git vim
 set up yandex disk, or point CONFPATH to dir with cloned repo, e.g.
 git clone https://github.com/arssher/conf.git
-export CONFPATH=$HOME/conf
 cd conf
-run ${CONFPATH}/bash/.bash_scripts/bin/restore_all.sh
+and
+./bootstrap.sh
+
 Install Ubuntu fonts, or terminator & emacs will complain.
 Configure caps lock and layout switchover (mate-keyboard-properties).
-
-sudo apt-get install vim git terminator chromium checkinstall locate openvpn linux-tools
 
 # building emacs
 sudo apt-get install gnutls-dev checkinstall
 build and install emacs:
 install_emacs.sh
-
-sudo apt-get install flex bison libreadline-dev zlib1g-dev
-sudo apt-get install docbook docbook-xml docbook-xsl fop libxml2-utils opensp xsltproc
-sudo apt-get install global colordiff python3-venv tor wajig
-# fast app moving between monitors with move-to-next-monitor
-sudo apt-get install xdotool wmctl
-# additional pg deps
-vim sudo strace build-essential git gdb \
-libwww-perl perl perl-modules libperl-dev libipc-run-perl tcl-dev \
-libedit-dev libssl-dev zlib1g-dev libpam0g-dev libxml2-dev \
-krb5-multidev libldap2-dev python-dev bison flex xsltproc gettext \
-libicu-dev libkrb5-dev libxslt-dev pkgconf libzstd-dev \
-libdbi-perl libdbd-pg-perl \
-resolvconf xcalib
-# building tmux
-sudo apt-get install libevent-dev
-# building usbmount
-sudo apt-get install lockfile-progs
-# themes
-# arc theme is fine theme with light and dark variants, requires gnome icons
-sudo apt-get install arc-theme gnome-icon-theme
-
-sudo pip install virtualenvwrapper
 
 Important root configs:
 fstab
@@ -84,10 +60,9 @@ network/interfaces
 openvpn
 
 Important home configs not saved here:
-ssh
-fonts, appearance -- can be dumped with dconf
 ydisk
 firefox
+
 
 How to play midi:
 sudo apt-get install audicious fluid-soundfont-gm
