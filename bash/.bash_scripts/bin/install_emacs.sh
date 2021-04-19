@@ -5,12 +5,11 @@
 set -e
 
 sudo apt-get update
-sudo apt-get -y build-dep emacs24
+sudo apt-get -y build-dep emacs
 
 link=https://ftp.gnu.org/pub/gnu/emacs/emacs-27.2.tar.gz
 ver=27.2
-wget -nc -P ~/Downloads/ $link
-cd ~/Downloads
+wget -nc -P . $link
 
 tar -xf emacs-$ver.tar.gz
 rm emacs-$ver.tar.gz
