@@ -1,2 +1,5 @@
 mint_shortcuts/dconf-settings.conf
 emacs/refcard
+
+private/
+etc/
