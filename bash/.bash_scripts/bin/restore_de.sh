@@ -9,7 +9,7 @@ set -e
 # if dconf exists
 if [ -x "$(command -v dconf)" ]; then
     backup_path="${CONFPATH}/de.dconf"
-    echo "importing ${backup_path} }to the machine..."
+    echo "importing ${backup_path} to the machine..."
 
     dconf load / < "${backup_path}"
 
