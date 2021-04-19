@@ -1,0 +1,30 @@
+---
+- hosts: all
+  gather_facts: yes
+  tasks:
+  - name: fetch debian release
+    shell: "cat /etc/debian_version | sed 's/\\/.*//'"
+    register: codename_cmd
+  - name: print debian release
+    ansible.builtin.debug:
+      msg: debian release is {{ codename_cmd.stdout }}
+  - name: configure non-free repos (e.g. for firmware-iwlwifi)
+    ansible.builtin.apt_repository:
+      repo: deb http://mirror.mephi.ru/debian/ {{ codename_cmd.stdout }} main contrib non-free
+      state: present
+    become: yes
+  - name: configure non-free src repos
+    ansible.builtin.apt_repository:
+      repo: deb-src http://mirror.mephi.ru/debian/ {{ codename_cmd.stdout }} main contrib non-free
+      state: present
+    become: yes
+  - name: remove main only repo entry
+    ansible.builtin.apt_repository:
+      repo: deb http://mirror.mephi.ru/debian/ {{ codename_cmd.stdout }} main
+      state: absent
+    become: yes
+  - name: remove main only src repo entry
+    ansible.builtin.apt_repository:
+      repo: deb-src http://mirror.mephi.ru/debian/ {{ codename_cmd.stdout }} main
+      state: absent
+    become: yes
