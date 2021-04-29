@@ -261,3 +261,4 @@ function stophp {
 # https://wiki.archlinux.org/index.php/readline
 # https://unix.stackexchange.com/questions/12107/how-to-unfreeze-after-accidentally-pressing-ctrl-s-in-a-terminal
 stty -ixon -ixoff
+source "$HOME/.cargo/env"

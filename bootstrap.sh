@@ -20,7 +20,7 @@ python3 -m pip install ansible
 ansible-playbook --connection=local --inventory localhost, --ask-become-pass -e ansible_python_interpreter=/usr/bin/python3 bootstrap.yml
 
 sudo apt-get -y install vim git terminator chromium checkinstall locate \
-     openvpn xbindkeys terminator openssh-server firmware-iwlwifi
+     openvpn xbindkeys terminator openssh-server firmware-iwlwifi network-manager-openvpn-gnome
 sudo apt-get -y install build-essential gdb
 # pg stuff
 sudo apt-get -y install flex bison libreadline-dev zlib1g-dev \

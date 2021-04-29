@@ -55,13 +55,9 @@
 (load-file (concat init-d "fly.el"))
 (load-file (concat init-d "dbg.el"))
 (load-file (concat init-d "magit.el"))
-(load-file (concat init-d "go.el"))
-(load-file (concat init-d "tla.el"))
+(load-file (concat init-d "lang.el"))
 
 ;; major modes
-(load-file (concat init-d "latex.el"))
-(load-file (concat init-d "asm.el"))
-(load-file (concat init-d "sql.el"))
 
 ;; mail; load only if mu4e is installed
 (add-to-list 'load-path (format "%s/opt/share/emacs/site-lisp/mu4e" (getenv "HOME")))
@@ -345,7 +341,6 @@
 ;; fill-unfill from ergo
 ;; Winner mode?
 ;; icicles?
-;; check out https://github.com/jwiegley/use-package
 ;; fix highlight matching ()
 ;; save tree in desktop+?
 ;; save remote files in desktop+?
