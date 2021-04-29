@@ -38,13 +38,13 @@ filename='/home/ars/Downloads/debian-bullseye-DI-alpha3-amd64-netinst.iso'
 show-warning=false
 
 [org/gnome/Totem]
-active-plugins=['apple-trailers', 'recent', 'vimeo', 'screenshot', 'movie-properties', 'skipto', 'media_player_keys', 'chapters', 'autoload-subtitles', 'screensaver', 'save-file']
+active-plugins=['recent', 'skipto', 'movie-properties', 'screenshot', 'rotation', 'autoload-subtitles', 'apple-trailers', 'variable-rate', 'screensaver', 'media-player-keys', 'vimeo', 'open-directory', 'save-file']
 debug=false
 show-visualizations=false
 subtitle-encoding='UTF-8'
 
 [org/gnome/control-center]
-last-panel='lock'
+last-panel='keyboard'
 
 [org/gnome/desktop/a11y/applications]
 screen-keyboard-enabled=false
@@ -66,7 +66,7 @@ translate=true
 
 [org/gnome/desktop/input-sources]
 mru-sources=[('xkb', 'us'), ('xkb', 'ru')]
-show-all-sources=true
+show-all-sources=false
 sources=[('xkb', 'us'), ('xkb', 'ru')]
 xkb-options=['ctrl:ralt_rctrl', 'lv3:ralt_switch', 'caps:ctrl_modifier']
 
@@ -79,13 +79,22 @@ monospace-font-name='Ubuntu Mono 11'
 show-battery-percentage=true
 
 [org/gnome/desktop/notifications]
-application-children=['org-gnome-tweaks', 'org-gnome-baobab', 'gnome-power-panel', 'appimagekit-d26df32af24e24b3ec7da56e38cf014a-telegram-desktop', 'firefox-esr', 'org-gnome-nautilus']
+application-children=['org-gnome-tweaks', 'org-gnome-baobab', 'gnome-power-panel', 'appimagekit-d26df32af24e24b3ec7da56e38cf014a-telegram-desktop', 'firefox-esr', 'org-gnome-nautilus', 'chromium', 'org-gnome-software', 'gnome-network-panel', 'zoom', 'element-desktop']
 
 [org/gnome/desktop/notifications/application/appimagekit-d26df32af24e24b3ec7da56e38cf014a-telegram-desktop]
 application-id='appimagekit_d26df32af24e24b3ec7da56e38cf014a-Telegram_Desktop.desktop'
 
+[org/gnome/desktop/notifications/application/chromium]
+application-id='chromium.desktop'
+
+[org/gnome/desktop/notifications/application/element-desktop]
+application-id='element-desktop.desktop'
+
 [org/gnome/desktop/notifications/application/firefox-esr]
 application-id='firefox-esr.desktop'
+
+[org/gnome/desktop/notifications/application/gnome-network-panel]
+application-id='gnome-network-panel.desktop'
 
 [org/gnome/desktop/notifications/application/gnome-power-panel]
 application-id='gnome-power-panel.desktop'
@@ -96,8 +105,17 @@ application-id='org.gnome.baobab.desktop'
 [org/gnome/desktop/notifications/application/org-gnome-nautilus]
 application-id='org.gnome.Nautilus.desktop'
 
+[org/gnome/desktop/notifications/application/org-gnome-software]
+application-id='org.gnome.Software.desktop'
+
 [org/gnome/desktop/notifications/application/org-gnome-tweaks]
 application-id='org.gnome.tweaks.desktop'
+
+[org/gnome/desktop/notifications/application/zoom]
+application-id='Zoom.desktop'
+
+[org/gnome/desktop/privacy]
+disable-microphone=false
 
 [org/gnome/desktop/screensaver]
 lock-delay=uint32 0
@@ -110,6 +128,8 @@ idle-delay=uint32 300
 event-sounds=false
 
 [org/gnome/desktop/wm/keybindings]
+begin-move=@as []
+begin-resize=@as []
 switch-input-source=['<Super>space']
 switch-input-source-backward=['<Shift><Super>space']
 
@@ -118,8 +138,15 @@ button-layout='appmenu:minimize,maximize,close'
 mouse-button-modifier='<Ctrl>'
 titlebar-font='Ubuntu Bold 11'
 
+[org/gnome/eog/view]
+background-color='rgb(0,0,0)'
+use-background-color=true
+
+[org/gnome/evince]
+document-directory=@ms 'file:///home/ars/Downloads'
+
 [org/gnome/evince/default]
-window-ratio=(0.5859375, 0.78125)
+window-ratio=(3.1770833333333335, 0.98665530948324798)
 
 [org/gnome/evolution-data-server]
 migrated=true
@@ -142,6 +169,10 @@ side-panel-active-page='GeditWindowDocumentsPanel'
 side-panel-size=200
 size=(900, 700)
 state=87168
+
+[org/gnome/gnome-screenshot]
+include-pointer=false
+last-save-directory='file:///home/ars/Pictures'
 
 [org/gnome/gnome-system-monitor]
 cpu-colors=[(uint32 0, '#FF6E00'), (1, '#CB0C29'), (2, '#49A835'), (3, '#2D7DB3'), (4, '#f25915e815e8'), (5, '#f25915e815e8'), (6, '#f25915e815e8'), (7, '#f25915e815e8')]
@@ -234,6 +265,7 @@ y=135
 
 [org/gnome/mutter]
 dynamic-workspaces=false
+overlay-key='Super_L'
 
 [org/gnome/nautilus/list-view]
 default-column-order=['name', 'size', 'type', 'owner', 'group', 'permissions', 'where', 'date_modified', 'date_modified_with_time', 'date_accessed', 'recency', 'starred', 'detailed_type']
@@ -242,6 +274,7 @@ default-visible-columns=['name', 'size', 'date_modified', 'starred']
 [org/gnome/nautilus/preferences]
 default-folder-viewer='list-view'
 search-filter-time-type='last_modified'
+search-view='list-view'
 
 [org/gnome/nautilus/window-state]
 initial-size=(890, 550)
@@ -552,7 +585,8 @@ ignore-phase2-ca-cert=false
 night-light-enabled=true
 
 [org/gnome/settings-daemon/plugins/media-keys]
-custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/']
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/']
+screensaver=['<Super>l']
 
 [org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0]
 binding='<Super>f'
@@ -574,16 +608,28 @@ binding='<Super>n'
 command='nautilus'
 name='nautilus'
 
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4]
+binding='<Super>s'
+command='systemctl suspend'
+name='suspend'
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5]
+binding='<Super>t'
+command='terminator --maximize'
+name='terminator'
+
 [org/gnome/settings-daemon/plugins/xsettings]
 antialiasing='grayscale'
 hinting='slight'
 
 [org/gnome/shell]
-command-history=['gparted']
+command-history=['gparted', 'r']
 enabled-extensions=['window-list@gnome-shell-extensions.gcampax.github.com', 'workspace-indicator@gnome-shell-extensions.gcampax.github.com']
 
 [org/gnome/shell/keybindings]
 focus-active-notification=@as []
+toggle-message-tray=@as []
+toggle-overview=@as []
 
 [org/gnome/shell/world-clocks]
 locations=@av []
@@ -592,8 +638,10 @@ locations=@av []
 document-type='photo'
 
 [org/gnome/software]
-check-timestamp=int64 1618822424
+check-timestamp=int64 1619668927
 first-run=false
+install-timestamp=int64 1619581441
+online-updates-timestamp=int64 1619668931
 
 [org/gtk/settings/color-chooser]
 custom-colors=[(0.78431372549019607, 0.0, 0.011764705882352941, 1.0), (0.93333333333333335, 0.11372549019607843, 0.0, 1.0), (0.28627450980392155, 0.6588235294117647, 0.20784313725490197, 1.0), (0.0, 0.46274509803921571, 0.78823529411764703, 1.0), (0.96470588235294119, 0.29019607843137257, 0.14901960784313725, 1.0)]
@@ -602,7 +650,7 @@ selected-color=(true, 0.78431372549019607, 0.0, 0.011764705882352941, 1.0)
 [org/gtk/settings/file-chooser]
 date-format='regular'
 location-mode='path-bar'
-show-hidden=false
+show-hidden=true
 show-size-column=true
 show-type-column=true
 sidebar-width=169
@@ -610,7 +658,7 @@ sort-column='name'
 sort-directories-first=false
 sort-order='ascending'
 type-format='category'
-window-position=(394, 102)
+window-position=(26, 23)
 window-size=(1133, 824)
 
 [org/mate/atril]

@@ -54,6 +54,10 @@ sudo apt-get install gnutls-dev checkinstall
 build and install emacs:
 install_emacs.sh
 
+uncomment WaylandEnable=false in
+/etc/gdm3/daemon.conf
+(in wayland gnome layout switching stops working after a while, wow)
+
 Important root configs:
 fstab
 network/interfaces
