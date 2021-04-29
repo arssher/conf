@@ -18,7 +18,8 @@
 (message "Packages are loaded")
 
 (defvar required-packages
-  '(auctex
+  '(use-package ; package for configuring packages, see below
+    auctex
     all-the-icons ; for neotree, which I actually don't use
     dash ; required by all-icons (used for neat icons in neotree)
     neotree ; project tree
@@ -37,6 +38,7 @@
     go-mode ; go support
     sql-indent ; sql indent
     exec-path-from-shell ; source shell vars
+    diminish ;; make modeline less noisy
    )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
@@ -56,3 +58,43 @@
 
 ;; don't ask long yes-or-no-p
 (defalias 'yes-or-no-p 'y-or-n-p)
+
+;; use-package
+;;
+;; use-package 1) helps lazy loading 2) centralizes package configuration 3)
+;; has basic support for automatic package dowloading, which in fact should be
+;; enough for me atm.
+;; I guess eventually I'd move everything here, but that's what we have currently.
+;;
+;; Short tutorial:
+;; Basic
+;;  (use-package foo)
+;; loads the package immediately.
+;;
+;; :init runs some code right now, before the package is loaded. It should be
+;; fast and without much dependencies.
+;; :config is run once the package is loaded, which often happens lazily.
+;;
+;; :command, :bind, :mode and similar delay the package loading.
+;; :command registers the function autoloaded (package is loaded once on its
+;; first invocation)
+;; :bind 1) registers function as autoloaded 2) immediately binds it
+;; ;mode 1) registers function turning on mode (named as package unless explicitly given)
+;;   as autoloaded 2) pushes entry to auto-mode-alist saying when to call this mode
+;;
+;; ;hook (prog-mode . ace-jump-mode) is a bit weird. It 1) registers ace-jump-mode
+;;   as autoloaded, of course 2) add-hook's ace-jump-mode on prog-mode-hook.
+;;
+;; you can force-disable lazy loading with :demand t
+(require 'use-package)
+
+;; ask to download all packages by default automatically
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
+
+
+;; automatically update packages on startup
+(use-package auto-package-update
+  :config
+  (setq auto-package-update-delete-old-versions t)
+  (auto-package-update-maybe))
