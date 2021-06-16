@@ -21,7 +21,9 @@ ansible-playbook --connection=local --inventory localhost, --ask-become-pass -e 
 
 sudo apt-get -y install vim git terminator chromium checkinstall locate \
      openvpn xbindkeys terminator openssh-server firmware-iwlwifi network-manager-openvpn-gnome
-sudo apt-get -y install build-essential gdb
+sudo apt-get -y install build-essential gdb clang
+# lang server stuff
+sudo apt-get -y install clangd bear
 # pg stuff
 sudo apt-get -y install flex bison libreadline-dev zlib1g-dev \
      docbook docbook-xml docbook-xsl fop libxml2-utils opensp xsltproc \
@@ -29,9 +31,11 @@ sudo apt-get -y install flex bison libreadline-dev zlib1g-dev \
      libedit-dev libssl-dev zlib1g-dev libpam0g-dev libxml2-dev \
      krb5-multidev libldap2-dev python-dev bison flex xsltproc gettext \
      libicu-dev libkrb5-dev libxslt-dev pkgconf libzstd-dev \
-     libdbi-perl libdbd-pg-perl \
+     libdbi-perl libdbd-pg-perl
 
 sudo apt-get -y install global colordiff python3-venv tor xcalib
+# mu/mu4e
+sudo apt-get install libgmime-3.0-dev libxapian-dev pass mbsync
 
 # fast app moving between monitors with move-to-next-monitor
 sudo apt-get -y install xdotool wmctrl

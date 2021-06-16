@@ -209,10 +209,11 @@
 (define-key dired-mode-map (kbd "M-s") nil)
 
 ;; ggtags: TODO enable them only in C mode
+;; (mostly obsolete, I use lsp-mode now)
 (require 'ggtags)
 (global-set-key (kbd "C-b") 'ggtags-find-tag-dwim)
 (global-set-key (kbd "C-S-b") 'ggtags-find-definition)
-(global-set-key (kbd "M-B") 'ggtags-prev-mark)
+(global-set-key (kbd "M-B") 'xref-pop-marker-stack)
 (global-set-key (kbd "M-F") 'ggtags-next-mark)
 (global-set-key (kbd "M-<f7>") 'ggtags-find-reference) ; idea
 (global-set-key (kbd "C-M-g") 'ggtags-grep) ; grepping the project

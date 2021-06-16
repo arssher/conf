@@ -69,9 +69,11 @@
 ;; lsp client
 (use-package lsp-mode
   :commands lsp
+  ;; lsp binds into xref, e.g. xref-find-definitions, so we don't need lsp-find-definition
+  ;; or similar
   :bind (:map lsp-mode-map
-	      ("C-b" . lsp-find-definition)
-	      ("M-<f7>" . lsp-find-references)
+	      ("C-b" . xref-find-definitions)
+	      ("M-<f7>" . xref-find-references)
 	      ("M-/" . completion-at-point))
   ;; see https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
   :config
@@ -92,6 +94,7 @@
   ;; (setq lsp-eldoc-render-all t)
   (setq lsp-idle-delay 0.6)
   (setq lsp-rust-analyzer-server-display-inlay-hints t)
+  (setq lsp-response-timeout 10)
   ;; prefix for lsp-mode-map
   (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))
 
@@ -102,14 +105,8 @@
 ;; to work
 (use-package rustic
   :bind (:map rustic-mode-map
-              ("M-j" . lsp-ui-imenu)
-              ("M-?" . lsp-find-references)
               ("C-c C-c l" . flycheck-list-errors)
-              ("C-c C-c a" . lsp-execute-code-action)
-              ("C-c C-c r" . lsp-rename)
-              ("C-c C-c q" . lsp-workspace-restart)
-              ("C-c C-c Q" . lsp-workspace-shutdown)
-              ("C-c C-c s" . lsp-rust-analyzer-status))
+              ("C-c C-c a" . lsp-execute-code-action))
   :config
   ;; uncomment for less flashiness
   ;; (setq lsp-enable-symbol-highlighting nil)
@@ -123,3 +120,58 @@
 (defun ars/rustic-mode-hook ()
   ;; so that run lsp-rename  works without having to confirm
   (setq-local buffer-save-without-query t))
+
+;; C/C++
+;;
+;; Short review:
+;; Etags & Ctags programs for generating tags -- definitions only. It seems
+;; that there is buit-in support for etags format in emacs, ctags can also
+;; generate these files
+;;
+;; GNU Global. Another tagger, more powerful, knows about references. Has its
+;; own file format. There are a bunch of emacs frontends, most notable are
+;; ggtags.el and helm-gtags.el. Global also provides and interface like cscope,
+;; so it can be used instead of it. I don't know cons and pros of this approach
+;; yet.
+
+;; Cscope. Another tagger, powerful beast too, knows about references.
+;; There are again a number of frontends, but the most popular seems to be
+;; xcscope.el
+
+;; CEDET, senator, and a lot of more great words: some monster which seems to
+;; be capable of anything, but it looks like no one can set it up rightly.
+
+;; Time to use lang server, its 2021, actually.
+
+;; Let's try Cscope with xcscope.el for now.
+;; (require 'xcscope)
+;; (cscope-setup)
+
+;; Now let's try gnu global
+;; Remember that you need GTAGSLIBPATH env var to search external projects,
+;; you can do that in ~/.emacs-local.el
+;; (add-hook 'c-mode-common-hook
+          ;; (lambda ()
+            ;; (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
+              ;; (ggtags-mode 1))))
+
+
+;; enable lsp-mode
+;; ... but getting compile_commands.json is quite pain.
+(add-hook 'c-mode-hook 'lsp)
+(add-hook 'c++-mode-hook 'lsp)
+
+
+;; turn on projectile
+;; Right now I plan to use it only for two things: switching between header and
+;; src, and, perhaps, quick project switching (basically, it just lets me avoid
+;; typing full path to the project)
+;; Now there is another feature which I use: regexp replacing in the project,
+;; I couldn't get it to work in ggtags.
+;; better set the var in init.el, but it must be set before loading...
+(setq projectile-keymap-prefix (kbd "C-c p"))
+(projectile-mode 1)
+(setq projectile-completion-system 'ivy)
+;; default fast 'alien method ignores 'projectile-globally-ignored-directories
+;; with .cache and stuff, so let's switch to hybrid
+(setq projectile-indexing-method 'hybrid)
