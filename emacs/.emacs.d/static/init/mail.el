@@ -16,13 +16,14 @@
 (setq mail-user-agent 'mu4e-user-agent)
 
 ;; directory with mail in mbox format
-(setq mu4e-maildir "/d/mail")
+(setq mu4e-maildir "/d/mbsmail")
 
 (setq mu4e-view-show-addresses t)
 
 ;; allow for updating mail using 'U' in the main view:
 (setq
-  mu4e-get-mail-command "offlineimap -o"   ;; one-shot
+  ;; mu4e-get-mail-command "offlineimap -o"   ;; one-shot
+  mu4e-get-mail-command "mbsync -a"   ;; one-shot
   mu4e-update-interval nil)
 
 ;; setup some handy shortcuts
@@ -32,7 +33,8 @@
 	 ("/pgpro/INBOX" . ?w)
 	 ("/yandex/ps-hackers" . ?h)
 	 ("/yandex/pgsql-general" . ?g)
-	 ("/yandex/Sent" . ?s)))
+	 ("/yandex/Sent" . ?s)
+	 ))
 
 ;; Personal information, not related to access
 (setq user-full-name "Arseny Sher"

@@ -27,3 +27,5 @@ cmd = diff "$LOCAL" "$REMOTE"
 	# ff = false
 [pull]
 	# rebase = true
+[submodule]
+	recurse = true

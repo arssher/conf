@@ -16,12 +16,14 @@ define hook-quit
     set confirm off
 end
 
-set logging off
+# There is some problem here: gdb in emacs starts infinitely get 'info break'
+# typed with this. And why I wanted logging in the first place?
+# set logging off
 # well, without that, logging will not work
 # https://sourceware.org/bugzilla/show_bug.cgi?id=14584
-set trace-commands on
-set logging file /home/ars/.gdb_log
-set logging on
+# set trace-commands on
+# set logging file /home/ars/.gdb_log
+# set logging on
 
 # save history of unlimited size, write always to ~/.gdb_history
 set history save on
@@ -42,7 +44,7 @@ source ~/.gdb/pg_memctx.py
 # this will fail if
 # python3 -m pip install arpeggio
 # is not executed
-source ~/.gdb/import_duel.py
+# source ~/.gdb/import_duel.py
 
 # unlimited printing
 set print elements 0

@@ -38,7 +38,6 @@
     go-mode ; go support
     sql-indent ; sql indent
     exec-path-from-shell ; source shell vars
-    diminish ;; make modeline less noisy
    )
   "A list of packages to ensure are installed at launch.")
 (require 'cl-lib)
@@ -94,7 +93,8 @@
 
 
 ;; automatically update packages on startup
-(use-package auto-package-update
-  :config
-  (setq auto-package-update-delete-old-versions t)
-  (auto-package-update-maybe))
+;; let's do it not so often, as it requires restart of all emacses
+;; (use-package auto-package-update
+  ;; :config
+  ;; (setq auto-package-update-delete-old-versions t)
+  ;; (auto-package-update-maybe))

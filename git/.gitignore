@@ -1,0 +1,9 @@
+# Run git config --global core.excludesfile '~/.gitignore'
+# to activate this
+
+GPATH
+GRTAGS
+GTAGS
+.idea/
+.cache/
+compile_commands.json
