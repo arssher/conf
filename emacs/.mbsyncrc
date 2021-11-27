@@ -1,0 +1,69 @@
+# man mbsync
+
+# First generic defaults
+Create Slave
+# store sync state in the mail store itself
+SyncState *
+# Without this apparently mbsync thinks mtime of email file is its
+# timestamp, which is nonsense; that is, immediately after getting all
+# messages it starts to push them back with current time.
+# see also
+# https://wiki.archlinux.org/index.php/isync
+# https://vxlabs.com/2021/03/21/mbsync-copyarrivaldate-yes/
+CopyArrivalDate yes
+
+
+IMAPAccount yandex
+Host imap.yandex.com
+User sher-ars
+# to set up it,
+# sudo apt-get install pass
+# pass init ars
+# pass insert mail/dummy dummy
+# pass insert mail/pgpro
+# pass insert mail/yandex
+# ... etc
+PassCmd "pass mail/yandex"
+SSLType IMAPS
+
+IMAPStore yandex-remote
+Account yandex
+
+MaildirStore yandex-local
+# The trailing "/" is important
+Path /d/mbsmail/yandex/
+Inbox /d/mbsmail/yandex/inbox
+Subfolders Verbatim
+
+Channel yandex
+Master :yandex-remote:
+Slave :yandex-local:
+# sync all folders
+Patterns *
+
+# yandex inbox
+# Channel yinb
+# Master :yandex-remote:
+# Slave :yandex-local:inbox
+
+
+IMAPAccount pgpro
+Host imap.postgrespro.ru
+User a.sher@postgrespro.ru
+PassCmd "pass mail/pgpro"
+SSLType IMAPS
+
+IMAPStore pgpro-remote
+Account pgpro
+
+MaildirStore pgpro-local
+# The trailing "/" is important
+Path /d/mbsmail/pgpro/
+Inbox /d/mbsmail/pgpro/inbox
+Subfolders Verbatim
+
+Channel pgpro
+Master :pgpro-remote:
+Slave :pgpro-local:
+# sync all folders
+Patterns *

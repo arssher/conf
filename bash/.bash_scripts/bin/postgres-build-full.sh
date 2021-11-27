@@ -5,10 +5,10 @@ show_help() {
     cat <<EOF
     Usage: bash ${0##*/} [-t target] [-m mode] [-r] [-e <ext,ext,...>] [-s]
 
-    Configure and build Postgres, found in \$PGSDIR, with prefix
-    (installation path) \$PGIDIR/\$PGINAME, using \$PGBDIR as a build directory.
-    If \$PGBDIR is not specified, it is /tmp/\$PGINAME by default.
-    If \$PGIDIR is not specified, it is ~/postgres/install by default.
+    Configure and build Postgres, found in \$PGSDIR (current dir by default),
+    with prefix (installation path) \$PGIDIR/\$PGINAME, using \$PGBDIR as a
+    build directory.  If \$PGBDIR is not specified, it is \$PGSDIR
+    default.  If \$PGIDIR is not specified, it is ~/postgres/install by default.
     Then install it.
 
     pg_workon in .bashrc makes it easier to use, setting these vars.
@@ -87,22 +87,21 @@ while getopts "m:ht:se:dcv" opt; do # the result will be stored in $opt
     esac
 done
 
-if [[ "${target}" =~ ^install.* ]] && [ -z "${PGINAME}" ]; then
-    echo "PGINAME variable with Postgres installation name is not defined, exiting"
-    exit 1
+if [ -z "${PGINAME}" ]; then
+    PGINAME=postgresql
 fi
+
 script_dir=`dirname "$(readlink -f "$0")"`
 
 if [ -z "${PGSDIR}" ]; then
-    echo "PGSDIR variable with path to Postgres sources directory is not defined, exiting"
-    exit 1
+    PGSDIR=${PWD}
 fi
 if [ -z "${PGIDIR+set}" ]; then
     export PGIDIR="${HOME}/postgres/install"
     echo "PGIDIR variable with path to Postgres installations is not defined, setting it to ${PGIDIR}"
 fi
 if [ -z "${PGBDIR+set}" ]; then
-    export PGBDIR="/tmp/${PGINAME}"
+    export PGBDIR=${PGSDIR}
     echo "PGBDIR variable with path to Postgres build directory is not defined, setting it to ${PGBDIR}"
 fi
 export PGIPATH="${PGIDIR}/${PGINAME}"
@@ -145,7 +144,7 @@ fi
 # CONFOPTS="${CONFOPTS} --without-zlib"
 
 # basic things
-export CFLAGS="${CFLAGS} -std=c99"
+export CFLAGS="${CFLAGS} -std=c11"
 # export CFLAGS="${CFLAGS} -std=c99 -Wno-unused-function"
 
 if [[ "${use_clang}" == "true" ]]; then

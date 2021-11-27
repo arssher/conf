@@ -157,7 +157,8 @@
 
 
 ;; enable lsp-mode
-;; ... but getting compile_commands.json is quite pain.
+;; ... you have to get compile_commands.json at the top dir and reload lang
+;; server to make it work, which is kinda pain
 (add-hook 'c-mode-hook 'lsp)
 (add-hook 'c++-mode-hook 'lsp)
 
