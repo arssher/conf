@@ -5,4 +5,4 @@ set -e
 echo "Copying git config to the yandex disk..."
 
 backup_path="${CONFPATH}/git"
-cp ~/.gitconfig ${backup_path}
+cp ~/.gitconfig ~/.gitignore ${backup_path}
