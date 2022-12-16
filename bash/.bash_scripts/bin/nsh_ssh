@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# To use, put
+# host safekeeper* pageserver*
+#     ProxyCommand nsh_ssh %h %p
+# to ~/.ssh/config
+# then you can connect like
+# ssh admin@safekeeper-0.us-east-2.aws.neon.build
+# your public key must be in /~/.ssh/authorized_keys of the target node
+
+host=$1
+port=$2
+
+echo $1 | grep -q -P '^[\w-]+\.[\w-]+\.aws\.neon\.[\w]+$' ||
+  die "Usage: nsh (pageserver|safekeeper|etcd)-XXX.REGION.aws.neon.(build|tech), e.g. safekeeper-0.us-east-2.aws.neon.build"
+IFS=. read HOST REGION PROVIDER neon TLD <<< $1
+
+case $TLD in
+  tech) PROFILE=prod ;;
+  build) PROFILE=dev ;;
+  *) die "Unknown TLD: $TLD";;
+esac
+
+INSTANCE_ID=$(aws --profile $PROFILE --region $REGION ec2 describe-instances \
+  --filters "Name=tag:Name,Values=$1"  \
+  --output text \
+  --query 'Reservations[*].Instances[*].InstanceId')
+[ -n "$INSTANCE_ID" ] || die "No $1 instance found in aws profile $PROFILE, region $REGION"
+
+aws --profile $PROFILE --region $REGION ssm start-session --target $INSTANCE_ID --document-name AWS-StartSSHSession --parameters "portNumber=${port}"

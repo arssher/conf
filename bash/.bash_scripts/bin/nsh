@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#set -x
+function die() {
+ echo $@
+ exit 1
+}
+
+#Sample host: pageserver-1.us-east-2.aws.neon.build
+
+echo $1 | grep -q -P '^[\w-]+\.[\w-]+\.aws\.neon\.[\w]+$' ||
+  die "Usage: nsh (pageserver|safekeeper|etcd)-XXX.REGION.aws.neon.(build|tech), e.g. safekeeper-0.us-east-2.aws.neon.build"
+IFS=. read HOST REGION PROVIDER neon TLD <<< $1
+
+case $TLD in
+  tech) PROFILE=prod ;;
+  build) PROFILE=dev ;;
+  *) die "Unknown TLD: $TLD";;
+esac
+
+INSTANCE_ID=$(aws --profile $PROFILE --region $REGION ec2 describe-instances \
+  --filters "Name=tag:Name,Values=$1"  \
+  --output text \
+  --query 'Reservations[*].Instances[*].InstanceId')
+[ -n "$INSTANCE_ID" ] || die "No $1 instance found in aws profile $PROFILE, region $REGION"
+
+echo "Connecting as aws --profile $PROFILE --region $REGION ssm start-session --target $INSTANCE_ID"
+aws --profile $PROFILE --region $REGION ssm start-session --target $INSTANCE_ID

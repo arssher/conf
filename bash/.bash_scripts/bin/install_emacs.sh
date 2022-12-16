@@ -7,8 +7,8 @@ set -e
 sudo apt-get update
 sudo apt-get -y build-dep emacs
 
-link=https://ftp.gnu.org/pub/gnu/emacs/emacs-27.2.tar.gz
-ver=27.2
+link=https://ftp.gnu.org/pub/gnu/emacs/emacs-28.1.tar.gz
+ver=28.1
 wget -nc -P . $link
 
 tar -xf emacs-$ver.tar.gz
@@ -22,7 +22,7 @@ numcores=`cat /proc/cpuinfo | awk '/^processor/{print $3}' | tail -1`
 
 # user install
 ./configure --prefix ${HOME}/opt && make -j${numcores} && make install
-echo "export PATH=${HOME}/opt/bin:$PATH" >> ~/.global_vars
+# echo "export PATH=${HOME}/opt/bin:$PATH" >> ~/.global_vars
 
 # one-time start to install packages
 emacs -batch --eval '(message "Hi!")'
