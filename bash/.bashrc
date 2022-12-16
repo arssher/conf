@@ -1,7 +1,6 @@
 # do this before we exit in non-interfactive shells!
 if [ -f ~/.global_vars ]; then
       source ~/.global_vars
-      # echo "global vars loaded"
 fi
 
 # ------------------------------------------------------------
@@ -113,6 +112,7 @@ if [ -x "$(command -v yandex-disk)" ]; then
     export YANDEXDISK_DIR=`cat ~/.config/yandex-disk/config.cfg | grep "dir=" | sed 's/dir=\"\(.*\)\"/\1/' | grep -E -v '^#.*'`
     export CONFPATH="${YANDEXDISK_DIR}/configs"
 fi
+export CONFPATH=~/Dropbox/configs
 
 PATH=$PATH:~/.bash_scripts/bin # TODO: perhaps check if it is already added?
 export LC_ALL="en_US.UTF-8"
@@ -201,10 +201,20 @@ ulimit -c unlimited
 git config --global alias.lg "log --color --graph --abbrev-commit
            --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset'"
 
+
+# k8s autocompletion
+# https://kubernetes.io/docs/reference/kubectl/cheatsheet/
+source <(kubectl completion bash)
+
 # Use virtualenvwrapper, if it is available
 if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
       source /usr/local/bin/virtualenvwrapper.sh
 fi
+
+# usage: neks dev-eu-west
+function neks {
+    kubectx $(kubectx | grep $1)
+}
 
 # quickly switch pg currently in use by outraging PATH
 # $1 is installation name
@@ -262,3 +272,7 @@ function stophp {
 # https://unix.stackexchange.com/questions/12107/how-to-unfreeze-after-accidentally-pressing-ctrl-s-in-a-terminal
 stty -ixon -ixoff
 source "$HOME/.cargo/env"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

@@ -191,7 +191,7 @@ export PYTHON=/usr/bin/python3
 # CONFOPTS="${CONFOPTS} --with-python"
 
 # since debug symbols don't affect performance, include them in rel mode too
-CONFOPTS="${CONFOPTS} --prefix=${PGIPATH} --enable-debug --enable-depend --enable-tap-tests "
+CONFOPTS="${CONFOPTS} --prefix=${PGIPATH} --enable-debug --enable-depend --enable-tap-tests --with-openssl"
 if grep -q "PGPRO_VERSION" "${PGSDIR}/src/include/pg_config.h.in"; then
     :
     # seems like we are building pgpro
