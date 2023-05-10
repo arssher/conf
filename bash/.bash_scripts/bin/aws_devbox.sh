@@ -1,12 +1,18 @@
 #!/bin/bash
 
+set -e
+# set -o xtrace # print cmds
+
 # create/start/stop instance with ssh port open
 
 export PROFILE=dev
 export REGION=eu-west-1
 export NAME=ars-dev.eu-west-1.aws.neon.build
 export AMI=ami-0aca9de1791dcec2a
-export ITYPE=t2.micro
+# export ITYPE=t2.micro
+export ITYPE=c5a.2xlarge
+# in GBs
+export VOLUME_SIZE=64
 
 CMD=$1
 
@@ -22,8 +28,9 @@ if [ "$CMD" = "get_ip" ]; then
 fi
 
 if [ "$CMD" = "create" ]; then
-    SG_ID=$(aws --profile $PROFILE --region $REGION ec2  describe-security-groups --filters Name=group-name,Values=ars-dev-sg --query 'SecurityGroups[0].GroupId')
+    SG_ID=$(aws --profile $PROFILE --region $REGION ec2  describe-security-groups --filters Name=group-name,Values=ars-dev-sg --query 'SecurityGroups[0].GroupId' --output text)
     if [ -z "$SG_ID" ]; then
+	echo "not found sg ars-dev-sg, creating it"
 	# get default vpc id
 	VPC_ID=$(aws --profile $PROFILE --region $REGION ec2 describe-vpcs --filters "Name=isDefault,Values=true" --query "Vpcs[].VpcId" --output text)
 	echo "default vpc id is ${VPC_ID}"
@@ -38,25 +45,26 @@ if [ "$CMD" = "create" ]; then
 
 	# to remove sg
 	# aws --profile $PROFILE --region $REGION ec2 delete-security-group --group-name ars-dev-sg
+    else
+	echo "found sg ${SG_ID}"
     fi
 
-    aws ec2 run-instances --profile $PROFILE --region $REGION --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${NAME}}]" --image-id $AMI --count 1 --instance-type $ITYPE --key-name ars-dev --security-group-ids ${SG_ID}
+    # root device name can be checked with
+    # aws --profile $PROFILE --region $REGION ec2 describe-images --image-id $AMI --region eu-west-1
+    # or at https://eu-west-1.console.aws.amazon.com/ec2/home?region=eu-west-1#ImageDetails:imageId=ami-0aca9de1791dcec2a
+    # https://stackoverflow.com/questions/53369224/how-to-launch-ec2-instance-with-custom-root-volume-ebs-size-more-than-8gb-usin
+    aws ec2 run-instances --profile $PROFILE --region $REGION --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${NAME}}]" --image-id $AMI --count 1 --instance-type $ITYPE --key-name ars-dev --security-group-ids ${SG_ID} --block-device-mapping "DeviceName=/dev/xvda,Ebs={VolumeSize=${VOLUME_SIZE}}"
 
-    INSTANCE_ID=$(aws --profile $PROFILE --region $REGION ec2 describe-instances \
-		      --filters "Name=tag:Name,Values=${NAME}"  \
-		      --output text \
-		      --query 'Reservations[*].Instances[*].InstanceId')
-    echo "instance id is ${INSTANCE_ID}"
+    # select not terminated instances
+    INSTANCE_ID=$(aws --profile $PROFILE --region $REGION ec2 describe-instances --filters "Name=tag:Name,Values=${NAME}" --query 'Reservations[*].Instances[?!contains(State.Name, `terminated`)].InstanceId' --output text)
+    echo "created instance id is ${INSTANCE_ID}"
 
     # wait for start
     aws ec2 --profile $PROFILE --region $REGION wait instance-status-ok --instance-ids ${INSTANCE_ID}
     exit 0
 fi
 
-INSTANCE_ID=$(aws --profile $PROFILE --region $REGION ec2 describe-instances \
-	      --filters "Name=tag:Name,Values=${NAME}"	\
-	      --output text \
-	      --query 'Reservations[*].Instances[*].InstanceId')
+INSTANCE_ID=$(aws --profile $PROFILE --region $REGION ec2 describe-instances --filters "Name=tag:Name,Values=${NAME}" --output text --query 'Reservations[*].Instances[?!contains(State.Name, `terminated`)].InstanceId')
 echo "instance id is ${INSTANCE_ID}"
 
 if [ "$CMD" = "stop" ]; then
