@@ -5,3 +5,6 @@
 \set gdb 'SELECT pg_backend_pid() \\g | psql_run_gdb.sh'
 
 \set pgpro_version 'select pgpro_version(); select pgpro_edition(); select pgpro_build();'
+
+-- use less, not more
+\setenv PAGER 'less -S'

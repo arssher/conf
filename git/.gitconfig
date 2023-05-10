@@ -19,6 +19,9 @@ cmd = diff "$LOCAL" "$REMOTE"
 # --tags actually lists commits with tags
 	tags = log --no-walk --tags --pretty='%h %d %s' --decorate=full
 	pullff = pull --no-rebase --ff
+    	p = push -u origin HEAD
+	pf = push -u -f origin HEAD
+	s = status
 
 [format]
 	suffix = .patch
