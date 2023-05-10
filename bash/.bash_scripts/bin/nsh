@@ -6,9 +6,11 @@ function die() {
  exit 1
 }
 
+HOST=$1
+
 #Sample host: pageserver-1.us-east-2.aws.neon.build
 
-echo $1 | grep -q -P '^[\w-]+\.[\w-]+\.aws\.neon\.[\w]+$' ||
+echo $HOST | grep -q -P '^[\w-]+\.[\w-]+\.aws\.neon\.[\w]+$' ||
   die "Usage: nsh (pageserver|safekeeper|etcd)-XXX.REGION.aws.neon.(build|tech), e.g. safekeeper-0.us-east-2.aws.neon.build"
 IFS=. read HOST REGION PROVIDER neon TLD <<< $1
 

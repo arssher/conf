@@ -212,6 +212,7 @@ if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
 fi
 
 # usage: neks dev-eu-west
+# or better just create aliases
 function neks {
     kubectx $(kubectx | grep $1)
 }
@@ -276,3 +277,5 @@ source "$HOME/.cargo/env"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+source "$HOME/.bash_scripts/utils.sh"
