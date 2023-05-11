@@ -7,8 +7,8 @@ set -e
 sudo apt-get update
 sudo apt-get -y build-dep emacs
 
-link=https://ftp.gnu.org/pub/gnu/emacs/emacs-28.1.tar.gz
-ver=28.1
+ver=28.2
+link="https://ftp.gnu.org/pub/gnu/emacs/emacs-${ver}.tar.gz"
 wget -nc -P . $link
 
 tar -xf emacs-$ver.tar.gz
