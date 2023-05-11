@@ -59,13 +59,13 @@ uncomment WaylandEnable=false in
 (in wayland gnome layout switching stops working after a while, wow)
 
 Important root configs:
-fstab
-network/interfaces
+fstab (restoring not scripted)
+/etc/NetworkManager/system-connections/
 openvpn
 
 Important home configs not saved here:
-ydisk
-firefox
+dropbox
+firefox/chrome
 
 
 How to play midi:
