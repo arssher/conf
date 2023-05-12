@@ -3,7 +3,7 @@
   gather_facts: yes
   tasks:
   - name: fetch debian release
-    shell: "cat /etc/debian_version | sed 's/\\/.*//'"
+    shell: "lsb_release -a | grep -i codename | awk '{print $2}'"
     register: codename_cmd
   - name: print debian release
     ansible.builtin.debug:
