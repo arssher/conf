@@ -7,7 +7,7 @@ Bash conf:
 
   Contains .bashrc and .bash_scripts folder. .bashrc reads file .global_vars, so
   you can create and specify machine-dependant global vars there. You can find
-  example in .global_vars.example.
+  example in .global_vars.example (it is also privately saved).
 
   .bash_scripts contains bin folder, I put executable scripts there. The
   directory will be added to the PATH in .bashrc (subdirectories will not be
@@ -22,7 +22,6 @@ Emacs conf:
 gdb conf:
 
   Contains .gdbinit file and .gdb dir.
-
 
 readline conf:
 
@@ -57,6 +56,16 @@ install_emacs.sh
 uncomment WaylandEnable=false in
 /etc/gdm3/daemon.conf
 (in wayland gnome layout switching stops working after a while, wow)
+In bookworm as of 05.2023 there was also this issue, but it somehow seems to
+got resolved after reboot or something. Nope, it is still there:
+https://discourse.ubuntu.com/t/keyboard-layout-switching-shortcut-periodically-stops-working/7617
+Also, setxkbmap doesn't work in wayland, and there is no map right alt to ctrl
+in gnome tweaks.
+Also, in wayland I had to replug monitor after restart to restore its settings.
+Also, with wayland ctrl mouse scroll switches workspaces instead of e.g. zooming in
+browsers, probably related to
+https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/1562
+which can't be turned off, oh my.
 
 Important root configs:
 fstab (restoring not scripted)
