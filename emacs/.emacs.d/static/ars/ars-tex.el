@@ -1,4 +1,5 @@
-(require 'tex-buf)
+(require 'tex)
+
 (defun TeX-command-default (name)
   "Next TeX command to use. Most of the code is stolen from `TeX-command-query'."
   (cond ((if (string-equal name TeX-region)

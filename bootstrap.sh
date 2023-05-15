@@ -21,7 +21,7 @@ ansible-playbook --connection=local --inventory localhost, --ask-become-pass -e 
 
 sudo apt-get -y install vim git terminator chromium checkinstall locate \
      openvpn terminator openssh-server firmware-iwlwifi network-manager-openvpn-gnome \
-     rsync
+     rsync xclip
 sudo apt-get -y install build-essential gdb clang
 # lang server stuff
 sudo apt-get -y install clangd bear

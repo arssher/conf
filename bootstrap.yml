@@ -1,6 +1,8 @@
 ---
 - hosts: all
   gather_facts: yes
+  vars:
+    mirror: http://deb.debian.org/debian/
   tasks:
   - name: fetch debian release
     shell: "lsb_release -a | grep -i codename | awk '{print $2}'"
@@ -10,21 +12,48 @@
       msg: debian release is {{ codename_cmd.stdout }}
   - name: configure non-free repos (e.g. for firmware-iwlwifi)
     ansible.builtin.apt_repository:
-      repo: deb http://mirror.mephi.ru/debian/ {{ codename_cmd.stdout }} main contrib non-free
+      repo: deb "{{ mirror }}" {{ codename_cmd.stdout }} main contrib non-free
       state: present
     become: yes
   - name: configure non-free src repos
     ansible.builtin.apt_repository:
-      repo: deb-src http://mirror.mephi.ru/debian/ {{ codename_cmd.stdout }} main contrib non-free
+      repo: deb-src "{{ mirror }}" {{ codename_cmd.stdout }} main contrib non-free
       state: present
     become: yes
+  # fixme: {{ release }}-security and {{ release }}-updates?
   - name: remove main only repo entry
     ansible.builtin.apt_repository:
-      repo: deb http://mirror.mephi.ru/debian/ {{ codename_cmd.stdout }} main
+      repo: deb "{{ mirror }}" {{ codename_cmd.stdout }} main
       state: absent
     become: yes
   - name: remove main only src repo entry
     ansible.builtin.apt_repository:
-      repo: deb-src http://mirror.mephi.ru/debian/ {{ codename_cmd.stdout }} main
+      repo: deb-src "{{ mirror }}" {{ codename_cmd.stdout }} main
       state: absent
     become: yes
+
+  - name: Add chrome apt signing key
+    ansible.builtin.apt_key:
+      url: "https://dl.google.com/linux/linux_signing_key.pub"
+      state: present
+    become: yes
+    tags:
+      - chrome
+
+  - name: add chrome repository into sources list
+    ansible.builtin.apt_repository:
+      repo: deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main
+      state: present
+      filename: google-chrome
+    become: yes
+    tags:
+      - chrome
+
+  - name: install google-chrome-stable
+    ansible.builtin.apt:
+      name: "google-chrome-stable"
+      state: latest
+      update_cache: true
+    become: yes
+    tags:
+      - chrome
