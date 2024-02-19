@@ -1,5 +1,6 @@
 \set PROMPT1 '%M:%> %n@%/:%p%R%# '
 
+-- unlimited history
 \set HISTSIZE -1
 
 \set gdb 'SELECT pg_backend_pid() \\g | psql_run_gdb.sh'

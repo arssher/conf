@@ -7,8 +7,11 @@ set -e
 
 export PROFILE=dev
 export REGION=eu-west-1
-export NAME=ars-dev.eu-west-1.aws.neon.build
-export AMI=ami-0aca9de1791dcec2a
+export REGION=us-east-2
+export NAME="ars-dev.${REGION}.aws.neon.build"
+# eu-west-1 ami
+export AMI=ami-0aca9de1791dcec2a # eu-west-1 debian-11-amd64-20220911-1135
+export AMI=ami-0d89c8b5893c02db4 # us-east-2 debian-11-amd64-20220911-1135
 # export ITYPE=t2.micro
 export ITYPE=c5a.2xlarge
 # in GBs
@@ -29,7 +32,7 @@ fi
 
 if [ "$CMD" = "create" ]; then
     SG_ID=$(aws --profile $PROFILE --region $REGION ec2  describe-security-groups --filters Name=group-name,Values=ars-dev-sg --query 'SecurityGroups[0].GroupId' --output text)
-    if [ -z "$SG_ID" ]; then
+    if [[ "$SG_ID" ==  "None" ]]; then
 	echo "not found sg ars-dev-sg, creating it"
 	# get default vpc id
 	VPC_ID=$(aws --profile $PROFILE --region $REGION ec2 describe-vpcs --filters "Name=isDefault,Values=true" --query "Vpcs[].VpcId" --output text)

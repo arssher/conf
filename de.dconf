@@ -47,7 +47,7 @@ image-dir-uri='file:///home/ars/Documents'
 blank-drive=false
 enable-probe=false
 enable-verify=false
-filename='/home/ars/tmp/tmp/tmp/pureos-10~devel-gnome-live-20211010_amd64.iso'
+filename='/home/ars/Downloads/debian-testing-amd64-netinst.iso'
 show-warning=false
 
 [org/gnome/Totem]
@@ -115,6 +115,11 @@ target-units='radian'
 window-position=(38, 65)
 word-size=64
 
+[org/gnome/calendar]
+active-view='month'
+window-maximized=true
+window-size=(768, 600)
+
 [org/gnome/clocks]
 world-clocks=[{'location': <(uint32 2, <('Larnaca', 'LCLK', true, [(0.60882901491959107, 0.58701239926966198)], [(0.60941080297245087, 0.58693968885302394)])>)>}]
 
@@ -125,12 +130,15 @@ size=(870, 690)
 state=87168
 
 [org/gnome/control-center]
-last-panel='keyboard'
+last-panel='wifi'
 window-state=(980, 640, false)
 
 [org/gnome/desktop/a11y/applications]
 screen-keyboard-enabled=false
 screen-reader-enabled=false
+
+[org/gnome/desktop/a11y/magnifier]
+mag-factor=6.0
 
 [org/gnome/desktop/app-folders]
 folder-children=['Utilities', 'Sundry']
@@ -152,25 +160,30 @@ categories=['X-SuSE-YaST']
 name='suse-yast.directory'
 translate=true
 
+[org/gnome/desktop/datetime]
+automatic-timezone=true
+
 [org/gnome/desktop/input-sources]
+current=uint32 0
 mru-sources=[('xkb', 'us'), ('xkb', 'ru')]
 per-window=false
 show-all-sources=false
 sources=[('xkb', 'us'), ('xkb', 'ru')]
-xkb-options=['ctrl:ralt_rctrl', 'lv3:ralt_switch', 'caps:ctrl_modifier', 'grp:win_space_toggle']
+xkb-options=['grp:win_space_toggle', 'caps:ctrl_modifier']
 
 [org/gnome/desktop/interface]
-document-font-name='Ubuntu 11'
+document-font-name='Cantarell 11'
 font-antialiasing='grayscale'
 font-hinting='slight'
-font-name='Ubuntu 11'
+font-name='Cantarell 11'
 gtk-theme='Adwaita'
-monospace-font-name='Noto Sans Mono 12'
+monospace-font-name='Ubuntu Mono 12'
 show-battery-percentage=true
+text-scaling-factor=1.0
 toolkit-accessibility=false
 
 [org/gnome/desktop/notifications]
-application-children=['org-gnome-tweaks', 'org-gnome-baobab', 'gnome-power-panel', 'appimagekit-d26df32af24e24b3ec7da56e38cf014a-telegram-desktop', 'firefox-esr', 'org-gnome-nautilus', 'chromium', 'org-gnome-software', 'gnome-network-panel', 'zoom', 'element-desktop', 'transmission-gtk', 'thunderbird', 'gnome-control-center', 'calibre-gui', 'libreoffice-writer', 'org-gnome-totem', 'org-gnome-eog', 'start-tor-browser', 'code', 'com-discordapp-discord', 'dropbox', 'org-gnome-extensions-desktop', 'org-gnome-chromegnomeshell', 'com-skype-client', 'google-chrome', 'slack-slack', 'skypeforlinux', 'xdg-desktop-portal-gnome', 'org-gnome-fileroller', 'around', 'com-slack-slack', 'org-gnome-soundrecorder', 'libreoffice-impress', 'org-telegram-desktop-9e31675981c94d40a844d19f1d048e10', 'org-gnome-evolution', 'playonlinux', 'protonvpn', 'drata-agent']
+application-children=['org-gnome-tweaks', 'org-gnome-baobab', 'gnome-power-panel', 'appimagekit-d26df32af24e24b3ec7da56e38cf014a-telegram-desktop', 'firefox-esr', 'org-gnome-nautilus', 'chromium', 'org-gnome-software', 'gnome-network-panel', 'zoom', 'element-desktop', 'transmission-gtk', 'thunderbird', 'gnome-control-center', 'calibre-gui', 'libreoffice-writer', 'org-gnome-totem', 'org-gnome-eog', 'start-tor-browser', 'code', 'com-discordapp-discord', 'dropbox', 'org-gnome-extensions-desktop', 'org-gnome-chromegnomeshell', 'com-skype-client', 'google-chrome', 'slack-slack', 'skypeforlinux', 'xdg-desktop-portal-gnome', 'org-gnome-fileroller', 'around', 'com-slack-slack', 'org-gnome-soundrecorder', 'libreoffice-impress', 'org-telegram-desktop-9e31675981c94d40a844d19f1d048e10', 'org-gnome-evolution', 'playonlinux', 'protonvpn', 'drata-agent', 'slack', 'org-gnome-settings', 'org-telegram-desktop', 'org-gnome-terminal', 'org-gnome-rhythmbox3', 'gnome-datetime-panel', 'filezilla', 'libreoffice-calc', 'gramps', 'terminator']
 
 [org/gnome/desktop/notifications/application/appimagekit-d26df32af24e24b3ec7da56e38cf014a-telegram-desktop]
 application-id='appimagekit_d26df32af24e24b3ec7da56e38cf014a-Telegram_Desktop.desktop'
@@ -205,11 +218,17 @@ application-id='dropbox.desktop'
 [org/gnome/desktop/notifications/application/element-desktop]
 application-id='element-desktop.desktop'
 
+[org/gnome/desktop/notifications/application/filezilla]
+application-id='filezilla.desktop'
+
 [org/gnome/desktop/notifications/application/firefox-esr]
 application-id='firefox-esr.desktop'
 
 [org/gnome/desktop/notifications/application/gnome-control-center]
 application-id='gnome-control-center.desktop'
+
+[org/gnome/desktop/notifications/application/gnome-datetime-panel]
+application-id='gnome-datetime-panel.desktop'
 
 [org/gnome/desktop/notifications/application/gnome-network-panel]
 application-id='gnome-network-panel.desktop'
@@ -219,6 +238,12 @@ application-id='gnome-power-panel.desktop'
 
 [org/gnome/desktop/notifications/application/google-chrome]
 application-id='google-chrome.desktop'
+
+[org/gnome/desktop/notifications/application/gramps]
+application-id='gramps.desktop'
+
+[org/gnome/desktop/notifications/application/libreoffice-calc]
+application-id='libreoffice-calc.desktop'
 
 [org/gnome/desktop/notifications/application/libreoffice-impress]
 application-id='libreoffice-impress.desktop'
@@ -247,11 +272,20 @@ application-id='org.gnome.FileRoller.desktop'
 [org/gnome/desktop/notifications/application/org-gnome-nautilus]
 application-id='org.gnome.Nautilus.desktop'
 
+[org/gnome/desktop/notifications/application/org-gnome-rhythmbox3]
+application-id='org.gnome.Rhythmbox3.desktop'
+
+[org/gnome/desktop/notifications/application/org-gnome-settings]
+application-id='org.gnome.Settings.desktop'
+
 [org/gnome/desktop/notifications/application/org-gnome-software]
 application-id='org.gnome.Software.desktop'
 
 [org/gnome/desktop/notifications/application/org-gnome-soundrecorder]
 application-id='org.gnome.SoundRecorder.desktop'
+
+[org/gnome/desktop/notifications/application/org-gnome-terminal]
+application-id='org.gnome.Terminal.desktop'
 
 [org/gnome/desktop/notifications/application/org-gnome-totem]
 application-id='org.gnome.Totem.desktop'
@@ -261,6 +295,9 @@ application-id='org.gnome.tweaks.desktop'
 
 [org/gnome/desktop/notifications/application/org-telegram-desktop-9e31675981c94d40a844d19f1d048e10]
 application-id='org.telegram.desktop._9e31675981c94d40a844d19f1d048e10.desktop'
+
+[org/gnome/desktop/notifications/application/org-telegram-desktop]
+application-id='org.telegram.desktop.desktop'
 
 [org/gnome/desktop/notifications/application/playonlinux]
 application-id='PlayOnLinux.desktop'
@@ -274,8 +311,14 @@ application-id='skypeforlinux.desktop'
 [org/gnome/desktop/notifications/application/slack-slack]
 application-id='slack_slack.desktop'
 
+[org/gnome/desktop/notifications/application/slack]
+application-id='slack.desktop'
+
 [org/gnome/desktop/notifications/application/start-tor-browser]
 application-id='start-tor-browser.desktop'
+
+[org/gnome/desktop/notifications/application/terminator]
+application-id='terminator.desktop'
 
 [org/gnome/desktop/notifications/application/thunderbird]
 application-id='thunderbird.desktop'
@@ -290,7 +333,7 @@ application-id='xdg-desktop-portal-gnome.desktop'
 application-id='Zoom.desktop'
 
 [org/gnome/desktop/peripherals/keyboard]
-numlock-state=true
+numlock-state=false
 
 [org/gnome/desktop/peripherals/mouse]
 natural-scroll=false
@@ -305,16 +348,19 @@ two-finger-scrolling-enabled=true
 
 [org/gnome/desktop/privacy]
 disable-microphone=false
+old-files-age=uint32 30
+recent-files-max-age=-1
+report-technical-problems=true
 
 [org/gnome/desktop/screensaver]
 lock-delay=uint32 0
-lock-enabled=false
+lock-enabled=true
 
 [org/gnome/desktop/search-providers]
 sort-order=['org.gnome.Contacts.desktop', 'org.gnome.Documents.desktop', 'org.gnome.Nautilus.desktop']
 
 [org/gnome/desktop/session]
-idle-delay=uint32 180
+idle-delay=uint32 300
 
 [org/gnome/desktop/sound]
 event-sounds=true
@@ -323,6 +369,8 @@ theme-name='__custom'
 [org/gnome/desktop/wm/keybindings]
 begin-move=@as []
 begin-resize=@as []
+switch-applications=['<Alt>Tab']
+switch-applications-backward=['<Shift><Alt>Tab']
 switch-input-source=['<Super>space']
 switch-input-source-backward=['<Shift><Super>space']
 unmaximize=['<Super>Down']
@@ -331,7 +379,7 @@ unmaximize=['<Super>Down']
 button-layout='appmenu:minimize,maximize,close'
 mouse-button-modifier='<Ctrl>'
 num-workspaces=4
-titlebar-font='Ubuntu Bold 11'
+titlebar-font='Cantarell 11'
 
 [org/gnome/eog/ui]
 sidebar=false
@@ -345,14 +393,14 @@ document-directory=@ms 'file:///home/ars/tmp/tmp/tmp'
 pictures-directory=@ms nothing
 
 [org/gnome/evince/default]
-window-ratio=(2.2779196344577337, 1.2068084904203638)
+window-ratio=(2.2222222222222223, 0.73958336593085527)
 
 [org/gnome/evolution-data-server]
 migrated=true
 network-monitor-gio-name=''
 
 [org/gnome/evolution]
-version='3.44.4'
+version='3.46.4'
 
 [org/gnome/evolution/addressbook]
 completion-minimum-query-length=3
@@ -413,12 +461,26 @@ list-mode='as-folder'
 name-column-width=978
 show-path=false
 sort-method='name'
-sort-type='ascending'
+sort-type='descending'
 
 [org/gnome/file-roller/ui]
 sidebar-width=200
 window-height=715
 window-width=1440
+
+[org/gnome/font-manager]
+compare-background-color='rgb(255,255,255)'
+compare-foreground-color='rgb(0,0,0)'
+compare-list=@as []
+content-pane-position=658
+google-fonts-background-color='rgb(255,255,255)'
+google-fonts-foreground-color='rgb(0,0,0)'
+is-maximized=true
+language-filter-list=@as []
+selected-category='0'
+selected-font='28'
+window-position=(371, 172)
+window-size=(900, 600)
 
 [org/gnome/gedit/plugins]
 active-plugins=['modelines', 'filebrowser', 'sort', 'spell', 'docinfo']
@@ -444,12 +506,13 @@ include-pointer=false
 last-save-directory='file:///home/ars/Pictures'
 
 [org/gnome/gnome-system-monitor]
-cpu-colors=[(uint32 0, '#FF6E00'), (1, '#CB0C29'), (2, '#49A835'), (3, '#2D7DB3'), (4, '#f25915e815e8'), (5, '#f25915e815e8'), (6, '#f25915e815e8'), (7, '#f25915e815e8')]
+cpu-colors=[(uint32 0, '#FF6E00'), (1, '#CB0C29'), (2, '#49A835'), (3, '#2D7DB3'), (4, '#f25915e815e8'), (5, '#f25915e815e8'), (6, '#f25915e815e8'), (7, '#f25915e815e8'), (8, '#f332850c7999'), (9, '#799991a1f332'), (10, '#b51cf3327999'), (11, '#f3327999d898')]
 current-tab='resources'
 maximized=true
+network-total-in-bits=false
 show-dependencies=false
 show-whose-processes='user'
-window-state=(1920, 973, 0, 27)
+window-state=(1920, 1136, 0, 32)
 
 [org/gnome/gnome-system-monitor/disktreenew]
 col-6-visible=true
@@ -561,13 +624,14 @@ default-column-order=['name', 'size', 'type', 'owner', 'group', 'permissions', '
 default-visible-columns=['name', 'size', 'date_modified', 'starred']
 
 [org/gnome/nautilus/preferences]
-default-folder-viewer='icon-view'
+default-folder-viewer='list-view'
+migrated-gtk-settings=true
 search-filter-time-type='last_modified'
 search-view='list-view'
 
 [org/gnome/nautilus/window-state]
-initial-size=(1457, 854)
-maximized=true
+initial-size=(1666, 1034)
+maximized=false
 
 [org/gnome/nm-applet]
 disable-connected-notifications=true
@@ -603,6 +667,10 @@ ignore-ca-cert=false
 ignore-phase2-ca-cert=false
 
 [org/gnome/nm-applet/eap/12376cab-d823-466f-820c-53c7641fe83c]
+ignore-ca-cert=false
+ignore-phase2-ca-cert=false
+
+[org/gnome/nm-applet/eap/13e85545-cf75-4524-85d7-f6bd41223d33]
 ignore-ca-cert=false
 ignore-phase2-ca-cert=false
 
@@ -658,7 +726,15 @@ ignore-phase2-ca-cert=false
 ignore-ca-cert=false
 ignore-phase2-ca-cert=false
 
+[org/gnome/nm-applet/eap/2e2f1273-e0f8-458e-9a04-2ad1069da1c5]
+ignore-ca-cert=false
+ignore-phase2-ca-cert=false
+
 [org/gnome/nm-applet/eap/2ed66c1d-0987-4561-ace0-011d3c3bb1f0]
+ignore-ca-cert=false
+ignore-phase2-ca-cert=false
+
+[org/gnome/nm-applet/eap/341fcb99-a157-4542-ab1a-85a05c77b4a4]
 ignore-ca-cert=false
 ignore-phase2-ca-cert=false
 
@@ -718,6 +794,10 @@ ignore-phase2-ca-cert=false
 ignore-ca-cert=false
 ignore-phase2-ca-cert=false
 
+[org/gnome/nm-applet/eap/624a7269-a665-437a-82a9-bacc9e3dafdc]
+ignore-ca-cert=false
+ignore-phase2-ca-cert=false
+
 [org/gnome/nm-applet/eap/6327bb58-1b9b-4c41-b098-0c918e34c6e7]
 ignore-ca-cert=false
 ignore-phase2-ca-cert=false
@@ -766,6 +846,10 @@ ignore-phase2-ca-cert=false
 ignore-ca-cert=false
 ignore-phase2-ca-cert=false
 
+[org/gnome/nm-applet/eap/9357d6d3-b352-48a9-8a9f-1d7027dce130]
+ignore-ca-cert=false
+ignore-phase2-ca-cert=false
+
 [org/gnome/nm-applet/eap/93e31b49-244d-4ae3-adf7-be9e2fbbd41c]
 ignore-ca-cert=false
 ignore-phase2-ca-cert=false
@@ -794,11 +878,19 @@ ignore-phase2-ca-cert=false
 ignore-ca-cert=false
 ignore-phase2-ca-cert=false
 
+[org/gnome/nm-applet/eap/afef3e82-d58d-47af-b3cc-aea54aac8fc1]
+ignore-ca-cert=false
+ignore-phase2-ca-cert=false
+
 [org/gnome/nm-applet/eap/b45d7990-c426-4556-9456-69d64dde2523]
 ignore-ca-cert=false
 ignore-phase2-ca-cert=false
 
 [org/gnome/nm-applet/eap/b98a8df7-55f8-42cc-bc71-23d45107c7ac]
+ignore-ca-cert=false
+ignore-phase2-ca-cert=false
+
+[org/gnome/nm-applet/eap/baad6668-ba19-4412-9b61-1254bd58b813]
 ignore-ca-cert=false
 ignore-phase2-ca-cert=false
 
@@ -901,6 +993,9 @@ ignore-phase2-ca-cert=false
 [org/gnome/portal/filechooser/com.github.Flacon]
 last-folder-path='/home/ars/Downloads/Nautilus Pompilius/34-1994 - Титаник (Bomba Music)'
 
+[org/gnome/portal/filechooser/com.sigil_ebook.Sigil]
+last-folder-path='/home/ars/tmp/epub'
+
 [org/gnome/portal/filechooser/com.slack.Slack]
 last-folder-path='/home/ars/tmp/tmp/tmp'
 
@@ -910,12 +1005,38 @@ last-folder-path='/home/ars/tmp/tmp/tmp'
 [org/gnome/portal/filechooser/org.telegram.desktop._9e31675981c94d40a844d19f1d048e10]
 last-folder-path='/home/ars/tmp/tmp/tmp'
 
+[org/gnome/portal/filechooser/org.telegram.desktop]
+last-folder-path='/home/ars/Dropbox/heavy/media/fun'
+
+[org/gnome/rhythmbox]
+position=(85, 197)
+
+[org/gnome/rhythmbox/player]
+volume=1.0
+
+[org/gnome/rhythmbox/plugins]
+active-plugins=['power-manager', 'ipod', 'notification', 'dbus-media-server', 'android', 'mtpdevice', 'mpris', 'audiocd', 'cd-recorder', 'rb', 'artsearch', 'iradio', 'generic-player', 'audioscrobbler']
+seen-plugins=['ipod', 'notification', 'dbus-media-server', 'rblirc', 'mtpdevice', 'fmradio', 'grilo', 'cd-recorder', 'pythonconsole', 'rb', 'artsearch', 'webremote', 'lyrics', 'magnatune', 'im-status', 'listenbrainz', 'replaygain', 'daap', 'audioscrobbler']
+
+[org/gnome/rhythmbox/plugins/audioscrobbler/Last.fm]
+scrobbling-enabled=true
+
+[org/gnome/rhythmbox/plugins/audioscrobbler/Libre.fm]
+scrobbling-enabled=true
+
+[org/gnome/rhythmbox/plugins/iradio]
+initial-stations-loaded=true
+
+[org/gnome/rhythmbox/rhythmdb]
+locations=['file:///home/ars/Music']
+
 [org/gnome/settings-daemon/plugins/color]
 night-light-enabled=false
+night-light-last-coordinates=(55.698675580057596, 37.5373205)
 
 [org/gnome/settings-daemon/plugins/media-keys]
 area-screenshot-clip=['Print']
-custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/']
+custom-keybindings=['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom2/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom3/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom4/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom5/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7/', '/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom8/']
 screensaver=['<Super>l']
 screenshot=@as []
 
@@ -950,23 +1071,38 @@ command='terminator --maximize'
 name='terminator'
 
 [org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom6]
-binding='<Super>o'
+binding=''
 command='code'
 name='code'
 
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom7]
+binding='<Super>o'
+command='/usr/bin/flameshot gui'
+name='flameshot'
+
+[org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom8]
+binding='<Super>r'
+command='/home/ars/opt/bin/NormCap-0.5.4-x86_64.AppImage'
+name='normcap'
+
 [org/gnome/settings-daemon/plugins/power]
 idle-dim=true
+power-button-action='nothing'
 sleep-inactive-ac-timeout=900
-sleep-inactive-ac-type='suspend'
+sleep-inactive-ac-type='nothing'
 sleep-inactive-battery-timeout=900
-sleep-inactive-battery-type='suspend'
+sleep-inactive-battery-type='nothing'
 
 [org/gnome/shell]
-app-picker-layout=[{'org.gnome.Contacts.desktop': <{'position': <0>}>, 'org.gnome.Weather.desktop': <{'position': <1>}>, 'org.gnome.clocks.desktop': <{'position': <2>}>, 'org.gnome.Maps.desktop': <{'position': <3>}>, 'org.gnome.TwentyFortyEight.desktop': <{'position': <4>}>, 'org.gnome.Totem.desktop': <{'position': <5>}>, 'org.gnome.Calculator.desktop': <{'position': <6>}>, 'sol.desktop': <{'position': <7>}>, 'org.gnome.gedit.desktop': <{'position': <8>}>, 'simple-scan.desktop': <{'position': <9>}>, 'org.gnome.Calendar.desktop': <{'position': <10>}>, 'gnome-control-center.desktop': <{'position': <11>}>, 'org.gnome.Chess.desktop': <{'position': <12>}>, 'org.gnome.Documents.desktop': <{'position': <13>}>, 'org.gnome.Extensions.desktop': <{'position': <14>}>, 'Utilities': <{'position': <15>}>, 'org.gnome.five-or-more.desktop': <{'position': <16>}>, 'org.gnome.Four-in-a-row.desktop': <{'position': <17>}>, 'org.gnome.Hitori.desktop': <{'position': <18>}>, 'org.gnome.Cheese.desktop': <{'position': <19>}>, 'im-config.desktop': <{'position': <20>}>, 'org.gnome.Klotski.desktop': <{'position': <21>}>}, {'libreoffice-startcenter.desktop': <{'position': <0>}>, 'libreoffice-calc.desktop': <{'position': <1>}>, 'libreoffice-draw.desktop': <{'position': <2>}>, 'libreoffice-impress.desktop': <{'position': <3>}>, 'org.gnome.LightsOff.desktop': <{'position': <4>}>, 'org.gnome.Mahjongg.desktop': <{'position': <5>}>, 'org.gnome.Mines.desktop': <{'position': <6>}>, 'org.gnome.Music.desktop': <{'position': <7>}>, 'org.gnome.Nibbles.desktop': <{'position': <8>}>, 'org.gnome.Quadrapassel.desktop': <{'position': <9>}>, 'org.gnome.Reversi.desktop': <{'position': <10>}>, 'org.gnome.Robots.desktop': <{'position': <11>}>, 'shotwell.desktop': <{'position': <12>}>, 'software-properties-gnome.desktop': <{'position': <13>}>, 'org.gnome.SoundRecorder.desktop': <{'position': <14>}>, 'org.gnome.Sudoku.desktop': <{'position': <15>}>, 'org.gnome.SwellFoop.desktop': <{'position': <16>}>, 'synaptic.desktop': <{'position': <17>}>, 'org.gnome.Tali.desktop': <{'position': <18>}>, 'org.gnome.Taquin.desktop': <{'position': <19>}>, 'org.gnome.Tetravex.desktop': <{'position': <20>}>, 'org.gnome.Todo.desktop': <{'position': <21>}>, 'transmission-gtk.desktop': <{'position': <22>}>, 'org.gnome.Evince.desktop': <{'position': <23>}>}, {'org.gnome.eog.desktop': <{'position': <0>}>, 'org.gnome.seahorse.Application.desktop': <{'position': <1>}>, 'Sundry': <{'position': <2>}>, 'org.gnome.tweaks.desktop': <{'position': <3>}>}]
-command-history=['gparted', 'r', 'xkill']
+app-picker-layout=[{'org.gnome.Contacts.desktop': <{'position': <0>}>, 'org.gnome.Weather.desktop': <{'position': <1>}>, 'org.gnome.clocks.desktop': <{'position': <2>}>, 'org.gnome.Maps.desktop': <{'position': <3>}>, 'org.gnome.TwentyFortyEight.desktop': <{'position': <4>}>, 'org.gnome.Totem.desktop': <{'position': <5>}>, 'org.gnome.Calculator.desktop': <{'position': <6>}>, 'sol.desktop': <{'position': <7>}>, 'org.gnome.Settings.desktop': <{'position': <8>}>, 'simple-scan.desktop': <{'position': <9>}>, 'org.gnome.Calendar.desktop': <{'position': <10>}>, 'org.gnome.Chess.desktop': <{'position': <11>}>, 'org.gnome.Extensions.desktop': <{'position': <12>}>, 'Utilities': <{'position': <13>}>, 'org.gnome.five-or-more.desktop': <{'position': <14>}>, 'org.gnome.Four-in-a-row.desktop': <{'position': <15>}>, 'org.gnome.Hitori.desktop': <{'position': <16>}>, 'org.gnome.Cheese.desktop': <{'position': <17>}>, 'im-config.desktop': <{'position': <18>}>, 'org.gnome.Klotski.desktop': <{'position': <19>}>}, {'libreoffice-startcenter.desktop': <{'position': <0>}>, 'libreoffice-calc.desktop': <{'position': <1>}>, 'libreoffice-draw.desktop': <{'position': <2>}>, 'libreoffice-impress.desktop': <{'position': <3>}>, 'org.gnome.LightsOff.desktop': <{'position': <4>}>, 'org.gnome.Mahjongg.desktop': <{'position': <5>}>, 'org.gnome.Mines.desktop': <{'position': <6>}>, 'org.gnome.Music.desktop': <{'position': <7>}>, 'org.gnome.Nibbles.desktop': <{'position': <8>}>, 'org.gnome.Quadrapassel.desktop': <{'position': <9>}>, 'org.gnome.Reversi.desktop': <{'position': <10>}>, 'org.gnome.Robots.desktop': <{'position': <11>}>, 'shotwell.desktop': <{'position': <12>}>, 'org.gnome.Rhythmbox3.desktop': <{'position': <13>}>, 'org.gnome.SoundRecorder.desktop': <{'position': <14>}>, 'org.gnome.Sudoku.desktop': <{'position': <15>}>, 'org.gnome.SwellFoop.desktop': <{'position': <16>}>, 'synaptic.desktop': <{'position': <17>}>, 'org.gnome.Tali.desktop': <{'position': <18>}>, 'org.gnome.Taquin.desktop': <{'position': <19>}>, 'org.gnome.Tetravex.desktop': <{'position': <20>}>, 'software-properties-gtk.desktop': <{'position': <21>}>, 'transmission-gtk.desktop': <{'position': <22>}>, 'org.gnome.Evince.desktop': <{'position': <23>}>}, {'org.gnome.eog.desktop': <{'position': <0>}>, 'org.gnome.seahorse.Application.desktop': <{'position': <1>}>, 'Sundry': <{'position': <2>}>, 'org.gnome.tweaks.desktop': <{'position': <3>}>, 'org.gnome.TextEditor.desktop': <{'position': <4>}>}]
+command-history=['gparted', 'r', 'flameshot gui', 'NormCap-0.5.4-x86_64.AppImage', '/home/ars/opt/bin/NormCap-0.5.4-x86_64.AppImage', 'xkill']
 enabled-extensions=['appindicatorsupport@rgcjonas.gmail.com', 'apps-menu@gnome-shell-extensions.gcampax.github.com', 'auto-move-windows@gnome-shell-extensions.gcampax.github.com', 'horizontal-workspaces@gnome-shell-extensions.gcampax.github.com', 'launch-new-instance@gnome-shell-extensions.gcampax.github.com', 'places-menu@gnome-shell-extensions.gcampax.github.com', 'drive-menu@gnome-shell-extensions.gcampax.github.com', 'screenshot-window-sizer@gnome-shell-extensions.gcampax.github.com', 'user-theme@gnome-shell-extensions.gcampax.github.com', 'window-list@gnome-shell-extensions.gcampax.github.com', 'windowsNavigator@gnome-shell-extensions.gcampax.github.com', 'workspace-indicator@gnome-shell-extensions.gcampax.github.com', 'native-window-placement@gnome-shell-extensions.gcampax.github.com', 'wsmatrix@martin.zurowietz.de', 'windowIsReady_Remover@nunofarruca@gmail.com']
 had-bluetooth-devices-setup=true
+last-selected-power-profile='performance'
 welcome-dialog-last-shown-version='41.1'
+
+[org/gnome/shell/app-switcher]
+current-workspace-only=false
 
 [org/gnome/shell/keybindings]
 focus-active-notification=@as []
@@ -980,34 +1116,38 @@ locations=[<(uint32 2, <('Larnaca', 'LCLK', true, [(0.60882901491959107, 0.58701
 document-type='photo'
 
 [org/gnome/software]
-check-timestamp=int64 1637985388
-download-updates=false
-download-updates-notify=false
+check-timestamp=int64 1708312265
+download-updates=true
+download-updates-notify=true
 first-run=false
-install-timestamp=int64 1635317685
+install-timestamp=int64 1683881159
 online-updates-timestamp=int64 1654093855
-update-notification-timestamp=int64 1681267948
+update-notification-timestamp=int64 1708312266
+
+[org/gnome/system/location]
+enabled=true
 
 [org/gnome/terminal/legacy]
 theme-variant='light'
 
 [org/gnome/terminal/legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
-audible-bell=false
-use-system-font=true
+audible-bell=true
+font='Monospace 12'
+use-system-font=false
 
 [org/gnome/tweaks]
 show-extensions-notice=false
 
 [org/gtk/gtk4/settings/file-chooser]
 date-format='regular'
-location-mode='filename-entry'
-show-hidden=false
+location-mode='path-bar'
+show-hidden=true
 show-size-column=true
 show-type-column=true
 sidebar-width=173
 sort-column='name'
 sort-directories-first=false
-sort-order='descending'
+sort-order='ascending'
 type-format='category'
 window-size=(856, 374)
 
@@ -1026,7 +1166,7 @@ sort-column='name'
 sort-directories-first=false
 sort-order='ascending'
 type-format='category'
-window-position=(0, 32)
+window-position=(349, 32)
 window-size=(1237, 824)
 
 [org/mate/atril]

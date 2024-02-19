@@ -24,7 +24,7 @@
 [profiles]
   [[default]]
     icon_bell = False
-    font = Ubuntu Mono 16
+    font = Monospace 14
     show_titlebar = False
     scrollback_infinite = True
     use_system_font = False

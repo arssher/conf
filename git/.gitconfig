@@ -22,7 +22,8 @@ cmd = diff "$LOCAL" "$REMOTE"
     	p = push -u origin HEAD
 	pf = push -u -f origin HEAD
 	s = status
-
+	# broken
+	ub = !git branch -D $1 && git fetch && git switch -c $1 origin/$1
 [format]
 	suffix = .patch
 	suffix = -v4.patch

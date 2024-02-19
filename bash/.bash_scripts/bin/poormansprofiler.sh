@@ -43,7 +43,7 @@ done
 
 for x in $(seq 1 $nsamples)
 do
-    pid=$(ps aux | grep '[p]ostgres:' | shuf -n 1 | awk '{print $2}')
+    # pid=$(ps aux | grep '[p]ostgres:' | shuf -n 1 | awk '{print $2}')
     gdb -nx -ex "set pagination 0" -ex "thread apply all bt" -batch -p $pid
     sleep $sleeptime
   done | \
