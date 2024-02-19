@@ -8,3 +8,4 @@ backup_path="${CONFPATH}/psql"
 rm -rf ${backup_path}/.psqlrc
 mkdir -p ${backup_path}
 cp ~/.psqlrc ${backup_path}/.psqlrc
+cp ~/.psql_history ${backup_path}/.psql_history

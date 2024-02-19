@@ -21,7 +21,7 @@ ansible-playbook --connection=local --inventory localhost, --ask-become-pass -e 
 
 sudo apt-get -y install vim git terminator chromium checkinstall locate \
      openvpn terminator openssh-server firmware-iwlwifi network-manager-openvpn-gnome \
-     rsync xclip
+     rsync xclip gparted fio sysstat hdparm hwinfo lshw
 sudo apt-get -y install build-essential gdb clang
 # lang server stuff
 sudo apt-get -y install clangd bear
@@ -32,9 +32,12 @@ sudo apt-get -y install flex bison libreadline-dev zlib1g-dev \
      libedit-dev libssl-dev zlib1g-dev libpam0g-dev libxml2-dev \
      krb5-multidev libldap2-dev python-dev bison flex xsltproc gettext \
      libicu-dev libkrb5-dev libxslt-dev pkgconf libzstd-dev \
-     libdbi-perl libdbd-pg-perl
+     libdbi-perl libdbd-pg-perl \
+     libcurl4-openssl-dev libseccomp-dev
 
-sudo apt-get -y install global colordiff python3-venv tor xcalib
+# mutagen is for yt-dl
+sudo apt-get -y ffmpeg install global colordiff python3-venv tor xcalib python3-mutagen unrar-free \
+     vlc filezilla hexchat
 # mu/mu4e
 # need also mbsync, it disappeared
 sudo apt-get install libgmime-3.0-dev libxapian-dev pass
@@ -55,3 +58,7 @@ sudo apt-get -y install arc-theme gnome-icon-theme
 sudo apt-get -y install gnutls-dev checkinstall
 # build and install emacs:
 install_emacs.sh
+
+sudo sysctl -w kernel.core_pattern=/tmp/core_{%E}_%p
+
+cargo install cork

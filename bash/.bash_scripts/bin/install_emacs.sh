@@ -7,7 +7,7 @@ set -e
 sudo apt-get update
 sudo apt-get -y build-dep emacs
 
-ver=28.2
+ver=29.2
 link="https://ftp.gnu.org/pub/gnu/emacs/emacs-${ver}.tar.gz"
 wget -nc -P . $link
 

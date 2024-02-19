@@ -14,11 +14,12 @@ EOF
     exit 0
 }
 
-conf_path="${HOME}/tmp/postgresql.conf"
+conf_path="${HOME}/postgres/postgresql.conf"
 datadir=/tmp
-datadir="${HOME}/tmp"
+# datadir="${HOME}/tmp"
 start_port=5432
 use_valgrind="false"
+standby="true"
 
 OPTIND=1 # reset opt counter, it is always must be set to 1
 # each symbol is option name; if there is colon after, it has value
@@ -73,7 +74,7 @@ for pgnum in "${pgnums[@]}"; do
     # 'restart' to be not confused by previous instance, who might not completed
     # shutdown yet
     if [[ "${use_valgrind}" == "false" ]]; then
-	pg_ctl -o "-p ${port}"  -D "${datadir}/data${pgnum}" -l "${datadir}/postgresql_${port}.log" restart
+	pg_ctl -o "-p ${port}"  -D "${datadir}/data${pgnum}" -l "${datadir}/data${pgnum}/pg.log" restart
     else
 	# options are mostly copied from buildfarm client code
 	# track-origin tracks the origin of uninitialised values
@@ -87,3 +88,16 @@ for pgnum in "${pgnums[@]}"; do
 		 pg_ctl -o "-p ${port}"  -D "${datadir}/data${pgnum}" -l "${datadir}/postgresql_${port}.log" restart
     fi
 done
+
+
+if [[ "${standby}" == "true" ]]; then
+    port=$(($start_port + 10))
+    existing_pid=$(ps aux | grep "[p]ostgres -p ${port}" | awk '{print $2}')
+    echo "killing old pg with pid ${existing_pid}"
+    kill -SIGQUIT $existing_pid || true
+    rm -rf "${datadir}/standby_data"
+    # --write-recovery-conf will set primary_conninfo and create standby.signal
+    pg_basebackup -h localhost -D "${datadir}/standby_data" -v --write-recovery-conf --wal-method stream
+    echo "cluster_name = 's1'" >> "${datadir}/standby_data/postgresql.conf"
+    pg_ctl -o "-p ${port}"  -D "${datadir}/standby_data" -l "${datadir}/standby_data/pg.log" restart
+fi
