@@ -19,7 +19,7 @@ datadir=/tmp
 # datadir="${HOME}/tmp"
 start_port=5432
 use_valgrind="false"
-standby="true"
+standby="false"
 
 OPTIND=1 # reset opt counter, it is always must be set to 1
 # each symbol is option name; if there is colon after, it has value
