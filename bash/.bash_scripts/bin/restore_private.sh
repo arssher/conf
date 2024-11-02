@@ -15,4 +15,6 @@ mkdir -p ~/.ssh
 shopt  -s dotglob
 cp -rp ${backup_path}/* ~/
 
+cp ${backup_path}/.psql_history ~/
+
 sudo cp  ${CONFPATH}/etc/NetworkManager/system-connections/* /etc/NetworkManager/system-connections/

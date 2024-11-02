@@ -2,10 +2,9 @@
 
 set -e
 
-echo "Copying psql files to the yandex disk..."
-
 backup_path="${CONFPATH}/psql"
+echo "Copying psql files to backup at ${backup_path}..."
 rm -rf ${backup_path}/.psqlrc
 mkdir -p ${backup_path}
 cp ~/.psqlrc ${backup_path}/.psqlrc
-cp ~/.psql_history ${backup_path}/.psql_history
+# note: psql history is saved in private

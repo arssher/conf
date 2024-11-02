@@ -30,3 +30,8 @@ function nkill {
 function git_ub {
     git checkout main && git branch -D $1; git fetch && git switch -c $1 origin/$1
 }
+
+function sk_http_ep {
+    # http endpoint of sk1
+    ps -eF | grep -i -E '[s]afekeeper -D.*sk1' | grep -i -E -o 'listen-http \S+' | awk '{print $2}'
+}

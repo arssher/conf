@@ -37,13 +37,21 @@ terminator conf:
   Contains only terminator conf
 
 Things done on fresh Debian install:
-sudo apt-get update
-sudo apt-get install git vim
-set up yandex disk, or point CONFPATH to dir with cloned repo, e.g.
+
+configure dropbox:
+cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
+~/.dropbox-dist/dropboxd
+mkdir -p ~/opt/bin/ && cd ~/opt/bin
+wget 'https://www.dropbox.com/download?dl=packages/dropbox.py' -O dropbox.py && chmod +x dropbox.py
+export CONFPATH=~/Dropbox/configs
+or point CONFPATH to dir with cloned repo, e.g.
 git clone https://github.com/arssher/conf.git
 cd conf
 and
 ./bootstrap.sh
+
+sudo apt-get update
+sudo apt-get install git vim
 
 Install Ubuntu fonts, or terminator & emacs will complain.
 Configure caps lock and layout switchover (mate-keyboard-properties).
