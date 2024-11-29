@@ -47,7 +47,7 @@
 ;; Show long lines as wrapped
 (global-visual-line-mode 1)
 
-(global-linum-mode t) ; show line numbers
+(global-display-line-numbers-mode 1) ; show line numbers
 (setq column-number-mode t) ; show column number
 
 (if (display-graphic-p)
@@ -56,8 +56,12 @@
 	  (tool-bar-mode -1)))
 (menu-bar-mode -1)
 
-;; ruler at 80
-(setq-default fill-column 80)
+;; ruler/formatting width.
+;; This is what pg mail lists like, and seems also to what thunderbird truncates
+;; lines in plain text mode (which he shouldn't do, really). For coding it
+;; should be a bit larger though, so makes sense to set it on per mode basis like
+;; https://stackoverflow.com/questions/8080495/how-do-i-set-the-emacs-fill-column-for-a-specific-mode
+(setq-default fill-column 72)
 (require 'fill-column-indicator)
 (setq fci-rule-color "#4d4d4d")
 (define-globalized-minor-mode my-global-fci-mode fci-mode

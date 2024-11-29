@@ -103,6 +103,7 @@
 ;;
 ;; you must install rust (obviously, e.g. via rustup) and rust-analyzer for this
 ;; to work
+;;
 (use-package rustic
   :bind (:map rustic-mode-map
               ("C-c C-c l" . flycheck-list-errors)
@@ -118,7 +119,7 @@
   (add-hook 'rustic-mode-hook 'ars/rustic-mode-hook))
 
 (defun ars/rustic-mode-hook ()
-  ;; so that run lsp-rename  works without having to confirm
+  so that run lsp-rename  works without having to confirm
   (setq-local buffer-save-without-query t))
 
 ;; C/C++

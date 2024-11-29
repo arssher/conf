@@ -24,6 +24,8 @@
 ;; replace standard undo/redo system with undo-tree package
 (require 'undo-tree)
 (global-undo-tree-mode)
+;; put *.~undo-tree~ files to ~/.emacs.d/undo
+(setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
 
 ;; save command history
 ;; TODO: does it work with all needed commands?
