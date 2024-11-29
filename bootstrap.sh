@@ -75,6 +75,8 @@ sudo apt-get -y install lockfile-progs
 # arc theme is fine theme with light and dark variants, requires gnome icons
 sudo apt-get -y install arc-theme gnome-icon-theme
 
-sudo sysctl -w kernel.core_pattern=/tmp/core_{%E}_%p
+echo fs.inotify.max_user_watches= 131070 | sudo tee -a /etc/sysctl.conf
+sudo sh -c "echo 'kernel.core_pattern = /tmp/core_{%E}_%p' > /etc/sysctl.d/60-core-pattern.conf"
+sudo sysctl -p
 
 cargo install cork
