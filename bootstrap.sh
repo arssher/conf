@@ -19,7 +19,7 @@ sudo apt-get -y install vim git checkinstall locate \
      openssh-server \
      rsync fio sysstat hdparm hwinfo lshw hping3 \
      xsel
-sudo apt-get -y install build-essential gdb clang
+sudo apt-get -y install build-essential gdb clang mold
 # lang server stuff
 sudo apt-get -y install clangd bear
 # pg stuff
