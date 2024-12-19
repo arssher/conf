@@ -1,11 +1,11 @@
 [global_config]
-  suppress_multiple_term_dialog = True
 [keybindings]
+  new_tab = <Primary>t
   cycle_next = <Alt>s
   cycle_prev = None
   close_term = None
-  next_tab = <Primary>Tab
-  prev_tab = <Primary><Shift>Tab
+  next_tab = <Alt>comma
+  prev_tab = <Alt>m
   switch_to_tab_1 = <Primary>1
   switch_to_tab_2 = <Primary>2
   switch_to_tab_3 = <Primary>3
@@ -15,6 +15,9 @@
   switch_to_tab_7 = <Primary>7
   switch_to_tab_8 = <Primary>8
   switch_to_tab_9 = <Primary>9
+  ungroup_all = ""
+  ungroup_win = ""
+  ungroup_tab = ""
   broadcast_off = None
   broadcast_group = None
   broadcast_all = None

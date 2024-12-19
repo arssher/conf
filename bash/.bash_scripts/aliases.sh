@@ -9,6 +9,6 @@ alias zk='pkill pageserver; pkill postgres; pkill safekeeper; pkill pytest; pkil
 alias gst='git status'
 alias cargo-zclippy='~/neon/neon/run_clippy.sh'
 alias pyf='poetry run ruff format . && poetry run ruff check --fix . && poetry run mypy .'
-alias ruf='cargo fmt --all && cargo fix --allow-dirty --allow-staged && ./run_clippy.sh && cargo test'
+alias ruf='cargo fmt --all && cargo fix --allow-dirty --allow-staged && ./run_clippy.sh && cargo nextest run'
 alias k=kubectl
 complete -o default -F __start_kubectl k
