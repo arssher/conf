@@ -18,7 +18,7 @@ sudo apt-get install python3-pip python3-venv
 sudo apt-get -y install vim git checkinstall locate \
      openssh-server \
      rsync fio sysstat hdparm hwinfo lshw hping3 \
-     xsel
+     xsel curl
 sudo apt-get -y install build-essential gdb clang mold
 # lang server stuff
 sudo apt-get -y install clangd bear

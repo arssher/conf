@@ -38,6 +38,20 @@ terminator conf:
 
 Things done on fresh Debian install:
 
+Add yourself to sudoers:
+su -
+usermod -aG sudo ars
+groups ars
+(reboot)
+
+sudo apt-get update
+sudo apt-get install git vim terminator rsync
+
+Optionally sync home from old machine:
+ssh-copy-id -f -i ~/.ssh/id_ed25519.pub ars@newmachine
+(-f ignores check and so doesn't need private password)
+rsync -azvP /home/ars/.ssh/ ars@192.168.1.152:/home/ars/.ssh/
+
 configure dropbox:
 cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
 ~/.dropbox-dist/dropboxd
@@ -49,9 +63,6 @@ git clone https://github.com/arssher/conf.git
 cd conf
 and
 ./bootstrap.sh
-
-sudo apt-get update
-sudo apt-get install git vim
 
 Install Ubuntu fonts, or terminator & emacs will complain.
 Configure caps lock and layout switchover (mate-keyboard-properties).
