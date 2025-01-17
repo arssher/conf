@@ -181,10 +181,23 @@ PROMPT_COMMAND="log_bash_persistent_history; $PROMPT_COMMAND"
 export VISUAL=emacs
 export EDITOR="$VISUAL"
 
-# x4: Postgres uses 4-spaces tab, set up 'less' for displaying it.
-# R option preserves ANSI color escape sequences, i.e. lets to colorize the
-# terminal.
-export LESS=-x4R
+# Set options for less.
+# https://www.topbug.net/blog/2016/09/27/make-gnu-less-more-powerful/
+# --quit-if-one-screen or -F: Exit if the entire file can be displayed in one screen.
+# --ignore-case or -i: Cause search in less to ignore case unless an uppercase letter is present in the search pattern.
+# --LONG-PROMPT or -M: Prompt more verbosely, i.e. shows line numbers and % of progress of current window.
+# -R is dunno what about coloring.
+# --HILITE_UNREAD highlights the first new line after scrolling a window down.
+# --tabs is tab width. Postgres uses 4-spaces tab.
+# --no-init not sure what it means, but --quit-if-one-screen needs it.
+# --window change the default scrolling size to 4 lines fewer than the current
+#   screen size, so always keep 4 lines overlapping with previous screen when scrolling with the space key.
+# --mouse --wheel-lines makes mouse work even though --no-init seems to break mouse if --mouse is absent.
+#
+# --no-init was also advised; it leaves less output after exiting it.
+# But I don't see need in it, and it doesn't see to break
+# --quit-if-one-screen as warned anyway.
+export LESS='--quit-if-one-screen --ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --tabs=4  --window=-4 --mouse --wheel-lines=3 --LINE-NUMBERS'
 
 # Map right alt to behave as ctrl. Doesn't work in X
 if [ -x "$(command -v setxkbmap)" ]; then
