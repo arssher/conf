@@ -49,6 +49,9 @@ source ~/.gdb/pg_memctx.py
 # unlimited printing
 set print elements 0
 
+# gdb keeps asking about auto downloading dbg info and doesn't react to
+# y/n in emacs for some reason, so disable it.
+set debuginfod enabled off
 
 # aliases
 define fc

@@ -76,7 +76,9 @@
 ;; Make the keys work with russian layout
 (reverse-input-method "russian-computer")
 
-;; Now, the keys.
+;; Now, the keys. As you know I use default ctrl as C and alt as M.
+;; I bind caps lock and right alt to be also ctrl to be more ergonomic
+;; though.
 ;; About prefixes:
 ;; * Alt is the best
 ;; * Ctrl is the second priority (right Alt)
@@ -169,6 +171,10 @@
 (global-set-key (kbd "M-K") 'drag-stuff-down) ; ergo
 (global-set-key (kbd "M-l") 'forward-char) ; ergo
 (global-set-key (kbd "C-l") 'goto-line) ; ergo
+;; Terminals normally doesn't distinguish C-; and just ; as there is
+;; no established escape sequence for the former:
+;; https://unix.stackexchange.com/a/161725/196632
+;; so map to M-; as well.
 (global-set-key (kbd "C-;") 'comment-idea)
 (global-set-key (kbd "M-;") 'comment-idea)
 ;; idea's shift-enter, defined in my-text-processing.el

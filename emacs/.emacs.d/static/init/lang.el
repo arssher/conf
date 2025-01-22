@@ -67,36 +67,37 @@
 
 
 ;; lsp client
-(use-package lsp-mode
-  :commands lsp
-  ;; lsp binds into xref, e.g. xref-find-definitions, so we don't need lsp-find-definition
-  ;; or similar
-  :bind (:map lsp-mode-map
-	      ("C-b" . xref-find-definitions)
-	      ("M-<f7>" . xref-find-references)
-	      ("M-/" . completion-at-point))
-  ;; see https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
-  :config
-  ;; highlighting occurences of symbol the cursor is currently on
-  (setq lsp-enable-symbol-highlighting nil)
-  ;; probably later
-  (setq lsp-enable-snippet nil)
-  ;; flycheck report counts in modeline
-  (setq lsp-modeline-diagnostics-enable nil)
-  ;; not sure about which pop up this one, but anyway
-  (setq lsp-signature-auto-activate nil)
-  ;; disable showing signature/other stuff in minibuffer when cursor is on symbol
-  (setq lsp-eldoc-hook nil)
-  ;; apparently this is only about company which I don't use
-  (setq lsp-completion-provider nil)
-  ;; what to use when checking on-save. "check" is default, I prefer clippy
-  (setq lsp-rust-analyzer-cargo-watch-command "clippy")
-  ;; (setq lsp-eldoc-render-all t)
-  (setq lsp-idle-delay 0.6)
-  (setq lsp-rust-analyzer-server-display-inlay-hints t)
-  (setq lsp-response-timeout 10)
-  ;; prefix for lsp-mode-map
-  (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))
+;; I switched to vscode for rust, let's disable it for now.
+;; (use-package lsp-mode
+;;   :commands lsp
+;;   ;; lsp binds into xref, e.g. xref-find-definitions, so we don't need lsp-find-definition
+;;   ;; or similar
+;;   :bind (:map lsp-mode-map
+;;  	      ("C-b" . xref-find-definitions)
+;;  	      ("M-<f7>" . xref-find-references)
+;;  	      ("M-/" . completion-at-point))
+;;   ;; see https://emacs-lsp.github.io/lsp-mode/tutorials/how-to-turn-off/
+;;   :config
+;;   ;; highlighting occurences of symbol the cursor is currently on
+;;   (setq lsp-enable-symbol-highlighting nil)
+;;   ;; probably later
+;;   (setq lsp-enable-snippet nil)
+;;   ;; flycheck report counts in modeline
+;;   (setq lsp-modeline-diagnostics-enable nil)
+;;   ;; not sure about which pop up this one, but anyway
+;;   (setq lsp-signature-auto-activate nil)
+;;   ;; disable showing signature/other stuff in minibuffer when cursor is on symbol
+;;   (setq lsp-eldoc-hook nil)
+;;   ;; apparently this is only about company which I don't use
+;;   (setq lsp-completion-provider nil)
+;;   ;; what to use when checking on-save. "check" is default, I prefer clippy
+;;   (setq lsp-rust-analyzer-cargo-watch-command "clippy")
+;;   ;; (setq lsp-eldoc-render-all t)
+;;   (setq lsp-idle-delay 0.6)
+;;   (setq lsp-rust-analyzer-server-display-inlay-hints t)
+;;   (setq lsp-response-timeout 10)
+;;   ;; prefix for lsp-mode-map
+;;   (define-key lsp-mode-map (kbd "C-c l") lsp-command-map))
 
 
 ;; rust
