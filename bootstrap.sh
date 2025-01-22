@@ -38,6 +38,9 @@ sudo apt-get -y install gnutls-dev checkinstall
 # build and install emacs:
 install_emacs.sh
 
+# various desktop stuff
+sudo apt-get install mpv enca
+
 # Approximately here starts desktop.
 
 # install ansible
