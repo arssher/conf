@@ -42,15 +42,16 @@ Add yourself to sudoers:
 su -
 usermod -aG sudo ars
 groups ars
-(reboot)
+(reboot or relogin)
 
 sudo apt-get update
 sudo apt-get install git vim terminator rsync
 
-Optionally sync home from old machine:
-ssh-copy-id -f -i ~/.ssh/id_ed25519.pub ars@newmachine
-(-f ignores check and so doesn't need private password)
-rsync -azvP /home/ars/.ssh/ ars@192.168.1.152:/home/ars/.ssh/
+Add
+contrib non-free
+sections to /etc/apt/sources.list.d/debian.sources
+e.g. ubuntu fonts are there (fonts-ubuntu), without them terminator & emacs
+will complain.
 
 configure dropbox:
 cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
@@ -61,16 +62,13 @@ export CONFPATH=~/Dropbox/configs
 or point CONFPATH to dir with cloned repo, e.g.
 git clone https://github.com/arssher/conf.git
 cd conf
-and
-./bootstrap.sh
+Look through and manually run things from bootstrap.sh (mostly restore of
+all configs & install packages).
 
-Install Ubuntu fonts, or terminator & emacs will complain.
-Configure caps lock and layout switchover (mate-keyboard-properties).
-
-# building emacs
-sudo apt-get install gnutls-dev checkinstall
-build and install emacs:
-install_emacs.sh
+Optionally sync home from old machine:
+ssh-copy-id -f -i ~/.ssh/id_ed25519.pub ars@newmachine
+(-f ignores already exists check and so doesn't need private key)
+rsync -azvP /home/ars/ ars@newmachine:/home/ars/
 
 uncomment WaylandEnable=false in
 /etc/gdm3/daemon.conf
@@ -85,6 +83,11 @@ Also, with wayland ctrl mouse scroll switches workspaces instead of e.g. zooming
 browsers, probably related to
 https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/1562
 which can't be turned off, oh my.
+
+# building emacs (obsolete, in 13 stock is good enough)
+sudo apt-get install gnutls-dev checkinstall
+build and install emacs:
+install_emacs.sh
 
 Important root configs:
 fstab (restoring not scripted)

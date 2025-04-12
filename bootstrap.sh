@@ -7,7 +7,6 @@ sudo apt-get update
 sudo apt-get install xbindkeys
 
 # restore conf
-# this is the least invasive thing here
 export CONFPATH=$(pwd)
 bash/.bash_scripts/bin/restore_all.sh
 source ~/.bashrc
@@ -50,6 +49,7 @@ source ~/venv/ansible/bin/activate
 python3 -m pip install ansible
 
 # some things are easier to configure with ansible
+# partially obsolete, haven't checked it for a while
 ansible-playbook --connection=local --inventory localhost, --ask-become-pass -e ansible_python_interpreter=/usr/bin/python3 bootstrap.yml
 
 sudo apt-get -y install chromium  \
@@ -68,10 +68,6 @@ sudo apt-get -y install ffmpeg global colordiff python3-venv tor xcalib python3-
 # need also mbsync, it disappeared
 sudo apt-get install libgmime-3.0-dev libxapian-dev pass
 
-# fast app moving between monitors with move-to-next-monitor
-# don't use it currently
-# sudo apt-get -y install xdotool wmctrl
-
 # building usbmount
 sudo apt-get -y install lockfile-progs
 # themes
@@ -79,7 +75,24 @@ sudo apt-get -y install lockfile-progs
 sudo apt-get -y install arc-theme gnome-icon-theme
 
 echo fs.inotify.max_user_watches= 131070 | sudo tee -a /etc/sysctl.conf
+echo fs.inotify.max_user_watches=524288  | sudo tee -a /etc/sysctl.conf
+echo fs.inotify.max_user_instances=512 | sudo tee -a /etc/sysctl.conf
+echo fs.file-max = 524288 | sudo tee -a /etc/sysctl.conf
+
+# should also allow higher per process limit, putting to
+# /etc/security/limits.conf
+# *               soft    nofile          524288
+# *               hard    nofile          524288
+# and relogin. To check
+ulimit -n
+
 sudo sh -c "echo 'kernel.core_pattern = /tmp/core_{%E}_%p' > /etc/sysctl.d/60-core-pattern.conf"
 sudo sysctl -p
 
+# install rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 cargo install cork
+
+# fast app moving between monitors with move-to-next-monitor
+# don't use it currently
+# sudo apt-get -y install xdotool wmctrl
