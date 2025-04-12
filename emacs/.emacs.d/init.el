@@ -129,7 +129,7 @@
 
 ;; The qwerty row:
 (global-set-key (kbd "M-w") 'select-line) ; ergo
-(global-set-key (kbd "C-w") 'kill-this-buffer) ; ergo
+(global-set-key (kbd "C-w") 'kill-current-buffer) ; ergo
 (global-set-key (kbd "C-M-w") 'just-one-space) ; ergo
 (global-set-key (kbd "M-e") 'backward-kill-word) ; ergo
 (global-set-key (kbd "M-r") 'kill-word) ; ergo
