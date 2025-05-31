@@ -29,7 +29,8 @@ sudo apt-get -y install flex bison libreadline-dev zlib1g-dev \
      krb5-multidev libldap2-dev python3-dev bison flex xsltproc gettext \
      libicu-dev libkrb5-dev libxslt-dev pkgconf libzstd-dev \
      libdbi-perl libdbd-pg-perl \
-     libcurl4-openssl-dev libseccomp-dev
+     libcurl4-openssl-dev libseccomp-dev \
+     protobuf-compiler libprotobuf-dev
 # building tmux
 sudo apt-get -y install libevent-dev
 # building emacs
@@ -54,12 +55,14 @@ ansible-playbook --connection=local --inventory localhost, --ask-become-pass -e 
 
 sudo apt-get -y install chromium  \
      openvpn terminator firmware-iwlwifi network-manager-openvpn-gnome \
-     xclip gparted
+     xclip gparted gnome-shell-extensions
 
 sudo apt-get install snapd flatpak
 
 flatpak install flathub org.telegram.desktop
 sudo snap install slack
+
+flatpak install --user flathub org.keepassxc.KeePassXC
 
 # mutagen is for yt-dl
 sudo apt-get -y install ffmpeg global colordiff python3-venv tor xcalib python3-mutagen unrar-free \
