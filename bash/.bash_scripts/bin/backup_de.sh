@@ -6,4 +6,4 @@ set -e
 
 echo "Copying desktop environment files to the CONFPATH (${CONFPATH})..."
 
-dconf dump / > "${CONFPATH}/de.dconf"
+dconf dump / > "${CONFPATH}/private/de.dconf"
