@@ -15,4 +15,8 @@ mkdir -p ~/.ssh
 shopt  -s dotglob
 cp -rp ${backup_path}/* ~/
 
-sudo cp  ${backup_path}/etc/NetworkManager/system-connections/* /etc/NetworkManager/system-connections/
+
+if [ -d "${backup_path}/etc/NetworkManager/system-connections" ]; then
+    echo "restoring nmconns"
+    sudo cp  ${backup_path}/etc/NetworkManager/system-connections/* /etc/NetworkManager/system-connections/
+fi
