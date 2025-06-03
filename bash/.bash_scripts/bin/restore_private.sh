@@ -15,4 +15,4 @@ mkdir -p ~/.ssh
 shopt  -s dotglob
 cp -rp ${backup_path}/* ~/
 
-sudo cp  ${CONFPATH}/etc/NetworkManager/system-connections/* /etc/NetworkManager/system-connections/
+sudo cp  ${backup_path}/etc/NetworkManager/system-connections/* /etc/NetworkManager/system-connections/
