@@ -13,4 +13,5 @@ cp ~/.ssh/config "${backup_path}/.ssh/"
 
 cp ~/.psql_history ${backup_path}/.psql_history
 
-sudo cp /etc/NetworkManager/system-connections/* ${CONFPATH}/etc/NetworkManager/system-connections/
+mkdir -p ${backup_path}/etc/NetworkManager/system-connections
+sudo cp /etc/NetworkManager/system-connections/* ${backup_path}/etc/NetworkManager/system-connections/
