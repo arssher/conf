@@ -11,7 +11,9 @@ export CONFPATH=$(pwd)
 bash/.bash_scripts/bin/restore_all.sh
 source ~/.bashrc
 
-sudo apt-get install python3-pip python3-venv
+sudo apt-get install emacs python3-pip python3-venv
+
+# install manually chrome, vscode, slack (from deb package)
 
 # first do things enough for the minimal remote box
 sudo apt-get -y install vim git checkinstall locate \
@@ -35,8 +37,9 @@ sudo apt-get -y install flex bison libreadline-dev zlib1g-dev \
 sudo apt-get -y install libevent-dev
 # building emacs
 sudo apt-get -y install gnutls-dev checkinstall
+
 # build and install emacs:
-install_emacs.sh
+# install_emacs.sh
 
 # various desktop stuff
 sudo apt-get install mpv enca
@@ -55,12 +58,11 @@ ansible-playbook --connection=local --inventory localhost, --ask-become-pass -e 
 
 sudo apt-get -y install chromium  \
      openvpn terminator firmware-iwlwifi network-manager-openvpn-gnome \
-     xclip gparted gnome-shell-extensions
+     xclip gparted gnome-shell-extensions fonts-ubuntu
 
 sudo apt-get install snapd flatpak
 
 flatpak install flathub org.telegram.desktop
-sudo snap install slack
 
 flatpak install --user flathub org.keepassxc.KeePassXC
 
