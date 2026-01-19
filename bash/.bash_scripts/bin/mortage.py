@@ -25,7 +25,7 @@ Notes:
   conservative I'd say.
 - Realty price is assumed to grow exactly with inflation, so we assume no 
   profit/loss here and so no calculations are done. Which is also conservative.
-- Rental is assumed to grow with exactly inflation too, so we don't do anything here.
+- Rental is assumed to grow with exactly inflation too, again we don't do anything here.
 - Amortization, taxes etc are assumed to be included into rental.
 '''
 if __name__ == '__main__':
@@ -37,8 +37,8 @@ if __name__ == '__main__':
     parser.add_argument("-r", help="monthly rental", type=int)
     parser.add_argument("-i", help="inflation in %", type=float, default=6.0)
     parser.add_argument("-s", help="how many years to skip before rental starts", type=int, default=3)
-    parser.add_argument("--price", help="realty price, used to calculate down payment", type=int, default=15000000)
-    parser.add_argument("-l", help="loan size, part of price", type=int, default=12000000)
+    parser.add_argument("-d", "--down-payment", help="down payment", type=int, default=3000000)
+    parser.add_argument("-l", "--loan", help="loan size", type=int, default=12000000)
     parser.add_argument("--renovation", help="renovation cost. 50k per 1m2 seems reasonable. Unlike down payment, not assumed to be returned when sold, which is not clear actually", type=int, default=2000000)
     args = parser.parse_args()
     print(args.y)
@@ -51,10 +51,9 @@ if __name__ == '__main__':
     rental = args.r
     inflation_f = args.i / 100.0
     skip_years = args.s
-    price = args.price
-    loan = args.l
+    down_payment = args.down_payment
+    loan = args.loan
     # initial
-    down_payment = price - loan
     renovation = args.renovation
     print(f"inflation factor: {inflation_f:.4f}, skip years: {skip_years}, loan: {loan}, down_payment: {down_payment}, renovation: {renovation}")
 
@@ -88,7 +87,10 @@ if __name__ == '__main__':
             # rental covers payment, the rest is profit
             rental_profit += yearly_rental - payment_yearly_inf_adjusted
 
-        # total (cumulative) rental minus payment balance
+        # Total (cumulative) rental minus payment balance. Note that these
+        # balances describe what you have on hands while the realty is not sold;
+        # IOW, they ignore accumulating owned part of the property and thus look
+        # a bit sad.
         balance = rental_sum - payment_sum_inf_adjusted
         # current year rental minus payment balance
         yearly_balance = yearly_rental - payment_yearly_inf_adjusted
@@ -96,18 +98,26 @@ if __name__ == '__main__':
         full_balance = balance - args.renovation
 
         investments = down_payment + renovation + payment_investments
-        assets = payment_inf_adjusted + rental_profit
-
-        # Note that in this basic model with mortage % == inflation % (free loan) and realty price changing exactly with 
-        # inflation (buying + selling gives zero), ignoring renovation profit just equals rental_sum.
-
-        # cagr = CAGR(payment_sum_inf_adjusted, payment_sum_inf_adjusted + rental_sum, i + 1)
+        # note: again, renovation is not included in assets as not assumed to be
+        # returned when selling 
         #
+        # FIXME: using linear payment assumes we buy back evenly over time,
+        # which is not true. I guess we should figure out current unpaid debt
+        # (which is not linear), lighten it by inflation and subtract from full
+        # loan -- the rest is owned (modeling payoff & sell).
+        assets = down_payment + (i + 1) / years * loan + rental_profit
+
+        # Note that in this basic model with mortage % == inflation % (free
+        # loan) and realty price changing exactly with inflation (buying +
+        # selling gives zero), if you ignore renovation & down payment, profit
+        # just equals rental_sum.
+        cagr = CAGR(investments, assets, i + 1)
+
         # Interesting points:
         # - when payment_inf_adjusted gets to rental, i.e. thing becomes self sustainable
         # - when accumulated the rest of rental - payment_inf_adjusted buys back the initial investments
         # - total (mostly initial) investments size
-        print(f"year {i}: monthly payment_i_a={payment_inf_adjusted:.2f}, payment_sum_i_a={payment_sum_inf_adjusted:.2f}, payment_sum={payment_sum:.2f} monthly rental={rental:.2f}, rental_sum={rental_sum:.2f}, yearly b={yearly_balance:.2f}, b={balance:.2f}, full_b={full_balance:.2f}, rental profit={rental_profit:.2f}, investments={investments:.2f}, assets={assets:.2f}")
+        print(f"year {i}: monthly payment_i_a={payment_inf_adjusted:.2f}, payment_sum_i_a={payment_sum_inf_adjusted:.2f}, payment_sum={payment_sum:.2f} monthly rental={rental:.2f}, rental_sum={rental_sum:.2f}, yearly b={yearly_balance:.2f}, b={balance:.2f}, full_b={full_balance:.2f}, rental profit={rental_profit:.2f}, investments={investments:.2f}, assets={assets:.2f}, CAGR={cagr:.2%}")
 
-        payment_inf_adjusted = payment_inf_adjusted * (1 - inflation_f)
+        payment_inf_adjusted = payment_inf_adjusted * (1 / (1 + inflation_f))
         # not changing rental assumes it changes with inflation
