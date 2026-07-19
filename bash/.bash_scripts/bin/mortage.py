@@ -3,6 +3,19 @@
 import argparse
 import sys
 
+# Calculate lost of purchasing power of value after 1 year of inflation with rate inflation_f.
+def lpp(value, inflation_f):
+    return value * (1 / (1 + inflation_f))
+
+def lpp_n_years(value, inflation_f, n_years):
+    return value * (1 / (1 + inflation_f))**n_years
+
+def lpp_test():
+    v1 = lpp(100, 0.03)
+    print(f"lpp test: {v1:.2f}")
+    v2 = lpp_n_years(100, 0.03, 5)
+    print(f"lpp_n_years test: {v2:.2f}")
+
 # cagrs as a fraction
 def CAGR(initial, end, n_years):
     # print(f"calculating cagr: initial={initial}, end={end}, n_years={n_years}")
@@ -20,13 +33,15 @@ def cagr_test():
 Notes:
 - Mortage conf is assumed to be calculated elsewhere, here we just take monthly
   payment, years and loan size as input. Defaults are for 12m for 30 years at 6%
-  interest.
+  interest. We still need rate to calculate payments interest / body parts.
 - Inflation is used to calculate mortage payment reduction over time. Default 6% is 
   conservative I'd say.
 - Realty price is assumed to grow exactly with inflation, so we assume no 
   profit/loss here and so no calculations are done. Which is also conservative.
 - Rental is assumed to grow with exactly inflation too, again we don't do anything here.
 - Amortization, taxes etc are assumed to be included into rental.
+
+- if you think mortage is a typo, it is not
 '''
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="""
@@ -34,6 +49,7 @@ if __name__ == '__main__':
                                      """)
     parser.add_argument("-y", help="years", type=int)
     parser.add_argument("--mortage-payment", help="monthly mortage payment", type=int, default=71946)
+    parser.add_argument("--mortage-rate", help="mortage rate", type=float, default=6.0)
     parser.add_argument("-r", help="monthly rental", type=int)
     parser.add_argument("-i", help="inflation in %", type=float, default=6.0)
     parser.add_argument("-s", help="how many years to skip before rental starts", type=int, default=3)
@@ -42,17 +58,17 @@ if __name__ == '__main__':
     parser.add_argument("--renovation", help="renovation cost. 50k per 1m2 seems reasonable. Unlike down payment, not assumed to be returned when sold, which is not clear actually", type=int, default=2000000)
     args = parser.parse_args()
     print(args.y)
-
-    # cagr_test()
-    # sys.exit(0)
     
     years = args.y
     payment = args.mortage_payment
+    mortage_rate_f = args.mortage_rate / 100.0
     rental = args.r
     inflation_f = args.i / 100.0
     skip_years = args.s
     down_payment = args.down_payment
     loan = args.loan
+    price = down_payment + loan
+    remaining_debt = loan
     # initial
     renovation = args.renovation
     print(f"inflation factor: {inflation_f:.4f}, skip years: {skip_years}, loan: {loan}, down_payment: {down_payment}, renovation: {renovation}")
@@ -67,6 +83,13 @@ if __name__ == '__main__':
     # part of rental left after covering payments
     rental_profit = 0
     for i in range(0, years):
+        for m in range(0, 12):
+            monthly_bank_interest = remaining_debt * (mortage_rate_f / 12)
+            monthly_body = payment - monthly_bank_interest
+            remaining_debt -= monthly_body
+            # print(f"year {i} month {m}: interest={monthly_bank_interest:.2f}, body={monthly_body:.2f}, remaining_loan={remaining_loan:.2f}")
+        remaining_debt_inf_adjusted = lpp_n_years(remaining_debt, inflation_f, i + 1)
+
         payment_yearly_inf_adjusted = payment_inf_adjusted * 12
         payment_sum_inf_adjusted += payment_yearly_inf_adjusted
         payment_sum += payment * 12
@@ -99,13 +122,14 @@ if __name__ == '__main__':
 
         investments = down_payment + renovation + payment_investments
         # note: again, renovation is not included in assets as not assumed to be
-        # returned when selling 
-        #
-        # FIXME: using linear payment assumes we buy back evenly over time,
-        # which is not true. I guess we should figure out current unpaid debt
-        # (which is not linear), lighten it by inflation and subtract from full
-        # loan -- the rest is owned (modeling payoff & sell).
-        assets = down_payment + (i + 1) / years * loan + rental_profit
+        # returned when selling
+        
+        # Models payoff & sell.
+        owned_value = price - remaining_debt_inf_adjusted
+        assets = owned_value + rental_profit
+
+        # You might want to compare with non existing linear payout model
+        # owned_value_lm = down_payment + (i + 1) / years * loan + rental_profit
 
         # Note that in this basic model with mortage % == inflation % (free
         # loan) and realty price changing exactly with inflation (buying +
@@ -117,7 +141,7 @@ if __name__ == '__main__':
         # - when payment_inf_adjusted gets to rental, i.e. thing becomes self sustainable
         # - when accumulated the rest of rental - payment_inf_adjusted buys back the initial investments
         # - total (mostly initial) investments size
-        print(f"year {i}: monthly payment_i_a={payment_inf_adjusted:.2f}, payment_sum_i_a={payment_sum_inf_adjusted:.2f}, payment_sum={payment_sum:.2f} monthly rental={rental:.2f}, rental_sum={rental_sum:.2f}, yearly b={yearly_balance:.2f}, b={balance:.2f}, full_b={full_balance:.2f}, rental profit={rental_profit:.2f}, investments={investments:.2f}, assets={assets:.2f}, CAGR={cagr:.2%}")
+        print(f"year {i}: monthly payment_i_a={payment_inf_adjusted:.2f}, payment_sum_i_a={payment_sum_inf_adjusted:.2f}, payment_sum={payment_sum:.2f}, debt={remaining_debt:.2f}, debt_i_a={remaining_debt_inf_adjusted:.2f}, monthly rental={rental:.2f}, rental_sum={rental_sum:.2f}, yearly b={yearly_balance:.2f}, b={balance:.2f}, full_b={full_balance:.2f}, rental profit={rental_profit:.2f}, investments={investments:.2f}, owned_value={owned_value:.2f}, assets={assets:.2f}, CAGR={cagr:.2%}")
 
-        payment_inf_adjusted = payment_inf_adjusted * (1 / (1 + inflation_f))
+        payment_inf_adjusted = lpp(payment_inf_adjusted, inflation_f)
         # not changing rental assumes it changes with inflation
