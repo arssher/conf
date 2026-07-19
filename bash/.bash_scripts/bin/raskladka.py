@@ -82,6 +82,10 @@ dry_sausage = Product("dry sausage", "колбаса", 35, "sausage")
 # finn crisps are nice
 black_crackers = Product("black crackers", "чёрные сухари", 30, "crackers")
 prunes = Product("prunes", "чернослив", DRIED_FRUITS_PORTION, "dried fruits")
+# a different dried apricot type than breakfast kuraga, for menu variety
+uryuk = Product("pitted uryuk", "урюк без косточки", DRIED_FRUITS_PORTION, "dried fruits")
+dried_mango = Product("dried mango", "сушёное манго", DRIED_FRUITS_PORTION, "dried fruits")
+dried_strawberries = Product("dried strawberries", "сушёная клубника", DRIED_FRUITS_PORTION, "dried fruits")
 dates = Product("dates", "финики", DRIED_FRUITS_PORTION, "dried fruits")
 dried_cherry = Product("dried cherry", "сушёная вишня", DRIED_FRUITS_PORTION, "dried fruits")
 # katz: 20-35
@@ -106,10 +110,16 @@ karpur = Product("karpur", "карпюр", 60, "grocery", density=0.25)
 lentils = Product("lentils", "чечевица", 90, "grocery", density=0.85)
 
 # tushenka goes about 40-75g. sublimated meat 15-30g.
-# specdetal 'big portion' dishes are 120g; side is included, so we don't need or reduce grain.
+# specdetal 'big portion' dishes are 120g; side is included, so we don't need (or could reduce if desired) grain.
 tushenka = Product("tushenka", "тушёнка", 40, "tushenka")
 sublimated_meat = Product("sublimated meat", "сублимированное мясо", 25, "sublimates")
 sublimated_dish = Product("sublimated dish", "сублимированное блюдо", 120, "sublimates")
+# let's also have concrete examples
+specdetal_rice_egg_vegetables = Product("specdetal rice with egg and vegetables", "спецдеталь рис с яйцом и овощами", 120, "sublimates")
+specdetal_chashushuli = Product("specdetal chashushuli", "спецдеталь чашушули", 120, "sublimates")
+specdetal_pasta_flotsky = Product("specdetal pasta flotsky", "спецдеталь макароны по-флотски", 120, "sublimates")
+specdetal_buckwheat_chicken = Product("specdetal buckwheat with chicken", "спецдеталь гречка с курицей", 120, "sublimates")
+specdetal_potato_beef = Product("specdetal potato with beef", "спецдеталь картошка с говядиной", 120, "sublimates")
 
 # sweets
 # katz: 35-50
@@ -126,6 +136,7 @@ tea = Product("tea", "чай", 10, "others")
 sugar = Product("sugar", "сахар", 15, "others", density=0.85)
 salt = Product("salt", "соль", 6, "others", density=1.2)
 ketchup = Product("ketchup", "кетчуп", 5, "others")
+crisped_fried_onion = Product("crisped fried onion", "хрустящий жареный лук", 5, "others")
 
 # Notes:
 # May also add onion/garlic to lunch/supper.
@@ -142,6 +153,7 @@ MSG = {
         "snack_nuts": "Snack nuts (cycled)",
         "snack_extras": "Snack extras",
         "supper_dish": "Supper dish",
+        "supper_dish_cycled": "Supper dish (cycled)",
         "supper_main": "Supper main (cycled)",
         "supper_meat": "Supper meat",
         "supper_extras": "Supper extras",
@@ -171,6 +183,7 @@ MSG = {
         "snack_nuts": "Орехи на перекус (по кругу)",
         "snack_extras": "Дополнительно на перекус",
         "supper_dish": "Блюдо на ужин",
+        "supper_dish_cycled": "Блюдо на ужин (по кругу)",
         "supper_main": "Гарнир на ужин (по кругу)",
         "supper_meat": "Мясо на ужин",
         "supper_extras": "Дополнительно на ужин",
@@ -222,7 +235,9 @@ class TableCloth:
         # if set, days in the menu are annotated with dates
         self.start_date = start_date
         # one of "tushenka" (side + tushenka), "sub-meat" (side + sublimated
-        # meat), "sub-dish" (ready sublimated dish, side included)
+        # meat), "sub-dish" (cycled ready sublimated dishes, side included),
+        # "sub-dish-generic" (same but a single generic dish, e.g. for early
+        # estimates before the dishes are picked)
         self.supper_mode = supper_mode
         # Control menu here.
         # Breakfasts:
@@ -237,7 +252,8 @@ class TableCloth:
         # served every lunch
         self.lunch_extras = [dry_sausage, black_crackers, onion]
         # Snacks:
-        self.snack_dried_fruits = [prunes, dates, dried_cherry]
+        self.snack_dried_fruits = [prunes, dates, dried_cherry, dried_mango, uryuk,
+                                   dried_strawberries]
         self.snack_dried_fruits_ptr = 0
         self.snack_nuts = [cashews, walnuts, hazelnut, almond, brazil_nut]
         self.snack_nuts_ptr = 0
@@ -246,12 +262,16 @@ class TableCloth:
         # Suppers:
         self.suppers = [rice, buckwheat, pasta, karpur]
         self.supper_ptr = 0
+        self.sub_dishes = [specdetal_rice_egg_vegetables, specdetal_chashushuli,
+                           specdetal_pasta_flotsky, specdetal_buckwheat_chicken,
+                           specdetal_potato_beef]
+        self.sub_dish_ptr = 0
         self.sweets = [halva, pryaniks, cookies, candies]
         self.sweets_ptr = 0
         # served every supper
         self.supper_extras = [ghee]
         # served every day
-        self.common = [tea, sugar, salt, ketchup]
+        self.common = [tea, sugar, salt, ketchup, crisped_fried_onion]
 
         self.menu_report = msg("per_person") + "\n"
         self.menu_report += f"{msg('bf_porridge')}: {format_products(self.breakfasts)}\n"
@@ -263,6 +283,8 @@ class TableCloth:
         self.menu_report += f"{msg('snack_nuts')}: {format_products(self.snack_nuts)}\n"
         self.menu_report += f"{msg('snack_extras')}: {format_products(self.snack_extras)}\n"
         if self.supper_mode == "sub-dish":
+            self.menu_report += f"{msg('supper_dish_cycled')}: {format_products(self.sub_dishes)}\n"
+        elif self.supper_mode == "sub-dish-generic":
             self.menu_report += f"{msg('supper_dish')}: {format_products([sublimated_dish])}\n"
         else:
             self.menu_report += f"{msg('supper_main')}: {format_products(self.suppers)}\n"
@@ -329,6 +351,10 @@ class TableCloth:
 
         entries = []
         if self.supper_mode == "sub-dish":
+            dish = self.sub_dishes[self.sub_dish_ptr]
+            self.sub_dish_ptr = (self.sub_dish_ptr + 1) % len(self.sub_dishes)
+            entries.append(self.add_product(dish, halved=True))
+        elif self.supper_mode == "sub-dish-generic":
             entries.append(self.add_product(sublimated_dish, halved=True))
         else:
             main = self.suppers[self.supper_ptr]
@@ -410,7 +436,7 @@ if __name__ == '__main__':
     parser.add_argument("-p", "--portions", help="number of full portions", type=int, default=10)
     parser.add_argument("--half-portions", help="number of half portions (half of grains, rest full; often used for kids)", type=int, default=0)
     parser.add_argument("--supper", help="supper mode: side + tushenka, side + sublimated meat, or ready sublimated dish",
-                        choices=["tushenka", "sub-meat", "sub-dish"], default="sub-dish")
+                        choices=["tushenka", "sub-meat", "sub-dish", "sub-dish-generic"], default="sub-dish")
     parser.add_argument("-l", "--lang", "--language", help="output language", choices=["en", "ru"], default="en")
     parser.add_argument("--start-date", help="trip start date as YYYY-MM-DD; annotates menu days with dates",
                         type=date.fromisoformat)
