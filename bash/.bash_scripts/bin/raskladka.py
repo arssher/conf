@@ -73,8 +73,13 @@ cheese = Product("cheese", "сыр", 35, "cheese")
 
 # old style folks often take 20g dry soup + 10g prysypka
 dry_soup = Product("dry soup", "сухой суп", 20, "sublimates")
-# specdetal sublimated soup is about 70g.
+# specdetal sublimated soup is 70g.
 sublimated_soup = Product("sublimated soup", "сублимированный суп", 70, "sublimates")
+# let's also have concrete examples
+specdetal_mushroom_soup = Product("specdetal mushroom soup", "спецдеталь грибной суп", 70, "sublimates")
+specdetal_lagman = Product("specdetal lagman", "спецдеталь лагман", 70, "sublimates")
+specdetal_minestrone = Product("specdetal minestrone", "спецдеталь минестроне", 70, "sublimates")
+specdetal_mastava = Product("specdetal mastava", "спецдеталь мастава", 70, "sublimates")
 
 onion = Product("onion", "лук", 10, "others")
 
@@ -148,6 +153,7 @@ MSG = {
         "bf_dried_fruits": "Breakfast dried fruits (cycled)",
         "bf_extras": "Breakfast extras",
         "lunch_soup": "Lunch soup",
+        "lunch_soup_cycled": "Lunch soup (cycled)",
         "lunch_extras": "Lunch extras",
         "snack_dried_fruits": "Snack dried fruits (cycled)",
         "snack_nuts": "Snack nuts (cycled)",
@@ -178,6 +184,7 @@ MSG = {
         "bf_dried_fruits": "Сухофрукты на завтрак (по кругу)",
         "bf_extras": "Дополнительно на завтрак",
         "lunch_soup": "Суп на обед",
+        "lunch_soup_cycled": "Суп на обед (по кругу)",
         "lunch_extras": "Дополнительно на обед",
         "snack_dried_fruits": "Сухофрукты на перекус (по кругу)",
         "snack_nuts": "Орехи на перекус (по кругу)",
@@ -229,7 +236,7 @@ def format_products(products: list[Product]) -> str:
 class TableCloth:
     """Table cloth for raskladka."""
     def __init__(self, portions: int, half_portions: int = 0, supper_mode: str = "sub-dish",
-                 start_date: date | None = None):
+                 lunch_mode: str = "sub-soup", start_date: date | None = None):
         self.portions = portions
         self.half_portions = half_portions
         # if set, days in the menu are annotated with dates
@@ -239,6 +246,9 @@ class TableCloth:
         # "sub-dish-generic" (same but a single generic dish, e.g. for early
         # estimates before the dishes are picked)
         self.supper_mode = supper_mode
+        # one of "sub-soup" (cycled sublimated soups) and "sub-soup-generic"
+        # (a single generic soup, e.g. for early estimates)
+        self.lunch_mode = lunch_mode
         # Control menu here.
         # Breakfasts:
         # pasta means pasta with cheese: cheese is in bf_extras anyway, and
@@ -250,7 +260,9 @@ class TableCloth:
         # served every breakfast
         self.bf_extras = [dry_milk, ghee, porridge_sugar, white_crackers, cheese]
         # Lunches:
-        self.lunch_soup = sublimated_soup
+        self.lunch_soups = [specdetal_mushroom_soup, specdetal_lagman,
+                            specdetal_minestrone, specdetal_mastava]
+        self.lunch_soup_ptr = 0
         # served every lunch
         self.lunch_extras = [dry_sausage, black_crackers, onion]
         # Snacks:
@@ -279,7 +291,10 @@ class TableCloth:
         self.menu_report += f"{msg('bf_porridge')}: {format_products(self.breakfasts)}\n"
         self.menu_report += f"{msg('bf_dried_fruits')}: {format_products(self.bf_dried_fruits)}\n"
         self.menu_report += f"{msg('bf_extras')}: {format_products(self.bf_extras)}\n"
-        self.menu_report += f"{msg('lunch_soup')}: {format_products([self.lunch_soup])}\n"
+        if self.lunch_mode == "sub-soup":
+            self.menu_report += f"{msg('lunch_soup_cycled')}: {format_products(self.lunch_soups)}\n"
+        else:
+            self.menu_report += f"{msg('lunch_soup')}: {format_products([sublimated_soup])}\n"
         self.menu_report += f"{msg('lunch_extras')}: {format_products(self.lunch_extras)}\n"
         self.menu_report += f"{msg('snack_dried_fruits')}: {format_products(self.snack_dried_fruits)}\n"
         self.menu_report += f"{msg('snack_nuts')}: {format_products(self.snack_nuts)}\n"
@@ -338,7 +353,12 @@ class TableCloth:
 
     def add_lunch(self):
         """Add lunch: soup plus daily extras"""
-        entries = [self.add_product(self.lunch_soup, halved=True)]
+        if self.lunch_mode == "sub-soup":
+            soup = self.lunch_soups[self.lunch_soup_ptr]
+            self.lunch_soup_ptr = (self.lunch_soup_ptr + 1) % len(self.lunch_soups)
+        else:
+            soup = sublimated_soup
+        entries = [self.add_product(soup, halved=True)]
         entries += [self.add_product(p) for p in self.lunch_extras]
         self.daily_report += f"{msg('lunch')}: " + ", ".join(entries) + "\n"
 
@@ -445,6 +465,8 @@ if __name__ == '__main__':
     parser.add_argument("--half-portions", help="number of half portions (half of grains, rest full; often used for kids)", type=int, default=0)
     parser.add_argument("--supper", help="supper mode: side + tushenka, side + sublimated meat, or ready sublimated dish",
                         choices=["tushenka", "sub-meat", "sub-dish", "sub-dish-generic"], default="sub-dish")
+    parser.add_argument("--lunch", help="lunch mode: cycled sublimated soups or a single generic one",
+                        choices=["sub-soup", "sub-soup-generic"], default="sub-soup")
     parser.add_argument("-l", "--lang", "--language", help="output language", choices=["en", "ru"], default="en")
     parser.add_argument("--start-date", help="trip start date as YYYY-MM-DD; annotates menu days with dates",
                         type=date.fromisoformat)
@@ -456,6 +478,6 @@ if __name__ == '__main__':
     LANG = args.lang
     print(msg("header").format(args.days, args.portions, args.half_portions) + "\n")
 
-    tablecloth = TableCloth(args.portions, args.half_portions, args.supper, args.start_date)
+    tablecloth = TableCloth(args.portions, args.half_portions, args.supper, args.lunch, args.start_date)
     tablecloth.add_days(args.days, args.first_day, args.last_day)
     print(tablecloth.report())
