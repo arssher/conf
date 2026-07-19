@@ -241,7 +241,9 @@ class TableCloth:
         self.supper_mode = supper_mode
         # Control menu here.
         # Breakfasts:
-        self.breakfasts = [oat, semolina, rice_porridge, millet]
+        # pasta means pasta with cheese: cheese is in bf_extras anyway, and
+        # dried fruits / dry milk are skipped on pasta days
+        self.breakfasts = [oat, semolina, rice_porridge, millet, pasta]
         self.breakfast_ptr = 0
         self.bf_dried_fruits = [dried_apricots, raisins]
         self.bf_dried_fruits_ptr = 0
@@ -318,14 +320,20 @@ class TableCloth:
         return f"{product.display_name} {weight}{msg('g')}"
 
     def add_breakfast(self):
-        """Add breakfast: porridge with dried fruits plus daily extras"""
+        """Add breakfast: porridge with dried fruits plus daily extras;
+        pasta breakfast goes without dried fruits, dry milk and sugar"""
         porridge = self.breakfasts[self.breakfast_ptr]
         self.breakfast_ptr = (self.breakfast_ptr + 1) % len(self.breakfasts)
-        fruits = self.bf_dried_fruits[self.bf_dried_fruits_ptr]
-        self.bf_dried_fruits_ptr = (self.bf_dried_fruits_ptr + 1) % len(self.bf_dried_fruits)
 
         entries = [self.add_product(porridge, halved=True)]
-        entries += [self.add_product(p, halved=(p is dry_milk)) for p in [fruits] + self.bf_extras]
+        extras = self.bf_extras
+        if porridge is pasta:
+            extras = [p for p in extras if p not in (dry_milk, porridge_sugar)]
+        else:
+            fruits = self.bf_dried_fruits[self.bf_dried_fruits_ptr]
+            self.bf_dried_fruits_ptr = (self.bf_dried_fruits_ptr + 1) % len(self.bf_dried_fruits)
+            entries.append(self.add_product(fruits))
+        entries += [self.add_product(p, halved=(p is dry_milk)) for p in extras]
         self.daily_report += f"{msg('breakfast')}: " + ", ".join(entries) + "\n"
 
     def add_lunch(self):
