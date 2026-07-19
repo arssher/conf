@@ -12,7 +12,7 @@ LANG = "en"
 MEALS = ["breakfast", "lunch", "snack", "supper"]
 
 # product types for the grouped total report, in purchase order
-PRODUCT_TYPES = ["grocery", "sublimates", "tushenka", "dried fruits & nuts",
+PRODUCT_TYPES = ["grocery", "sublimates", "tushenka", "dried fruits", "nuts",
                  "cheese", "sausage", "crackers", "sweets", "others"]
 
 @dataclass
@@ -51,8 +51,8 @@ cereal = Product("cereal", "хлопья", 50, "grocery", density=0.35)
 # katz: 35-50
 # nastya: 25
 DRIED_FRUITS_PORTION = 35
-dried_apricots = Product("dried apricots", "курага", DRIED_FRUITS_PORTION, "dried fruits & nuts")
-raisins = Product("raisins", "изюм", DRIED_FRUITS_PORTION, "dried fruits & nuts")
+dried_apricots = Product("dried apricots", "курага", DRIED_FRUITS_PORTION, "dried fruits")
+raisins = Product("raisins", "изюм", DRIED_FRUITS_PORTION, "dried fruits")
 
 # katz: 15-30
 # nastya: 15
@@ -81,11 +81,16 @@ onion = Product("onion", "лук", 10, "others")
 dry_sausage = Product("dry sausage", "колбаса", 35, "sausage")
 # finn crisps are nice
 black_crackers = Product("black crackers", "чёрные сухари", 30, "crackers")
-prunes = Product("prunes", "чернослив", DRIED_FRUITS_PORTION, "dried fruits & nuts")
-dates = Product("dates", "финики", DRIED_FRUITS_PORTION, "dried fruits & nuts")
-dried_cherry = Product("dried cherry", "сушёная вишня", DRIED_FRUITS_PORTION, "dried fruits & nuts")
+prunes = Product("prunes", "чернослив", DRIED_FRUITS_PORTION, "dried fruits")
+dates = Product("dates", "финики", DRIED_FRUITS_PORTION, "dried fruits")
+dried_cherry = Product("dried cherry", "сушёная вишня", DRIED_FRUITS_PORTION, "dried fruits")
 # katz: 20-35
-nuts = Product("nuts", "орехи", 30, "dried fruits & nuts")
+NUTS_PORTION = 30
+cashews = Product("cashews", "кешью", NUTS_PORTION, "nuts")
+walnuts = Product("walnuts", "грецкий орех", NUTS_PORTION, "nuts")
+hazelnut = Product("hazelnut", "фундук", NUTS_PORTION, "nuts")
+almond = Product("almond", "миндаль", NUTS_PORTION, "nuts")
+brazil_nut = Product("brazil nut", "бразильский орех", NUTS_PORTION, "nuts")
 # 15-25
 chocolate = Product("chocolate", "шоколад", 30, "sweets")
 
@@ -134,6 +139,7 @@ MSG = {
         "lunch_soup": "Lunch soup",
         "lunch_extras": "Lunch extras",
         "snack_dried_fruits": "Snack dried fruits (cycled)",
+        "snack_nuts": "Snack nuts (cycled)",
         "snack_extras": "Snack extras",
         "supper_dish": "Supper dish",
         "supper_main": "Supper main (cycled)",
@@ -162,6 +168,7 @@ MSG = {
         "lunch_soup": "Суп на обед",
         "lunch_extras": "Дополнительно на обед",
         "snack_dried_fruits": "Сухофрукты на перекус (по кругу)",
+        "snack_nuts": "Орехи на перекус (по кругу)",
         "snack_extras": "Дополнительно на перекус",
         "supper_dish": "Блюдо на ужин",
         "supper_main": "Гарнир на ужин (по кругу)",
@@ -188,7 +195,8 @@ TYPE_NAMES_RU = {
     "grocery": "бакалея",
     "sublimates": "сублиматы",
     "tushenka": "тушёнка",
-    "dried fruits & nuts": "сухофрукты и орехи",
+    "dried fruits": "сухофрукты",
+    "nuts": "орехи",
     "cheese": "сыр",
     "sausage": "колбаса",
     "crackers": "сухари",
@@ -231,8 +239,10 @@ class TableCloth:
         # Snacks:
         self.snack_dried_fruits = [prunes, dates, dried_cherry]
         self.snack_dried_fruits_ptr = 0
+        self.snack_nuts = [cashews, walnuts, hazelnut, almond, brazil_nut]
+        self.snack_nuts_ptr = 0
         # served every snack
-        self.snack_extras = [nuts, chocolate]
+        self.snack_extras = [chocolate]
         # Suppers:
         self.suppers = [rice, buckwheat, pasta, karpur]
         self.supper_ptr = 0
@@ -250,6 +260,7 @@ class TableCloth:
         self.menu_report += f"{msg('lunch_soup')}: {format_products([self.lunch_soup])}\n"
         self.menu_report += f"{msg('lunch_extras')}: {format_products(self.lunch_extras)}\n"
         self.menu_report += f"{msg('snack_dried_fruits')}: {format_products(self.snack_dried_fruits)}\n"
+        self.menu_report += f"{msg('snack_nuts')}: {format_products(self.snack_nuts)}\n"
         self.menu_report += f"{msg('snack_extras')}: {format_products(self.snack_extras)}\n"
         if self.supper_mode == "sub-dish":
             self.menu_report += f"{msg('supper_dish')}: {format_products([sublimated_dish])}\n"
@@ -302,11 +313,13 @@ class TableCloth:
         self.daily_report += f"{msg('lunch')}: " + ", ".join(entries) + "\n"
 
     def add_snack(self):
-        """Add snack: dried fruits plus daily extras"""
+        """Add snack: dried fruits and nuts plus daily extras"""
         fruits = self.snack_dried_fruits[self.snack_dried_fruits_ptr]
         self.snack_dried_fruits_ptr = (self.snack_dried_fruits_ptr + 1) % len(self.snack_dried_fruits)
+        nuts = self.snack_nuts[self.snack_nuts_ptr]
+        self.snack_nuts_ptr = (self.snack_nuts_ptr + 1) % len(self.snack_nuts)
 
-        entries = [self.add_product(p) for p in [fruits] + self.snack_extras]
+        entries = [self.add_product(p) for p in [fruits, nuts] + self.snack_extras]
         self.daily_report += f"{msg('snack')}: " + ", ".join(entries) + "\n"
 
     def add_supper(self):
