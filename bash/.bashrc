@@ -108,10 +108,8 @@ fi
 # pwd:
 
 
-if [ -x "$(command -v yandex-disk)" ]; then
-    export YANDEXDISK_DIR=`cat ~/.config/yandex-disk/config.cfg | grep "dir=" | sed 's/dir=\"\(.*\)\"/\1/' | grep -E -v '^#.*'`
-    export CONFPATH="${YANDEXDISK_DIR}/configs"
-fi
+# Private conf not kept in the public dotfiles repo: secrets, ssh config,
+# shell/psql history, dconf dump, /etc bits. See restore_private.sh.
 export CONFPATH=~/Dropbox/configs
 
 PATH=$PATH:~/.bash_scripts/bin # TODO: perhaps check if it is already added?
@@ -295,3 +293,4 @@ source "$HOME/.bash_scripts/utils.sh"
 if [ -f $HOME/.cargo/env ]; then
     . "$HOME/.cargo/env"
 fi
+. "/home/ars/.deno/env"
