@@ -123,7 +123,11 @@ if [ -f ~/.global_vars ]; then
       # echo "global vars loaded"
 fi
 
-source ~/.bash_scripts/aliases.sh
+# aliases.sh lives in the private Dropbox stash, not in the public repo, so
+# it may be absent until restore_private.sh has run.
+if [ -f ~/.bash_scripts/aliases.sh ]; then
+    source ~/.bash_scripts/aliases.sh
+fi
 
 # Eternal bash history. It is not reread after every command, so every terminal
 # have it's own history.  To search all commands, including typed in other
