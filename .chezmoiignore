@@ -1,0 +1,18 @@
+# Patterns here are TARGET paths -- where a file would land relative to $HOME --
+# not source paths. So the script archive is ".bash_scripts/archive" (its
+# destination), even though it lives at dot_bash_scripts/archive/ in the source.
+# Writing "dot_bash_scripts/archive" would match nothing and the archive would
+# get applied into ~/.bash_scripts/archive.
+
+# Repo-only directories: docs, the bootstrap scripts, and the vscode settings
+# backup (kept in git for paranoia; vscode normally syncs via the GH account).
+docs
+bootstrap
+vscode
+
+# Scripts parked for review. Tracked in git, never applied to $HOME.
+.bash_scripts/archive
+.bash_scripts/archive/**
+
+# Machine-local Claude Code permission overrides.
+.claude

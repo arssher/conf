@@ -1,0 +1,45 @@
+{
+    "security.workspace.trust.untrustedFiles": "open",
+    "tlaplus.tlc.modelChecker.options": "-workers 3",
+    "gitlens.codeLens.enabled": false,
+    "gitlens.statusBar.enabled": false,
+    "[c]": {
+        "editor.formatOnSave": false,
+        "editor.formatOnSaveMode": "modifications"
+    },
+    "[cpp]": {
+        "editor.formatOnSaveMode": "modifications"
+    },
+    "[python]": {
+        "editor.formatOnSave": false,
+        "editor.formatOnType": true
+    },
+    "[yaml]": {
+        // use redhat.vscode-yaml extension for formatting
+        "editor.defaultFormatter": "redhat.vscode-yaml",
+        "editor.formatOnSave": false,
+    },
+    // redhat.vscode-yaml seems to validate against some k8s schemas, don't need that.
+    "yaml.validate": false,
+    "editor.renderWhitespace": "none",
+    "files.associations": {
+        "*.h": "c"
+    },
+    "files.watcherExclude": {
+        "**/test_output/**": true,
+        "**/tmp_install/**": true,
+        "**/target/**": true
+    },
+    "update.mode": "none",
+    "rust-analyzer.checkOnSave.overrideCommand": null,
+    "rust-analyzer.files.excludeDirs": [
+        "**/test_output/**",
+        "**/target/**"
+    ],
+    "editor.formatOnSave": true,
+    "go.toolsManagement.autoUpdate": true,
+    "explorer.confirmDelete": false,
+    "redhat.telemetry.enabled": true,
+    "git.openRepositoryInParentFolders": "never",
+    "editor.minimap.enabled": false
+}
