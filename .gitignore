@@ -1,5 +1,12 @@
-mint_shortcuts/dconf-settings.conf
 emacs/refcard
 
 private/
 etc/
+
+# gtags output (gtags is run in subdirs, so match anywhere)
+GPATH
+GRTAGS
+GTAGS
+
+# virtualenv for the lyrics scripts in .bash_scripts/bin
+.venv-lyrics/
