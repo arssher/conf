@@ -1,9 +1,16 @@
-# Run git config --global core.excludesfile '~/.gitignore'
-# to activate this
+# Global gitignore, active via
+#   git config --global core.excludesfile '~/.gitignore'
+# (already set on this machine).
 
+# gtags output
 GPATH
 GRTAGS
 GTAGS
+
+# editor / build droppings
 .idea/
 .cache/
 compile_commands.json
+
+# per-project Claude Code permission overrides are machine-local
+**/.claude/settings.local.json
