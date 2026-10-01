@@ -11,6 +11,3 @@ GTAGS
 .idea/
 .cache/
 compile_commands.json
-
-# per-project Claude Code permission overrides are machine-local
-**/.claude/settings.local.json

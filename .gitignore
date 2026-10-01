@@ -10,3 +10,6 @@ GTAGS
 
 # virtualenv for the lyrics scripts in .bash_scripts/bin
 .venv-lyrics/
+
+# machine-local Claude Code permission overrides; this repo is public
+**/.claude/settings.local.json
