@@ -25,8 +25,10 @@ fi
 
 echo "restore_root: this needs sudo"
 
-# NetworkManager refuses to load a connection profile that is group- or
-# world-readable, so 0600 root:root is mandatory, not just tidy.
+# 0600 root:root because these hold plaintext secrets. NetworkManager does not
+# enforce it -- it loads a 0644 profile without complaint, which is how this
+# machine ended up with 167 world-readable ones -- but NM writes 0600 itself when
+# it saves a connection, so that is the mode to restore to.
 conns="${stash}/NetworkManager/system-connections"
 if [ -d "${conns}" ]; then
     echo "restore_root: NetworkManager connections"
