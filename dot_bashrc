@@ -202,7 +202,7 @@ export EDITOR="$VISUAL"
 export LESS='--quit-if-one-screen --ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --tabs=4  --window=-4 --mouse --wheel-lines=3 --LINE-NUMBERS'
 
 # Map right alt to behave as ctrl. Doesn't work in X
-if [ -x "$(command -v setxkbmap)" ]; then
+if [ -n "${DISPLAY:-}" ] && command -v setxkbmap >/dev/null 2>&1; then
     setxkbmap -option ctrl:ralt_rctrl
 fi;
 # TODO: check the following:
@@ -219,7 +219,9 @@ git config --global alias.lg "log --color --graph --abbrev-commit
 
 # k8s autocompletion
 # https://kubernetes.io/docs/reference/kubectl/cheatsheet/
-source <(kubectl completion bash)
+if command -v kubectl >/dev/null 2>&1; then
+    source <(kubectl completion bash)
+fi
 
 # Use virtualenvwrapper, if it is available
 if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
@@ -281,14 +283,17 @@ function stophp {
 # https://wiki.archlinux.org/index.php/readline
 # https://unix.stackexchange.com/questions/12107/how-to-unfreeze-after-accidentally-pressing-ctrl-s-in-a-terminal
 stty -ixon -ixoff
-source "$HOME/.cargo/env"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-source "$HOME/.bash_scripts/utils.sh"
-if [ -f $HOME/.cargo/env ]; then
+if [ -f "$HOME/.bash_scripts/utils.sh" ]; then
+    source "$HOME/.bash_scripts/utils.sh"
+fi
+if [ -f "$HOME/.cargo/env" ]; then
     . "$HOME/.cargo/env"
 fi
-. "/home/ars/.deno/env"
+if [ -f "$HOME/.deno/env" ]; then
+    . "$HOME/.deno/env"
+fi
