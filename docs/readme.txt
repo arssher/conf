@@ -1,5 +1,4 @@
 This repo is a chezmoi source directory. chezmoi keeps $HOME in sync with it.
-The repo is public, so nothing secret or work-specific belongs here.
 
 Workflow:
 
