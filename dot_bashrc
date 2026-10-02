@@ -116,13 +116,6 @@ PATH=$PATH:~/.bash_scripts/bin # TODO: perhaps check if it is already added?
 export LC_ALL="en_US.UTF-8"
 
 
-# Read file with machine-dependant global env variables
-# include .bashrc if it exists
-if [ -f ~/.global_vars ]; then
-      source ~/.global_vars
-      # echo "global vars loaded"
-fi
-
 # aliases.sh lives in the private Dropbox stash, not in the public repo, so
 # it may be absent until restore_private.sh has run.
 if [ -f ~/.bash_scripts/aliases.sh ]; then
@@ -211,10 +204,6 @@ fi;
 
 # always dump core
 ulimit -c unlimited
-
-# beatiful git log as `git log`
-git config --global alias.lg "log --color --graph --abbrev-commit
-           --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset'"
 
 
 # k8s autocompletion
