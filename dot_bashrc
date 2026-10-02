@@ -1,4 +1,31 @@
-# do this before we exit in non-interfactive shells!
+# Who reads this file, and how it gets here:
+#
+#   new terminal tab, `bash`, `su`
+#       /etc/bash.bashrc, then this file. The ordinary case.
+#
+#   login shell: console, `bash -l`, `ssh host`, Terminal.app on macOS
+#       /etc/profile (which sources /etc/bash.bashrc) -> the first of
+#       ~/.bash_profile, ~/.bash_login, ~/.profile -> and ~/.profile sources
+#       this file from its own line 14. So creating a ~/.bash_profile shadows
+#       ~/.profile and this file stops being read by login shells entirely.
+#
+#   `ssh host 'some command'` -- non-interactive
+#       bash notices stdin is a socket and reads /etc/bash.bashrc and this file
+#       anyway. This is the only path that gives a remote command an
+#       environment, and it is why .global_vars is sourced below rather than
+#       after the interactivity guard. Does not happen when invoked as `sh`.
+#
+# Who does NOT read this file:
+#
+#   `bash script.sh`, `bash -c ...`   only $BASH_ENV, if set.
+#   the systemd user session           Wayland, the GNOME app launcher and user
+#                                      services take their environment from
+#                                      ~/.config/environment.d/ instead.
+#
+# Everything above the `case $- in *i*)` guard below therefore runs in all three
+# shell cases; everything after it only in interactive ones.
+
+# do this before we exit in non-interactive shells!
 if [ -f ~/.global_vars ]; then
       source ~/.global_vars
 fi
