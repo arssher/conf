@@ -11,6 +11,8 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin
 chezmoi init --ssh --apply arssher/conf
 source ~/.bashrc
 
+curl -fsSL https://claude.ai/install.sh | bash
+
 # Secrets, history and work-specific scripts are not in the repo. Once whatever
 # syncs the private directory is up and CONFPATH points at it:
 #   restore_private.sh          $HOME bits
