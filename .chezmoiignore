@@ -15,8 +15,10 @@ vscode
 .bash_scripts/archive
 .bash_scripts/archive/**
 
-# Machine-local Claude Code permission overrides.
-.claude
+# Machine-local Claude Code permission overrides. Only this file: the rest of
+# dot_claude/ is managed. Never add ~/.claude/.credentials.json or the state
+# under projects/, sessions/, history.jsonl and friends -- this repo is public.
+.claude/settings.local.json
 
 # Stashes kept outside this repo. They are gitignored, but chezmoi reads the
 # filesystem rather than git, so without these lines `chezmoi apply` copies them
