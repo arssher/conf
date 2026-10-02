@@ -1,0 +1,12 @@
+# chezmoi's own configuration. `chezmoi init` renders this to
+# ~/.config/chezmoi/chezmoi.toml, so a fresh machine gets it automatically.
+
+# chezmoi derives file modes from the umask rather than recording them, because
+# git stores only the executable bit. This machine's login umask is 0002, which
+# would make every managed file group-writable -- 0775 for commands, 0664 for
+# plain files. 0022 gives the conventional 0755 and 0644 instead.
+#
+# ~/.config is handled separately: its source dir carries the private_ attribute,
+# which strips group and world bits regardless of this umask, keeping the
+# directory at 0700 as the XDG convention (and .local and .cache here) expect.
+umask = 0o022
