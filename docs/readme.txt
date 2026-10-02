@@ -13,6 +13,25 @@ Workflow:
 After chezmoi add, commit in the source dir as usual: chezmoi cd && git add
 ... && git commit && git push.
 
+What init does, in order:
+
+  1. clones the repo into the source dir, ~/.local/share/chezmoi. If no repo
+     is named it initialises an empty git repo there instead. If the source
+     dir is already a git repo it leaves it alone.
+  2. renders .chezmoi.toml.tmpl into ~/.config/chezmoi/chezmoi.toml.
+  3. runs chezmoi apply -- but only if --apply was given.
+
+So plain `init` touches nothing in $HOME: init, then diff, then apply is the
+cautious order, and the diff is worth reading the first time.
+
+--ssh makes it guess git@github.com:... rather than an https URL, which is
+what you want if you also push from the machine.
+
+Note that apply and update take an --init flag too, and it means something
+else: re-render the config file from .chezmoi.toml.tmpl. That is what clears
+"warning: config file template has changed, run chezmoi init" after the
+template is edited.
+
 
 Source naming:
 
