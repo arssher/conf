@@ -1,40 +1,82 @@
-"restore" scripts install ${CONFPATH} conf onto the machine, "backup"
-scripts export machine's conf to ${CONFPATH}.
-.bashrc here sets CONFPATH to ${YANDEXDISK_DIR}/configs.
+This repo is a chezmoi source directory. chezmoi keeps $HOME in sync with it.
+The repo is public, so nothing secret or work-specific belongs here.
+
+Workflow:
+
+  chezmoi init --ssh --apply arssher/conf   on a new machine
+  chezmoi cd                                shell in the source dir
+  chezmoi diff                              what would change in $HOME
+  chezmoi apply                             source -> $HOME
+  chezmoi re-add                            $HOME -> source
+  chezmoi add ~/.newrc                      start managing a new file
+  chezmoi update                            git pull, then apply
+
+After chezmoi add, commit in the source dir as usual: chezmoi cd && git add
+... && git commit && git push.
 
 
-Bash conf:
+Source naming:
 
-  Contains .bashrc and .bash_scripts folder. .bashrc reads file .global_vars, so
-  you can create and specify machine-dependant global vars there. You can find
-  example in .global_vars.example (it is also privately saved).
+  dot_foo              -> ~/.foo
+  executable_foo       -> +x on the target. Required: git records only one
+                          exec bit and chezmoi does not infer the mode from it.
+  private_dot_config   -> ~/.config at 0700. private_ strips group and world
+                          bits whatever the umask. It applies to that entry
+                          only, not recursively.
 
-  .bash_scripts contains bin folder, I put executable scripts there. The
-  directory will be added to the PATH in .bashrc (subdirectories will not be
-  added).
+  Nested dotfiles need the prefix at every level, e.g.
+  dot_gdb/vuvova-gdb-tools/dot_gitignore. Miss it and chezmoi treats the file
+  as internal and silently never applies it.
 
 
-Emacs conf:
+Things that are easy to get wrong:
 
-  Only init.el file and two dirs -- static_packages and themes -- are backup'ed.
-  The rest is the ELPA's business.
+  .chezmoiignore matches TARGET paths, not source paths. The script archive is
+  ".bash_scripts/archive", not "dot_bash_scripts/archive". Spelled the source
+  way it matches nothing and the archive gets applied.
 
-gdb conf:
+  A .tmpl suffix is load-bearing. Without it {{ include ... }} and
+  {{ .chezmoi.destDir }} are not evaluated and the file quietly behaves as a
+  literal string.
 
-  Contains .gdbinit file and .gdb dir.
+  chezmoi reads the filesystem, not git. Gitignored is not chezmoi-ignored, so
+  anything sitting in the source dir gets applied unless .chezmoiignore says
+  otherwise.
 
-readline conf:
+  File modes come from the umask, which is pinned in .chezmoi.toml.tmpl so that
+  every machine produces the same 0755/0644 regardless of its own umask.
 
-  Contains only .inputrc file with keybindings like in my emacs.
+  chezmoi apply does NOT delete files it does not manage. Removing something
+  from the source leaves the copy in $HOME alone.
 
-xbindkeys conf:
+  dot_bash_scripts/archive/ is tracked but .chezmoiignore'd: scripts parked for
+  review, never applied. To put one back on PATH:
+    chezmoi cd
+    git mv dot_bash_scripts/archive/foo.sh dot_bash_scripts/bin/executable_foo.sh
+  A few of them lack +x, so chmod when promoting.
 
-  That's what currently is used for keybindings.
-  Contains only .xbindkeysrc
+  docs/, bootstrap/ and vscode/ are likewise tracked but not applied.
 
-terminator conf:
 
-  Contains only terminator conf
+Content kept outside this repo:
+
+  Secrets, ssh client config, shell and psql history, the desktop settings
+  dump, and work-specific scripts live in a separate private directory, not in
+  git. $CONFPATH in .bashrc points at it, and it has its own readme.
+
+  The scripts that move things between there and the machine are in
+  .bash_scripts/bin: restore_private.sh and backup_private.sh for $HOME,
+  restore_root.sh and backup_root.sh for root-owned config, restore_de.sh and
+  backup_de.sh for the desktop settings dump.
+
+  restore_private.sh is fill-in-only: it never overwrites an existing file, and
+  it sets modes itself rather than copying them from the source. Pushing the
+  other way is backup_private.sh, which does overwrite, deliberately.
+
+  chezmoi runs restore_private.sh once on first apply, via .chezmoiscripts. On
+  a new machine $CONFPATH is usually not set yet at that point, so it no-ops
+  and you run restore_private.sh by hand once the private directory is there.
+
 
 Things done on fresh Debian install:
 
@@ -53,17 +95,13 @@ sections to /etc/apt/sources.list.d/debian.sources
 e.g. ubuntu fonts are there (fonts-ubuntu), without them terminator & emacs
 will complain.
 
-configure dropbox:
-cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf -
-~/.dropbox-dist/dropboxd
-mkdir -p ~/opt/bin/ && cd ~/opt/bin
-wget 'https://www.dropbox.com/download?dl=packages/dropbox.py' -O dropbox.py && chmod +x dropbox.py
-export CONFPATH=~/Dropbox/configs
-or point CONFPATH to dir with cloned repo, e.g.
-git clone https://github.com/arssher/conf.git
-cd conf
-Look through and manually run things from bootstrap.sh (mostly restore of
-all configs & install packages).
+Install chezmoi and lay down the dotfiles:
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin
+chezmoi init --ssh --apply arssher/conf
+
+Then set up whatever syncs the private directory, point CONFPATH at it, and
+run restore_private.sh. Look through and manually run things from
+bootstrap/bootstrap.sh for the packages.
 
 Optionally sync home from old machine:
 ssh-copy-id -f -i ~/.ssh/id_ed25519.pub ars@newmachine
@@ -89,14 +127,19 @@ sudo apt-get install gnutls-dev checkinstall
 build and install emacs:
 install_emacs.sh
 
-Important root configs:
-fstab (restoring not scripted)
+Important root configs (restore_root.sh handles the first two, see its notes):
 /etc/NetworkManager/system-connections/
 openvpn
+fstab (deliberately not restored -- the UUIDs are machine-specific)
 
-Important home configs not saved here:
-dropbox
+Important home configs not saved anywhere:
+the sync client's own config
 firefox/chrome
+
+The GNOME app launcher does not read .bashrc. To put a directory on the PATH
+of graphical sessions use ~/.config/environment.d/, which the systemd user
+session reads and which also works under wayland, where .profile is not
+sourced at all. See dot_config/environment.d/.
 
 
 How to play midi:

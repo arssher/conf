@@ -3,13 +3,19 @@
 set -e
 
 sudo apt-get update
-# restore_xbindkeys needs it
+# the xbindkeys reload hook needs it
 sudo apt-get install xbindkeys
 
-# restore conf
-export CONFPATH=$(pwd)
-bash/.bash_scripts/bin/restore_all.sh
+# lay down the dotfiles
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin
+chezmoi init --ssh --apply arssher/conf
 source ~/.bashrc
+
+# Secrets, history and work-specific scripts are not in the repo. Once whatever
+# syncs the private directory is up and CONFPATH points at it:
+#   restore_private.sh          $HOME bits
+#   restore_root.sh             root-owned config, needs sudo
+#   restore_de.sh               desktop settings dump
 
 sudo apt-get install emacs python3-pip python3-venv
 
