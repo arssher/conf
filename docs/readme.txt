@@ -73,22 +73,14 @@ Things that are easy to get wrong:
 
 Content kept outside this repo:
 
-  Secrets, ssh client config, shell and psql history, the desktop settings
-  dump, and work-specific scripts live in a separate private directory, not in
-  git. $CONFPATH in .bashrc points at it, and it has its own readme.
+  A separate private directory holds what does not belong in git here.
+  $CONFPATH in .bashrc points at it, and it documents itself.
 
-  The scripts that move things between there and the machine are in
-  .bash_scripts/bin: restore_private.sh and backup_private.sh for $HOME,
-  restore_root.sh and backup_root.sh for root-owned config, restore_de.sh and
-  backup_de.sh for the desktop settings dump.
-
-  restore_private.sh is fill-in-only: it never overwrites an existing file, and
-  it sets modes itself rather than copying them from the source. Pushing the
-  other way is backup_private.sh, which does overwrite, deliberately.
-
-  chezmoi runs restore_private.sh once on first apply, via .chezmoiscripts. On
-  a new machine $CONFPATH is usually not set yet at that point, so it no-ops
-  and you run restore_private.sh by hand once the private directory is there.
+  The restore_* and backup_* names in .bash_scripts/bin are symlinks to
+  private-dispatch.sh, which execs the real script of the same name from
+  $CONFPATH/bin. They exit with a message if that directory is not on this
+  machine. chezmoi also runs restore_private.sh once on first apply, via
+  .chezmoiscripts.
 
 
 Things done on fresh Debian install:
