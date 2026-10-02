@@ -106,7 +106,7 @@ chezmoi init --ssh --apply arssher/conf
 
 Then set up whatever syncs the private directory, point CONFPATH at it, and
 run restore_private.sh. Look through and manually run things from
-bootstrap/bootstrap.sh for the packages.
+bootstrap.sh for the packages.
 
 Optionally sync home from old machine:
 ssh-copy-id -f -i ~/.ssh/id_ed25519.pub ars@newmachine

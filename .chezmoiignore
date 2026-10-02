@@ -4,10 +4,11 @@
 # Writing "dot_bash_scripts/archive" would match nothing and the archive would
 # get applied into ~/.bash_scripts/archive.
 
-# Repo-only directories: docs, the bootstrap scripts, and the vscode settings
+# Repo-only content: the readme, the bootstrap scripts, and the vscode settings
 # backup (kept in git for paranoia; vscode normally syncs via the GH account).
-docs
-bootstrap
+readme.txt
+bootstrap.sh
+bootstrap.yml
 vscode
 
 # Scripts parked for review. Tracked in git, never applied to $HOME.
