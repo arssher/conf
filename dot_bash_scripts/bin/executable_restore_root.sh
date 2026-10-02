@@ -34,7 +34,10 @@ if [ -d "${conns}" ]; then
     for src in "${conns}"/*; do
         [ -f "${src}" ] || continue
         dest="/etc/NetworkManager/system-connections/$(basename "${src}")"
-        if [ -e "${dest}" ]; then
+        # Tested under sudo on purpose: these directories are 0700 root:root on
+        # some systems, where an unprivileged [ -e ] reports "absent" for a file
+        # that exists and the guard below would silently clobber a live profile.
+        if sudo test -e "${dest}"; then
             echo "  == $(basename "${src}") exists, left alone"
             continue
         fi
@@ -50,7 +53,7 @@ if [ -d "${stash}/openvpn" ]; then
     for src in "${stash}"/openvpn/*; do
         [ -f "${src}" ] || continue
         dest="/etc/openvpn/$(basename "${src}")"
-        if [ -e "${dest}" ]; then
+        if sudo test -e "${dest}"; then
             echo "  == $(basename "${src}") exists, left alone"
             continue
         fi

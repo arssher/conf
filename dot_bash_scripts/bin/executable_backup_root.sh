@@ -35,8 +35,14 @@ if [ -d /etc/openvpn ]; then
 fi
 
 # Kept for reference only; restore_root.sh deliberately will not install it,
-# since the UUIDs name this machine's filesystems.
-sudo install -m 600 -o "$(id -u)" -g "$(id -g)" /etc/fstab "${stash}/fstab"
-echo "  -> fstab (reference only)"
+# since the UUIDs name this machine's filesystems. Guarded because set -e would
+# otherwise abort the whole run on a system that has no /etc/fstab, such as a
+# container -- and abort it *after* the real work above had already succeeded.
+if sudo test -f /etc/fstab; then
+    sudo install -m 600 -o "$(id -u)" -g "$(id -g)" /etc/fstab "${stash}/fstab"
+    echo "  -> fstab (reference only)"
+else
+    echo "  -- no /etc/fstab, skipped"
+fi
 
 echo "backup_root: done"
