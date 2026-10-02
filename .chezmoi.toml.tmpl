@@ -1,12 +1,15 @@
 # chezmoi's own configuration. `chezmoi init` renders this to
-# ~/.config/chezmoi/chezmoi.toml, so a fresh machine gets it automatically.
+# ~/.config/chezmoi/chezmoi.toml, so every machine gets it automatically.
 
 # chezmoi derives file modes from the umask rather than recording them, because
-# git stores only the executable bit. This machine's login umask is 0002, which
-# would make every managed file group-writable -- 0775 for commands, 0664 for
-# plain files. 0022 gives the conventional 0755 and 0644 instead.
+# git stores only the executable bit. Pinning the umask here is what makes modes
+# reproducible: otherwise one source tree yields different permissions per host,
+# according to whatever umask policy that host happens to set. Debian with
+# USERGROUPS_ENAB uses 0002 and would make everything group-writable (0775/0664);
+# macOS defaults to 0022. Pinning 0022 gives the conventional 0755 for commands
+# and 0644 for plain files everywhere, and matches what macOS does natively.
 #
 # ~/.config is handled separately: its source dir carries the private_ attribute,
 # which strips group and world bits regardless of this umask, keeping the
-# directory at 0700 as the XDG convention (and .local and .cache here) expect.
+# directory at 0700 as the XDG convention (and ~/.local and ~/.cache) expect.
 umask = 0o022
