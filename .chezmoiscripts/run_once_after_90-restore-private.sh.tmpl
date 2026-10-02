@@ -14,10 +14,23 @@
 # during `chezmoi init --apply`, so this almost always no-ops on a new box. That
 # is intended, not a bug to work around: guessing the stash location here would
 # hardcode it into the repo.
+#
+# The destination is taken from chezmoi, not from the ambient $HOME, and is
+# passed down to restore_private.sh. This matters: the script writes everything
+# relative to $HOME, so under `chezmoi apply --destination elsewhere` an
+# $HOME-based hook runs the wrong copy of the script and writes to the real home
+# instead of the destination. Found the hard way -- a rehearsal apply into a
+# temp directory clobbered live files in $HOME.
 
 set -euo pipefail
 
-restore="${HOME}/.bash_scripts/bin/restore_private.sh"
+dest="{{ .chezmoi.destDir }}"
+restore="${dest}/.bash_scripts/bin/restore_private.sh"
+
+if [ "${dest}" != "${HOME}" ]; then
+    echo "private config: destination ${dest} is not \$HOME (${HOME})."
+    echo "private config: running against ${dest}, not the real home."
+fi
 
 if [ -z "${CONFPATH:-}" ]; then
     echo "private config: CONFPATH unset, skipping."
@@ -36,4 +49,4 @@ if [ ! -x "${restore}" ]; then
     exit 0
 fi
 
-exec "${restore}"
+exec env HOME="${dest}" "${restore}"
