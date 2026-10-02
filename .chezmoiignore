@@ -16,3 +16,11 @@ vscode
 
 # Machine-local Claude Code permission overrides.
 .claude
+
+# TEMPORARY. The old bash/ source dir still holds gitignored leftovers that
+# Step 2 did not move: gtags output, the 34MB .venv-lyrics/ and a .claude
+# settings file. All five already exist in the live ~/.bash_scripts, so they
+# are duplicates awaiting deletion. chezmoi reads the filesystem rather than
+# git, so without this line it would happily apply them to ~/bash/.
+# Delete bash/ and this entry together.
+bash

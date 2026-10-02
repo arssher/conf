@@ -226,12 +226,6 @@ if [ -f /usr/local/bin/virtualenvwrapper.sh ]; then
       source /usr/local/bin/virtualenvwrapper.sh
 fi
 
-# usage: neks dev-eu-west
-# or better just create aliases
-function neks {
-    kubectx $(kubectx | grep $1)
-}
-
 # quickly switch pg currently in use by outraging PATH
 # $1 is installation name
 # If $2 is given, it is the source name (under ~/postgres/);
