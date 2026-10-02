@@ -27,11 +27,6 @@ cautious order, and the diff is worth reading the first time.
 --ssh makes it guess git@github.com:... rather than an https URL, which is
 what you want if you also push from the machine.
 
-Note that apply and update take an --init flag too, and it means something
-else: re-render the config file from .chezmoi.toml.tmpl. That is what clears
-"warning: config file template has changed, run chezmoi init" after the
-template is edited.
-
 
 Source naming:
 
