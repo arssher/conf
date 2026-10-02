@@ -1,0 +1,16 @@
+# External content chezmoi fetches rather than storing in this repo.
+# Keys are TARGET paths, relative to $HOME, same convention as .chezmoiignore.
+
+# tpm, the tmux plugin manager. The last line of dot_tmux.conf runs
+# ~/.tmux/plugins/tpm/tpm, so it has to exist before tmux starts.
+#
+# Replaces the hand-rolled `git clone` in restore_tmux.sh, which only cloned
+# when ~/.tmux was missing entirely and never updated it afterwards.
+#
+# The plugins tpm itself manages -- tmux-resurrect, tmux-copycat, tmux-yank,
+# all declared in dot_tmux.conf -- are still installed from inside tmux with
+# prefix + I. Only tpm is bootstrapped here.
+[".tmux/plugins/tpm"]
+    type = "git-repo"
+    url = "https://github.com/tmux-plugins/tpm.git"
+    refreshPeriod = "168h"

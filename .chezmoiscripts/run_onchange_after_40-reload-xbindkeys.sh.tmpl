@@ -1,0 +1,27 @@
+#!/bin/bash
+#
+# Make a running xbindkeys pick up a changed ~/.xbindkeysrc.
+#
+# This replaces the tail of restore_xbindkeys.sh. That script ran `xbindkeys -p`
+# after copying the config, but -p/--poll-rc *starts a new instance* in polling
+# mode rather than reloading the existing one, so repeated runs stacked up
+# duplicate daemons. SIGHUP is what makes xbindkeys reread its config.
+#
+# Starting xbindkeys is deliberately not done here: on a fresh machine this runs
+# during `chezmoi init --apply`, quite possibly with no X display at all.
+# Launching it is the desktop session's job; this only reloads what is running.
+#
+# The hash below is what makes chezmoi re-run the script: run_onchange_ scripts
+# execute whenever their own content changes, so embedding the config's hash ties
+# the two together.
+#
+# .xbindkeysrc hash: {{ include "dot_xbindkeysrc" | sha256sum }}
+
+set -e
+
+command -v xbindkeys >/dev/null 2>&1 || exit 0
+
+if pgrep -x xbindkeys >/dev/null 2>&1; then
+    echo "reloading xbindkeys"
+    pkill -HUP -x xbindkeys
+fi
