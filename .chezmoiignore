@@ -16,3 +16,12 @@ vscode
 
 # Machine-local Claude Code permission overrides.
 .claude
+
+# Stashes kept outside this repo. They are gitignored, but chezmoi reads the
+# filesystem rather than git, so without these lines `chezmoi apply` copies them
+# into ~/private/ and ~/etc/, where nothing reads them.
+# restore_private.sh is what puts their content in the right places.
+private
+private/**
+etc
+etc/**
