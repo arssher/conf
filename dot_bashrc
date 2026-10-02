@@ -112,7 +112,12 @@ fi
 # shell/psql history, dconf dump, /etc bits. See restore_private.sh.
 export CONFPATH=~/Dropbox/configs
 
-PATH=$PATH:~/.bash_scripts/bin # TODO: perhaps check if it is already added?
+# Appended only if absent: .bashrc is sourced by every interactive bash, and an
+# unconditional append grows PATH with shell depth. Same shape as .cargo/env.
+case ":${PATH}:" in
+    *:"$HOME/.bash_scripts/bin":*) ;;
+    *) PATH="$PATH:$HOME/.bash_scripts/bin" ;;
+esac
 export LC_ALL="en_US.UTF-8"
 
 
