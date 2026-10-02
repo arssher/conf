@@ -1,0 +1,70 @@
+#!/bin/bash
+#
+# Install root-owned config from the stash at $CONFPATH/etc. Needs sudo, so it is
+# always run by hand -- this is the half that was split out of
+# restore_private.sh, which chezmoi runs non-interactively where a password
+# prompt would hang.
+#
+# Fill-in-only like its sibling: an existing file on the machine wins, because a
+# live NetworkManager connection or fstab is more likely to be right than a
+# stashed copy of unknown age.
+
+set -euo pipefail
+
+if [ -z "${CONFPATH:-}" ]; then
+    echo "restore_root: CONFPATH is unset, nothing to restore from" >&2
+    exit 1
+fi
+
+stash="${CONFPATH}/etc"
+
+if [ ! -d "${stash}" ]; then
+    echo "restore_root: no stash at ${stash}, nothing to do"
+    exit 0
+fi
+
+echo "restore_root: this needs sudo"
+
+# NetworkManager refuses to load a connection profile that is group- or
+# world-readable, so 0600 root:root is mandatory, not just tidy.
+conns="${stash}/NetworkManager/system-connections"
+if [ -d "${conns}" ]; then
+    echo "restore_root: NetworkManager connections"
+    sudo install -d -m 755 -o root -g root /etc/NetworkManager/system-connections
+    for src in "${conns}"/*; do
+        [ -f "${src}" ] || continue
+        dest="/etc/NetworkManager/system-connections/$(basename "${src}")"
+        if [ -e "${dest}" ]; then
+            echo "  == $(basename "${src}") exists, left alone"
+            continue
+        fi
+        sudo install -m 600 -o root -g root "${src}" "${dest}"
+        echo "  -> $(basename "${src}")"
+    done
+fi
+
+# openvpn configs sit next to their key material, so 0600 again.
+if [ -d "${stash}/openvpn" ]; then
+    echo "restore_root: openvpn"
+    sudo install -d -m 755 -o root -g root /etc/openvpn
+    for src in "${stash}"/openvpn/*; do
+        [ -f "${src}" ] || continue
+        dest="/etc/openvpn/$(basename "${src}")"
+        if [ -e "${dest}" ]; then
+            echo "  == $(basename "${src}") exists, left alone"
+            continue
+        fi
+        sudo install -m 600 -o root -g root "${src}" "${dest}"
+        echo "  -> $(basename "${src}")"
+    done
+fi
+
+# fstab is deliberately not restored: it names this machine's filesystems by
+# UUID, so a stashed copy from another box is wrong by construction. Read
+# ${stash}/fstab and merge the interesting lines by hand.
+if [ -f "${stash}/fstab" ]; then
+    echo "restore_root: NOT restoring fstab -- UUIDs are machine-specific."
+    echo "              compare by hand: diff ${stash}/fstab /etc/fstab"
+fi
+
+echo "restore_root: done"
