@@ -1,6 +1,41 @@
-# ~/.profile: executed by the command interpreter for login shells.
-# This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
-# exists.
+# ~/.profile -- read once per login session, not per shell.
+#
+# Who reads this file, and how it gets here:
+#
+#   login shell: console, `bash -l`, `ssh host`, Terminal.app on macOS
+#       /etc/profile (which sources /etc/bash.bashrc) -> then the FIRST of
+#       ~/.bash_profile, ~/.bash_login, ~/.profile. This file is read only
+#       because neither of the other two exists. Creating either one shadows
+#       this file completely and silently -- no error, the PATH additions below
+#       simply stop happening.
+#
+#   the X11 desktop session, but it does not get far
+#       /etc/gdm3/Xsession does source /etc/profile and then this file before
+#       starting the session. It does NOT follow that GUI programs see any of
+#       it: GNOME runs under systemd --user even on X11, and apps launched from
+#       the shell inherit the systemd user environment instead. Checked on this
+#       machine -- gnome-shell's PATH is byte-identical to
+#       `systemctl --user show-environment`, and neither it nor xbindkeys has
+#       CONFPATH, LC_ALL, EDITOR, LESS or GOPATH set. So do not put anything
+#       here expecting a GUI program to see it; use ~/.config/environment.d/.
+#
+#   a login `sh` (dash on Debian)
+#       also reads it, which is why nothing here may use bashisms. Keep it
+#       POSIX: `[ ]` not `[[ ]]`, no arrays, no `source`.
+#
+# Who does NOT read this file:
+#
+#   new terminal tab, `bash`, `su`     ~/.bashrc only.
+#   `ssh host 'some command'`          ~/.bashrc only -- bash reads it there
+#                                      because stdin is a socket.
+#   `bash script.sh`, `bash -c ...`    only $BASH_ENV, if set.
+#   the systemd user session            GNOME, the app launcher and user services
+#                                      take their environment from
+#                                      ~/.config/environment.d/ instead -- on
+#                                      X11 as well as Wayland, see above.
+#
+# Note it sources ~/.bashrc itself, below, so a login bash ends up running both.
+#
 # see /usr/share/doc/bash/examples/startup-files for examples.
 # the files are located in the bash-doc package.
 
