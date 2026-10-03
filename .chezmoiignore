@@ -28,3 +28,16 @@ private
 private/**
 etc
 etc/**
+
+# Linux-only targets, skipped on macOS. This file is always treated as a
+# template, so no .tmpl suffix -- adding one would stop it being read at all.
+# .xbindkeysrc is X11; terminator is a Linux GTK terminal; environment.d is a
+# systemd user-session mechanism and macOS has no systemd.
+# Not excluded on purpose: dot_gdbinit/dot_gdb/ (gdb installs via brew, and the
+# content is postgres pretty-printers), and the xbindkeys hook, which already
+# self-guards on `command -v xbindkeys`.
+{{ if eq .chezmoi.os "darwin" }}
+.xbindkeysrc
+.config/terminator
+.config/environment.d
+{{ end }}
