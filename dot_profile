@@ -18,6 +18,8 @@
 #       `systemctl --user show-environment`, and neither it nor xbindkeys has
 #       CONFPATH, LC_ALL, EDITOR, LESS or GOPATH set. So do not put anything
 #       here expecting a GUI program to see it; use ~/.config/environment.d/.
+#       This is also why ~/.global_vars is deliberately not sourced here: it
+#       would reach the Xsession shell and nothing the desktop actually runs.
 #
 #   a login `sh` (dash on Debian)
 #       also reads it, which is why nothing here may use bashisms. Keep it
