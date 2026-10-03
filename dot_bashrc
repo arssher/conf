@@ -25,9 +25,36 @@
 # Everything above the `case $- in *i*)` guard below therefore runs in all three
 # shell cases; everything after it only in interactive ones.
 
-# do this before we exit in non-interactive shells!
+# ===========================================================================
+# PART 1 -- runs in EVERY shell, interactive or not.
+#
+# Only things a non-interactive shell genuinely needs belong here: environment
+# that a remote command or a script would miss otherwise. Nothing that writes to
+# the terminal, and nothing that only makes sense at a prompt.
+# ===========================================================================
+
 if [ -f ~/.global_vars ]; then
       source ~/.global_vars
+fi
+
+export LC_ALL="en_US.UTF-8"
+
+# use emacs as an editor everywhere
+export VISUAL=emacs
+export EDITOR="$VISUAL"
+
+# always dump core, including from something started remotely
+ulimit -c unlimited
+
+# toolchains, for the PATH they add
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+if [ -f "$HOME/.cargo/env" ]; then
+    . "$HOME/.cargo/env"
+fi
+if [ -f "$HOME/.deno/env" ]; then
+    . "$HOME/.deno/env"
 fi
 
 # ------------------------------------------------------------
@@ -37,6 +64,22 @@ fi
 case $- in
     *i*) ;;
       *) return;;
+esac
+
+# ===========================================================================
+# PART 2 -- interactive shells only. Everything below this point is skipped by
+# the return above, so a script or a remote command never sees any of it.
+# ===========================================================================
+
+# Private conf not kept in the public dotfiles repo: secrets, ssh config,
+# shell/psql history, dconf dump, /etc bits. See restore_private.sh.
+export CONFPATH=~/Dropbox/configs
+
+# Appended only if absent: .bashrc is sourced by every interactive bash, and an
+# unconditional append grows PATH with shell depth. Same shape as .cargo/env.
+case ":${PATH}:" in
+    *:"$HOME/.bash_scripts/bin":*) ;;
+    *) PATH="$PATH:$HOME/.bash_scripts/bin" ;;
 esac
 
 # check the window size after each command and, if necessary,
@@ -141,17 +184,6 @@ fi
 # pwd:
 
 
-# Private conf not kept in the public dotfiles repo: secrets, ssh config,
-# shell/psql history, dconf dump, /etc bits. See restore_private.sh.
-export CONFPATH=~/Dropbox/configs
-
-# Appended only if absent: .bashrc is sourced by every interactive bash, and an
-# unconditional append grows PATH with shell depth. Same shape as .cargo/env.
-case ":${PATH}:" in
-    *:"$HOME/.bash_scripts/bin":*) ;;
-    *) PATH="$PATH:$HOME/.bash_scripts/bin" ;;
-esac
-export LC_ALL="en_US.UTF-8"
 
 
 # aliases.sh lives in the private Dropbox stash, not in the public repo, so
@@ -210,9 +242,6 @@ log_bash_persistent_history()
 }
 PROMPT_COMMAND="log_bash_persistent_history; $PROMPT_COMMAND"
 
-# use emacs as an editor everywhere
-export VISUAL=emacs
-export EDITOR="$VISUAL"
 
 # Set options for less.
 # https://www.topbug.net/blog/2016/09/27/make-gnu-less-more-powerful/
@@ -240,8 +269,6 @@ fi;
 # logger "setting altgr -> ctrl"
 # DISPLAY=:0 XDG_RUNTIME_DIR=/run/user/$(id -u) setxkbmap -option ctrl:ralt_rctrl
 
-# always dump core
-ulimit -c unlimited
 
 
 # k8s autocompletion
@@ -311,16 +338,7 @@ function stophp {
 # https://unix.stackexchange.com/questions/12107/how-to-unfreeze-after-accidentally-pressing-ctrl-s-in-a-terminal
 stty -ixon -ixoff
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 if [ -f "$HOME/.bash_scripts/utils.sh" ]; then
     source "$HOME/.bash_scripts/utils.sh"
-fi
-if [ -f "$HOME/.cargo/env" ]; then
-    . "$HOME/.cargo/env"
-fi
-if [ -f "$HOME/.deno/env" ]; then
-    . "$HOME/.deno/env"
 fi
