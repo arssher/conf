@@ -6,14 +6,17 @@
 # stacked in each key cell, a board for the navigation cluster, and a section
 # per prefix key for what no board can hold.
 #
-# Usage: ./draw-kbd.sh [--txt] [--ergo] [layout]      (default layout: us)
-#   --txt   also write <layout>.txt, the same boards in box-drawing characters
-#   --ergo  also draw ergoemacs-mode's own sheets, which look better and say
-#           less: four layers per key and no boxes for the arrows
+# Usage: ./draw-kbd.sh [--txt] [--ergo] [--scale N] [layout]   (default: us)
+#   --txt      also write <layout>.txt, the same boards in box-drawing characters
+#   --ergo     also draw ergoemacs-mode's own sheets, which look better and say
+#              less: four layers per key and no boxes for the arrows
+#   --scale N  how many PNG pixels per SVG unit (default 2). The SVG is vector
+#              and unaffected; this only sets how crisp the PNG is.
 #
 # Env:   ERGOEMACS_SRC  checkout of ergoemacs-mode   (default ~/dev/ergoemacs-mode)
 #        KBD_OUT        output directory             (default this directory)
 #        KBD_INIT       init file to draw            (default ~/.emacs.d/init.el)
+#        KBD_SCALE      same as --scale
 
 set -eu
 
@@ -22,14 +25,24 @@ here=$(cd "$(dirname "$0")" && pwd)
 : "${KBD_OUT:=$here}"
 
 ergo=
+: "${KBD_SCALE:=2}"
+scale=$KBD_SCALE
 while [ $# -gt 0 ]; do
     case $1 in
-        --txt)  export KBD_TXT=1;  shift ;;
-        --ergo) export KBD_ERGO=1; ergo=1; shift ;;
-        --*)    echo "draw-kbd: unknown option $1" >&2; exit 2 ;;
-        *)      break ;;
+        --txt)   export KBD_TXT=1;  shift ;;
+        --ergo)  export KBD_ERGO=1; ergo=1; shift ;;
+        --scale) scale=${2:-}; shift 2 ;;
+        --*)     echo "draw-kbd: unknown option $1" >&2; exit 2 ;;
+        *)       break ;;
     esac
 done
+
+case $scale in
+    ''|*[!0-9]*) echo "draw-kbd: --scale wants a positive integer, got '$scale'" >&2
+                 exit 2 ;;
+    0)           echo "draw-kbd: --scale 0 makes no picture" >&2; exit 2 ;;
+esac
+dpi=$((96 * scale))
 layout=${1:-us}
 
 export ERGOEMACS_SRC KBD_OUT
@@ -60,22 +73,26 @@ rasterise() {
     _h=$(sed -n 's/.*[^-]height="\([0-9.]*\)".*/\1/p' "$_svg" | head -1 | cut -d. -f1)
     : "${_w:=1600}" "${_h:=1200}"
 
+    # Each of these takes the scale differently: inkscape and convert as dots
+    # per inch against the SVG's nominal 96, rsvg-convert as a zoom, and
+    # chromium as a device pixel ratio over a window still sized in CSS pixels.
     if command -v inkscape >/dev/null 2>&1; then
-        inkscape "$_svg" -o "$_png"
+        inkscape "$_svg" -d "$dpi" -o "$_png"
     elif command -v rsvg-convert >/dev/null 2>&1; then
-        rsvg-convert -o "$_png" "$_svg"
+        rsvg-convert -z "$scale" -o "$_png" "$_svg"
     elif command -v chromium >/dev/null 2>&1 || command -v google-chrome >/dev/null 2>&1; then
         _browser=$(command -v chromium || command -v google-chrome)
         "$_browser" --headless --disable-gpu --hide-scrollbars \
+                    --force-device-scale-factor="$scale" \
                     --default-background-color=FFFFFFFF \
                     --window-size="$_w,$_h" --screenshot="$_png" "file://$_svg" 2>/dev/null
     elif command -v convert >/dev/null 2>&1; then
-        convert -density 150 -background white "$_svg" "$_png"
+        convert -density "$dpi" -background white "$_svg" "$_png"
     else
         echo "draw-kbd: no SVG rasteriser found, leaving $_svg unconverted" >&2
         return 0
     fi
-    echo "draw-kbd: wrote $_svg and $_png"
+    echo "draw-kbd: wrote $_svg and $_png ($((_w * scale))x$((_h * scale)))"
 }
 
 rasterise "$svg"

@@ -9,6 +9,7 @@ Draws the bindings from `~/.emacs.d/init.el` as one picture.
 ./draw-kbd.sh dvorak           # any layout name from ergoemacs-layouts.el
 ./draw-kbd.sh --txt            # also us.txt, the same boards in box characters
 ./draw-kbd.sh --ergo           # also ergoemacs-mode's own sheets
+./draw-kbd.sh --scale 4        # a crisper PNG (default 2)
 ```
 
 | Variable        | Default                | Meaning                         |
@@ -16,6 +17,7 @@ Draws the bindings from `~/.emacs.d/init.el` as one picture.
 | `ERGOEMACS_SRC` | `~/dev/ergoemacs-mode` | checkout supplying the layouts  |
 | `KBD_OUT`       | this directory         | where the output lands          |
 | `KBD_INIT`      | `~/.emacs.d/init.el`   | the init file to draw           |
+| `KBD_SCALE`     | `2`                    | PNG pixels per SVG unit         |
 
 The checkout is the only prerequisite: `git clone
 https://github.com/ergoemacs/ergoemacs-mode ~/dev/ergoemacs-mode`.  Nothing
@@ -34,8 +36,13 @@ would replace the very bindings we are trying to draw.
 - a section per prefix key for what no board can hold, packed into shelves
   across the width rather than run down the page,
 
-and `us.png`, the same thing rasterised by whichever of inkscape,
-rsvg-convert, headless chromium or ImageMagick `convert` is installed.
+and `us.png`, the same thing rasterised at `--scale` pixels per SVG unit — 2
+by default, so 3128x1536 — by whichever of inkscape, rsvg-convert, headless
+chromium or ImageMagick `convert` is installed.  Each takes the scale
+differently: inkscape and `convert` as dots per inch against the SVG's nominal
+96, rsvg-convert as a zoom, chromium as a device pixel ratio over a window
+still sized in CSS pixels.  The SVG is vector and unaffected; only the PNG has
+a resolution at all.
 
 Each cell row is coloured by its modifier, following the ergoemacs picture:
 blue Alt, red Alt+Shift, green Ctrl, magenta Ctrl+Shift, brown Ctrl+Alt.  A
