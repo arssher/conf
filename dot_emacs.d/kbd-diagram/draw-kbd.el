@@ -291,7 +291,7 @@ Alt binding reads back as a two-key sequence."
 (defvar draw-kbd-svg-font "'DejaVu Sans Mono','Liberation Mono',monospace"
   "Cells are monospace so that truncating by character count is honest.")
 
-(defvar draw-kbd-svg-font-size 13
+(defvar draw-kbd-svg-font-size 14
   "Cell text size.  Everything else on the picture is derived from it, so this
 is the one knob for how big the whole thing comes out.")
 
