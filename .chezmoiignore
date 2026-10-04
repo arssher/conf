@@ -4,9 +4,12 @@
 # Writing "dot_bash_scripts/archive" would match nothing and the archive would
 # get applied into ~/.bash_scripts/archive.
 
-# Repo-only content: the readme, the bootstrap scripts, and the vscode settings
-# backup (kept in git for paranoia; vscode normally syncs via the GH account).
+# Repo-only content: the readme, the notes for Claude Code (~/.claude/CLAUDE.md
+# is the one that belongs in $HOME, and it is managed under private_dot_claude),
+# the bootstrap scripts, and the vscode settings backup (kept in git for
+# paranoia; vscode normally syncs via the GH account).
 readme.txt
+CLAUDE.md
 bootstrap.sh
 bootstrap.yml
 vscode
