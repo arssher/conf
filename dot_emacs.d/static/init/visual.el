@@ -7,7 +7,7 @@
 ;; Windows and frames
 
 (require 'ars-visual)
-;; (load "ars-windows-frames-funcs.el") ;; for debugging
+;; (load "ars-visual.el") ;; for debugging
 ;; (ars-frame-fullscreen)
 ;; (ars-frame-maximized)
 
