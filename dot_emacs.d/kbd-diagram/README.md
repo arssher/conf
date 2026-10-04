@@ -31,8 +31,8 @@ Two pictures:
 
 | File            | Keyboard                                              |
 |-----------------|-------------------------------------------------------|
-| `us.svg`        | the main block alone, about 1970x1190                 |
-| `us_full.svg`   | plus Print, Ins/Home/PgUp, Del/End/PgDn, arrows; 2530x1080 |
+| `us.svg`        | the main block alone, about 2260x1340                 |
+| `us_full.svg`   | plus Print, Ins/Home/PgUp, Del/End/PgDn, arrows; 2910x1215 |
 
 The right-hand cluster is wide and rarely interesting, so it is off by default.
 Nothing is lost by that: whatever is bound on those keys is listed under the
@@ -48,7 +48,7 @@ Each holds:
   rather than run down the page,
 
 and a PNG of each, rasterised at `--scale` pixels per SVG unit — 2 by default,
-so 3946x2380 and 5066x2164 — by whichever of inkscape, rsvg-convert, headless
+so 4526x2670 and 5814x2430 — by whichever of inkscape, rsvg-convert, headless
 chromium or ImageMagick `convert` is installed.  Each takes the scale
 differently: inkscape and `convert` as dots per inch against the SVG's nominal
 96, rsvg-convert as a zoom, chromium as a device pixel ratio over a window
