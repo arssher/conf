@@ -17,9 +17,9 @@
 ;;
 ;;   draw-kbd-svg    the default; writes <layout>.svg
 ;;   draw-kbd-ascii  --txt; the same boards in box-drawing characters
-;;   draw-kbd-ergo   --ergo; ergoemacs-mode's own SVG template, which looks
-;;                   better and says less -- four layers per key, no boxes for
-;;                   the arrows
+;;   draw-kbd-ergo   --ergo; ergoemacs-mode's own SVG template, whose look the
+;;                   default backend borrows but which says less -- four layers
+;;                   per key, no boxes for the arrows
 
 ;;; Code:
 
@@ -265,7 +265,9 @@ side in one row at the same height."
 (defun draw-kbd--pack (blocks avail gap-x gap-y)
   "Lay BLOCKS out in columns no wider than AVAIL.
 Each block is (WIDTH HEIGHT . PAYLOAD).  Returns (PLACED TOTAL-W TOTAL-H),
-where PLACED is a list of (X Y . PAYLOAD).
+where PLACED is a list of (X Y W H . PAYLOAD).  W is the width of the column
+the block landed in rather than the block's own, so that a backend which draws
+a box around a block gets boxes that line up down a column.
 
 Every column count is tried and the shortest layout that fits wins, which is
 what keeps one tall block from setting the height of a whole row: it gets a
@@ -304,7 +306,7 @@ so a prefix stays where you would look for it."
       (dolist (col (nth 0 best))
         (let ((y 0) (colw (apply #'max (mapcar #'car col))))
           (dolist (b col)
-            (push (cons x (cons y (cddr b))) placed)
+            (push (append (list x y colw (cadr b)) (cddr b)) placed)
             (setq y (+ y (cadr b) gap-y)))
           (setq x (+ x colw gap-x))))
       (list (nreverse placed) (nth 1 best) (nth 2 best)))))
@@ -368,11 +370,41 @@ is the one knob for how big the whole thing comes out.")
 (defvar draw-kbd-svg-gap-ratio 0.75
   "Space between neighbouring keys, as a multiple of the font size.")
 
+(defvar draw-kbd-svg-head-font "Helvetica,Arial,'DejaVu Sans',sans-serif"
+  "Font of the cap legend.  Proportional, unlike the rows below it: a cap
+legend is short, sits at a fixed spot and is never truncated, so nothing about
+it depends on counting characters.")
+
+(defvar draw-kbd-svg-head-ratio 1.2
+  "Cap legend size, as a multiple of `draw-kbd-svg-font-size'.  The ergoemacs
+picture draws the legend about this much larger than the rows under it, which
+is what makes a cell read as a key with writing on it rather than as a list.")
+
 (defvar draw-kbd-svg-stroke-ratio 0.14
   "Key border weight, as a multiple of the font size.")
 
-(defvar draw-kbd-svg-key-stroke "#5a5a5a" "Colour of a key's border.")
-(defvar draw-kbd-svg-key-fill "#fafafa" "Fill of a key.")
+(defvar draw-kbd-svg-radius-ratio 0.45
+  "Corner radius of a key, as a multiple of the font size.")
+
+(defvar draw-kbd-svg-shadow-ratio 0.16
+  "How far the slab under a key sticks out below and to its right, as a
+multiple of the font size.")
+
+(defvar draw-kbd-svg-key-stroke "#3b3b3b" "Colour of a key's border.")
+(defvar draw-kbd-svg-key-shadow "#9b9b9b"
+  "The slab a key sits on: the same shape nudged down and right.  Two flat
+rects rather than a blur, which is what the ergoemacs picture does and what
+every rasteriser can be relied on to draw the same way.")
+(defvar draw-kbd-svg-key-fill '("#ffffff" . "#d6d6d6")
+  "Top and bottom of the gradient down a keycap.")
+
+(defvar draw-kbd-svg-case-fill '("#f2f2f2" . "#cdcdcd")
+  "Top and bottom of the gradient down the case the keys sit in.")
+(defvar draw-kbd-svg-case-stroke "#8a8a8a" "Colour of the case's border.")
+
+(defvar draw-kbd-svg-panel-fill "#f7f7f7"
+  "Fill behind a prefix section, so it reads as part of the picture.")
+(defvar draw-kbd-svg-panel-stroke "#d8d8d8" "Colour of a section's border.")
 
 (defvar draw-kbd-svg-layer-colors
   '(("M"  . "#1a4b9c") ("MS" . "#b31a1a")
@@ -408,6 +440,30 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
   "Weight of a key's border."
   (max 1.0 (* draw-kbd-svg-font-size draw-kbd-svg-stroke-ratio)))
 
+(defun draw-kbd--svg-head-size ()
+  "Size of a cap legend."
+  (round (* draw-kbd-svg-font-size draw-kbd-svg-head-ratio)))
+
+(defun draw-kbd--svg-head-h ()
+  "Height the cap legend's line takes inside a cell."
+  (max (draw-kbd--svg-line-h) (round (* (draw-kbd--svg-head-size) 1.2))))
+
+(defun draw-kbd--svg-radius ()
+  "Corner radius of a key."
+  (max 2.0 (* draw-kbd-svg-font-size draw-kbd-svg-radius-ratio)))
+
+(defun draw-kbd--svg-shadow ()
+  "Offset of the slab under a key."
+  (max 1.0 (* draw-kbd-svg-font-size draw-kbd-svg-shadow-ratio)))
+
+(defun draw-kbd--svg-case-pad ()
+  "Margin between the outermost key and the edge of the case."
+  (draw-kbd--svg-key-gap))
+
+(defun draw-kbd--svg-panel-pad ()
+  "Margin between a prefix section's text and the edge of its panel."
+  (draw-kbd--svg-pad))
+
 (defun draw-kbd--svg-board-gap ()
   "Space between one board and the next."
   (* 2 (draw-kbd--svg-key-gap)))
@@ -421,48 +477,69 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
      (* (draw-kbd--svg-char-w) (+ 3 draw-kbd-svg-label-width))))
 
 (defun draw-kbd--svg-cell-h (layers)
-  (+ (* 2 (draw-kbd--svg-pad)) (* (draw-kbd--svg-line-h) (1+ (length layers)))))
+  (+ (* 2 (draw-kbd--svg-pad)) (draw-kbd--svg-head-h)
+     (* (draw-kbd--svg-line-h) (length layers))))
+
+(defun draw-kbd--svg-defs ()
+  "The two gradients, in `objectBoundingBox' units so that one definition
+serves every key whatever its size."
+  (cl-flet ((grad (id pair)
+              (format (concat "<linearGradient id=\"%s\" x1=\"0\" y1=\"0\""
+                              " x2=\"0\" y2=\"1\">"
+                              "<stop offset=\"0\" stop-color=\"%s\"/>"
+                              "<stop offset=\"1\" stop-color=\"%s\"/>"
+                              "</linearGradient>\n")
+                      id (car pair) (cdr pair))))
+    (concat "<defs>\n"
+            (grad "kbd-cap" draw-kbd-svg-key-fill)
+            (grad "kbd-case" draw-kbd-svg-case-fill)
+            "</defs>\n")))
 
 (defun draw-kbd--svg-cell (x y head rows layers)
   "One key cell at X,Y with cap legend HEAD and (TAG . LABEL) ROWS."
-  (let ((w (draw-kbd--svg-cell-w))
-        (h (draw-kbd--svg-cell-h layers))
-        (i 0))
+  (let* ((w (draw-kbd--svg-cell-w))
+         (h (draw-kbd--svg-cell-h layers))
+         (sw (draw-kbd--svg-stroke))
+         (r (draw-kbd--svg-radius))
+         (d (draw-kbd--svg-shadow))
+         (pad (draw-kbd--svg-pad))
+         (lh (draw-kbd--svg-line-h))
+         ;; Where the first row's baseline sits: under the cap legend's line.
+         (top (+ pad (draw-kbd--svg-head-h) draw-kbd-svg-font-size))
+         (i -1))
     (concat
      (format "<g transform=\"translate(%.1f,%.1f)\">" x y)
-     ;; Inset by half the stroke, or the border is clipped by the cell's edge.
-     (let ((sw (draw-kbd--svg-stroke)))
-       (format (concat "<rect x=\"%.2f\" y=\"%.2f\" width=\"%.1f\""
-                       " height=\"%.1f\" rx=\"4\" fill=\"%s\""
-                       " stroke=\"%s\" stroke-width=\"%.2f\"/>")
-               (/ sw 2) (/ sw 2) (- w sw) (- h sw)
-               draw-kbd-svg-key-fill draw-kbd-svg-key-stroke sw))
-     (format "<text x=\"%d\" y=\"%d\" font-weight=\"bold\" fill=\"#000\">%s</text>"
-             (draw-kbd--svg-pad) (+ (draw-kbd--svg-pad) draw-kbd-svg-font-size)
+     ;; The slab the cap sits on, then the cap.  Both inset by half the stroke,
+     ;; or the border is clipped by the cell's edge.
+     (format (concat "<rect x=\"%.2f\" y=\"%.2f\" width=\"%.1f\" height=\"%.1f\""
+                     " rx=\"%.1f\" fill=\"%s\"/>")
+             (+ (/ sw 2) d) (+ (/ sw 2) d) (- w sw) (- h sw) r
+             draw-kbd-svg-key-shadow)
+     (format (concat "<rect x=\"%.2f\" y=\"%.2f\" width=\"%.1f\""
+                     " height=\"%.1f\" rx=\"%.1f\" fill=\"url(#kbd-cap)\""
+                     " stroke=\"%s\" stroke-width=\"%.2f\"/>")
+             (/ sw 2) (/ sw 2) (- w sw) (- h sw) r
+             draw-kbd-svg-key-stroke sw)
+     (format (concat "<text x=\"%d\" y=\"%d\" font-family=\"%s\" font-size=\"%d\""
+                     " font-weight=\"bold\" fill=\"#000\">%s</text>")
+             pad (+ pad (draw-kbd--svg-head-size))
+             draw-kbd-svg-head-font (draw-kbd--svg-head-size)
              (draw-kbd--svg-esc head))
      (mapconcat
       (lambda (row)
         (setq i (1+ i))
         (let* ((tag (string-trim (car row)))
+               (base (+ top (* i lh)))
                (colour (or (cdr (assoc tag draw-kbd-svg-layer-colors)) "#222")))
-          (if (string= (cdr row) ""
-                       )
+          (if (string= (cdr row) "")
               ;; Nothing bound: just the tag, so the row still reads as a row.
               (format "<text x=\"%d\" y=\"%d\" fill=\"#bbb\">%s</text>"
-                      (draw-kbd--svg-pad)
-                      (+ (draw-kbd--svg-pad) draw-kbd-svg-font-size
-                         (* i (draw-kbd--svg-line-h)))
-                      (draw-kbd--svg-esc (car row)))
+                      pad base (draw-kbd--svg-esc (car row)))
             (concat
              (format "<text x=\"%d\" y=\"%d\" fill=\"#aaa\">%s</text>"
-                     (draw-kbd--svg-pad)
-                     (+ (draw-kbd--svg-pad) draw-kbd-svg-font-size
-                        (* i (draw-kbd--svg-line-h)))
-                     (draw-kbd--svg-esc (car row)))
+                     pad base (draw-kbd--svg-esc (car row)))
              (format "<text x=\"%.1f\" y=\"%d\" fill=\"%s\">%s</text>"
-                     (+ (draw-kbd--svg-pad) (* 3 (draw-kbd--svg-char-w)))
-                     (+ (draw-kbd--svg-pad) draw-kbd-svg-font-size
-                        (* i (draw-kbd--svg-line-h)))
+                     (+ pad (* 3 (draw-kbd--svg-char-w))) base
                      colour (draw-kbd--svg-esc (cdr row)))))))
       rows "")
      "</g>")))
@@ -479,13 +556,21 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
          ;; Clear of the heading and its subtitle, both sized from the font.
          (y (* draw-kbd-svg-font-size 4.2))
          (max-x 0)
-         body)
-    (let ((unit (+ w (draw-kbd--svg-key-gap))))
+         case-svg body)
+    ;; The keyboard, inside its case.  The case is one rect around every key,
+    ;; so it is drawn from the bounding box the rows turn out to have rather
+    ;; than from anything `draw-kbd--keyboard' has to say about it.
+    (let* ((unit (+ w (draw-kbd--svg-key-gap)))
+           (cpad (draw-kbd--svg-case-pad))
+           (case-y y)
+           (case-w 0)
+           (bottom y))
+      (setq y (+ y cpad))
       (cl-loop for row in (draw-kbd--keyboard layout full)
                for n from 0
                do (let ((row-h 0))
                     (dolist (seg row)
-                      (let ((x (* (car seg) unit)))
+                      (let ((x (+ cpad (* (car seg) unit))))
                         (dolist (cell (cdr seg))
                           (let ((layers (nth 3 cell)))
                             (push (draw-kbd--svg-cell
@@ -498,39 +583,64 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                             (setq row-h (max row-h (draw-kbd--svg-cell-h layers))
                                   x (+ x unit))))
                         ;; x has run past the last key of the segment by one gap.
-                        (setq max-x (max max-x (- x (draw-kbd--svg-key-gap))))))
+                        (setq case-w (max case-w (- x (draw-kbd--svg-key-gap))))))
+                    (setq bottom (+ y row-h))
                     ;; A real keyboard has a gap under the function row only.
-                    (setq y (+ y row-h (if (= n 0)
-                                           (draw-kbd--svg-board-gap)
-                                         (draw-kbd--svg-key-gap)))))))
+                    (setq y (+ bottom (if (= n 0)
+                                          (draw-kbd--svg-board-gap)
+                                        (draw-kbd--svg-key-gap))))))
+      ;; Room for the slab that sticks out past the rightmost and lowest keys.
+      (let ((sw (draw-kbd--svg-stroke))
+            (d (draw-kbd--svg-shadow)))
+        (setq case-w (+ case-w cpad d)
+              case-svg (format (concat "<rect x=\"%.2f\" y=\"%.2f\" width=\"%.1f\""
+                                       " height=\"%.1f\" rx=\"%.1f\""
+                                       " fill=\"url(#kbd-case)\" stroke=\"%s\""
+                                       " stroke-width=\"%.2f\"/>")
+                               (/ sw 2) (+ case-y (/ sw 2))
+                               (- case-w sw) (- (+ bottom cpad d) case-y sw)
+                               (* 1.5 (draw-kbd--svg-radius))
+                               draw-kbd-svg-case-stroke sw)
+              max-x (max max-x case-w)
+              y (max y (+ bottom cpad d)))))
     ;; Legend, then the prefix sections, then size the canvas to fit.
-    (let ((lx 0))
-      (setq y (+ y (draw-kbd--svg-board-gap)))
+    (let* ((cw (draw-kbd--svg-char-w))
+           (lh (draw-kbd--svg-line-h))
+           ;; Step by the widest entry rather than a fixed amount, so the row
+           ;; survives a bigger font.
+           (step (* cw (+ 7 (apply #'max
+                                   (mapcar (lambda (l)
+                                             (let ((tg (string-trim (car l))))
+                                               (length (or (cdr (assoc tg draw-kbd-layer-names))
+                                                           tg))))
+                                           draw-kbd-layers)))))
+           (lx 0))
+      (setq y (+ y (draw-kbd--svg-board-gap) lh))
       (dolist (layer draw-kbd-layers)
         (let* ((tag (string-trim (car layer)))
-               (name (or (cdr (assoc tag draw-kbd-layer-names)) tag)))
-          (push (format (concat "<text x=\"%d\" y=\"%.1f\" fill=\"%s\""
-                                " font-weight=\"bold\">%s = %s</text>")
-                        lx y (or (cdr (assoc tag draw-kbd-svg-layer-colors)) "#222")
-                        tag name)
+               (name (or (cdr (assoc tag draw-kbd-layer-names)) tag))
+               (colour (or (cdr (assoc tag draw-kbd-svg-layer-colors)) "#222"))
+               ;; A chip in the row's own colour, so the legend is read by
+               ;; colour the way the cells are.
+               (chipw (* cw 3.4)))
+          (push (format (concat "<rect x=\"%.1f\" y=\"%.1f\" width=\"%.1f\""
+                                " height=\"%.1f\" rx=\"%.1f\" fill=\"%s\"/>"
+                                "<text x=\"%.1f\" y=\"%.1f\" fill=\"#fff\""
+                                " font-weight=\"bold\">%s</text>"
+                                "<text x=\"%.1f\" y=\"%.1f\" fill=\"#222\">%s</text>")
+                        lx (- y (* lh 0.78)) chipw lh (* 0.25 lh) colour
+                        (+ lx (* cw 0.5)) y (draw-kbd--svg-esc tag)
+                        (+ lx chipw (* cw 0.8)) y (draw-kbd--svg-esc name))
                 body)
-          ;; Step by the widest legend entry rather than a fixed amount, so
-          ;; the row survives a bigger font.
-          (setq lx (+ lx (* (draw-kbd--svg-char-w)
-                            (+ 4 (apply #'max
-                                        (mapcar (lambda (l)
-                                                  (let ((tg (string-trim (car l))))
-                                                    (length (format "%s = %s" tg
-                                                                    (or (cdr (assoc tg draw-kbd-layer-names))
-                                                                        tg)))))
-                                                draw-kbd-layers))))))))
-      (setq max-x (max max-x lx))
-      (setq y (+ y (* 2 (draw-kbd--svg-line-h)))))
+          (setq lx (+ lx step))))
+      (setq max-x (max max-x (- lx (* cw 3)))
+            y (+ y (* 2 lh))))
     ;; The sections are short and many, so they go in columns beside the
     ;; keyboard rather than down the page.
     (let* ((sections (draw-kbd--sections seen))
            (cw (draw-kbd--svg-char-w))
            (lh (draw-kbd--svg-line-h))
+           (ppad (draw-kbd--svg-panel-pad))
            (blocks
             (mapcar
              (lambda (sec)
@@ -539,24 +649,31 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                       (cmdw (apply #'max 0 (mapcar (lambda (r) (length (cdr r))) rows)))
                       (headw (length (format "%s (%d)" (car sec) (length rows))))
                       (indent 2))
-                 (list (* cw (max headw (+ indent keyw 1 cmdw)))
-                       (* lh (1+ (length rows)))
-                       sec (* cw indent) (* cw (+ indent keyw 1)))))
+                 (list (+ (* 2 ppad) (* cw (max headw (+ indent keyw 1 cmdw))))
+                       (+ (* 2 ppad) (* lh (1+ (length rows))))
+                       sec (+ ppad (* cw indent)) (+ ppad (* cw (+ indent keyw 1))))))
              sections)))
       (when blocks
-        (push (format (concat "<text x=\"0\" y=\"%.1f\" fill=\"#000\""
-                              " font-weight=\"bold\">Not on the keyboard above."
-                              "  Only my own bindings, not Emacs's:</text>")
-                      y)
+        (push (format (concat "<text x=\"0\" y=\"%.1f\" font-family=\"%s\""
+                              " fill=\"#000\" font-weight=\"bold\">Not on the"
+                              " keyboard above.  Only my own bindings,"
+                              " not Emacs's:</text>")
+                      y draw-kbd-svg-head-font)
               body)
         (setq y (+ y (* 2 lh)))
         (cl-destructuring-bind (placed pw ph)
             (draw-kbd--pack blocks max-x (* 3 cw) lh)
           (dolist (p placed)
-            (cl-destructuring-bind (bx by sec key-x cmd-x) p
+            (cl-destructuring-bind (bx by bw bh sec key-x cmd-x) p
+              (push (format (concat "<rect x=\"%.1f\" y=\"%.1f\" width=\"%.1f\""
+                                    " height=\"%.1f\" rx=\"%.1f\" fill=\"%s\""
+                                    " stroke=\"%s\"/>")
+                            bx (+ y by) bw bh (* 0.3 lh)
+                            draw-kbd-svg-panel-fill draw-kbd-svg-panel-stroke)
+                    body)
               (push (format (concat "<text x=\"%.1f\" y=\"%.1f\""
                                     " font-weight=\"bold\">%s (%d)</text>")
-                            bx (+ y by lh)
+                            (+ bx ppad) (+ y by ppad lh)
                             (draw-kbd--svg-esc (car sec)) (length (cdr sec)))
                     body)
               (cl-loop for row in (cdr sec)
@@ -565,9 +682,9 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                                                 " fill=\"#333\">%s</text>"
                                                 "<text x=\"%.1f\" y=\"%.1f\""
                                                 " fill=\"#333\">%s</text>")
-                                        (+ bx key-x) (+ y by (* i lh))
+                                        (+ bx key-x) (+ y by ppad (* i lh))
                                         (draw-kbd--svg-esc (car row))
-                                        (+ bx cmd-x) (+ y by (* i lh))
+                                        (+ bx cmd-x) (+ y by ppad (* i lh))
                                         (draw-kbd--svg-esc (cdr row)))
                                 body))))
           (setq max-x (max max-x pw)
@@ -581,12 +698,15 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                                 " font-family=\"%s\" font-size=\"%d\">\n")
                         width height width height
                         draw-kbd-svg-font draw-kbd-svg-font-size)
+                (draw-kbd--svg-defs)
                 (format "<rect width=\"%d\" height=\"%d\" fill=\"#ffffff\"/>\n"
                         width height)
                 "<g transform=\"translate(12,12)\">\n"
-                (format (concat "<text x=\"0\" y=\"%d\" font-size=\"%d\""
-                                " font-weight=\"bold\" fill=\"#000\">%s (%s)</text>\n")
+                (format (concat "<text x=\"0\" y=\"%d\" font-family=\"%s\""
+                                " font-size=\"%d\" font-weight=\"bold\""
+                                " fill=\"#000\">%s (%s)</text>\n")
                         (round (* draw-kbd-svg-font-size 1.4))
+                        draw-kbd-svg-head-font
                         (round (* draw-kbd-svg-font-size 1.5))
                         (draw-kbd--svg-esc lay) (draw-kbd--svg-esc draw-kbd-title))
                 (format (concat "<text x=\"0\" y=\"%d\" fill=\"#666\">"
@@ -594,6 +714,8 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                         (round (* draw-kbd-svg-font-size 2.9))
                         (draw-kbd--svg-esc (abbreviate-file-name draw-kbd-init-file))
                         (format-time-string "%Y-%m-%d"))
+                ;; The case first: every key is drawn on top of it.
+                case-svg "\n"
                 (mapconcat #'identity (nreverse body) "\n")
                 "\n</g>\n</svg>\n")))
     (message "draw-kbd: wrote %s" file)
@@ -674,7 +796,7 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
     (cl-destructuring-bind (placed _pw ph) (draw-kbd--pack blocks width gap 1)
       (let ((out (make-list ph "")))
         (dolist (p placed)
-          (cl-destructuring-bind (bx by lines) p
+          (cl-destructuring-bind (bx by _w _h lines) p
             (cl-loop for line in lines
                      for i from by
                      do (setf (nth i out)

@@ -9,8 +9,8 @@
 #
 # Usage: ./draw-kbd.sh [--txt] [--ergo] [--scale N] [layout]   (default: us)
 #   --txt      also write <layout>.txt, the same boards in box-drawing characters
-#   --ergo     also draw ergoemacs-mode's own sheets, which look better and say
-#              less: four layers per key and no boxes for the arrows
+#   --ergo     also draw ergoemacs-mode's own sheets, whose look this borrows
+#              but which say less: four layers per key, no boxes for the arrows
 #   --scale N  how many PNG pixels per SVG unit (default 2). The SVG is vector
 #              and unaffected; this only sets how crisp the PNG is.
 #

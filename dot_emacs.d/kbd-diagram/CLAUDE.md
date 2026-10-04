@@ -31,8 +31,8 @@ Two pictures:
 
 | File            | Keyboard                                              |
 |-----------------|-------------------------------------------------------|
-| `us.svg`        | the main block alone, about 2260x1340                 |
-| `us_full.svg`   | plus Print, Ins/Home/PgUp, Del/End/PgDn, arrows; 2910x1215 |
+| `us.svg`        | the main block alone, about 2290x1415                 |
+| `us_full.svg`   | plus Print, Ins/Home/PgUp, Del/End/PgDn, arrows; 2933x1281 |
 
 The right-hand cluster is wide and rarely interesting, so it is off by default.
 Nothing is lost by that: whatever is bound on those keys is listed under the
@@ -48,12 +48,21 @@ Each holds:
   rather than run down the page,
 
 and a PNG of each, rasterised at `--scale` pixels per SVG unit — 2 by default,
-so 4526x2670 and 5814x2430 — by whichever of inkscape, rsvg-convert, headless
+so 4580x2830 and 5866x2562 — by whichever of inkscape, rsvg-convert, headless
 chromium or ImageMagick `convert` is installed.  Each takes the scale
 differently: inkscape and `convert` as dots per inch against the SVG's nominal
 96, rsvg-convert as a zoom, chromium as a device pixel ratio over a window
 still sized in CSS pixels.  The SVG is vector and unaffected; only the PNG has
 a resolution at all.
+
+The keys are drawn the way the ergoemacs picture draws them: gradient caps
+with rounded corners and a dark border, each sitting on a grey slab nudged down
+and right, all of them inside a case whose bounding box is whatever the rows
+turned out to need.  The slab is a second flat rect rather than a blur filter —
+that is upstream's trick, and it is the one thing every rasteriser draws the
+same way.  The cap legend is proportional bold sans, like the heading; the rows
+under it stay monospace, because that is what makes truncating by character
+count honest.
 
 Each cell row is coloured by its modifier, following the ergoemacs picture:
 blue Alt, red Alt+Shift, green Ctrl, magenta Ctrl+Shift, brown Ctrl+Alt.  A
@@ -98,8 +107,17 @@ drawn, which is the whole difference between `us.svg` and `us_full.svg`.
 | `draw-kbd-svg-layer-colors`   | the colour of each row                      |
 | `draw-kbd-svg-gap-ratio`      | space between keys, per font size           |
 | `draw-kbd-svg-stroke-ratio`   | key border weight, per font size            |
-| `draw-kbd-svg-key-stroke`     | and its colour                              |
-| `draw-kbd-svg-key-fill`       | the fill behind a key                       |
+| `draw-kbd-svg-radius-ratio`   | its corner radius, per font size            |
+| `draw-kbd-svg-shadow-ratio`   | how far its slab sticks out, per font size  |
+| `draw-kbd-svg-key-stroke`     | the border's colour                         |
+| `draw-kbd-svg-key-shadow`     | the slab's                                  |
+| `draw-kbd-svg-key-fill`       | top and bottom of the gradient down a cap   |
+| `draw-kbd-svg-case-fill`      | the same, for the case the keys sit in      |
+| `draw-kbd-svg-case-stroke`    | its border                                  |
+| `draw-kbd-svg-panel-fill`     | the fill behind a prefix section            |
+| `draw-kbd-svg-panel-stroke`   | and its border                              |
+| `draw-kbd-svg-head-font`      | the cap legend's face                       |
+| `draw-kbd-svg-head-ratio`     | its size, per font size                     |
 | `draw-kbd-svg-label-width`    | how much room a command name gets           |
 | `draw-kbd-svg-line-ratio`     | line height, per font size                  |
 | `draw-kbd-svg-font-size`      | how big everything is                       |
@@ -113,16 +131,20 @@ derived from it, so raising it scales the drawing rather than
 making the text collide with the boxes.
 
 Labels come from `ergoemacs-function-short-names` first, then from the command
-name with the usual prefixes stripped, truncated to the label width.  The cell
+name with the usual prefixes stripped, truncated to the label width.  The row
 font is monospace on purpose: it makes truncating by character count honest,
-which is what lets the cell width be computed rather than measured.
+which is what lets the cell width be computed rather than measured — there is
+no way to measure a glyph in a batch Emacs.  The cap legend escapes that
+because it is short, fixed in place and never truncated, which is why it can be
+proportional.
 
 ## Why not ergoemacs-mode's own picture
 
-It is where this started — `--ergo` still draws it, and it is the picture at
-the bottom of <https://ergoemacs.github.io/>.  It fills numbered placeholders
-in an Inkscape SVG, `kbd-ergo.svg`, which has room for four layers per key and
-no boxes at all for the arrows.  Of the 103 bindings my `init.el` adds to stock
+It is where this started — `--ergo` still draws it, it is the picture at the
+bottom of <https://ergoemacs.github.io/>, and `draw-kbd-svg` now looks like it
+on purpose.  What it could not do was hold the content.  It fills numbered
+placeholders in an Inkscape SVG, `kbd-ergo.svg`, which has room for four layers
+per key and no boxes at all for the arrows.  Of the 103 bindings my `init.el` adds to stock
 Emacs it drew 65, and the rest needed a list beside the picture.  Drawing the
 SVG directly has no such ceiling.
 
