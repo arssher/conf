@@ -19,3 +19,9 @@ GTAGS
 dot_emacs.d/kbd-diagram/*.txt
 dot_emacs.d/kbd-diagram/*.svg
 dot_emacs.d/kbd-diagram/*.png
+
+# elpa packages. packages.el derives package-user-dir from the init.el being
+# loaded, so loading the source copy rather than ~/.emacs.d/init.el installs
+# them here instead of beside the applied config. The real ones live in
+# ~/.emacs.d/elpa and belong to no repo.
+dot_emacs.d/elpa/

@@ -24,6 +24,13 @@ vscode
 .emacs.d/kbd-diagram
 .emacs.d/kbd-diagram/**
 
+# elpa packages, should a stray copy ever appear in the source tree -- see the
+# .gitignore note on how loading the source init.el puts them there. Target
+# paths, so ".emacs.d/elpa": the source spelling would match nothing and the
+# 16M would get applied over the real ~/.emacs.d/elpa.
+.emacs.d/elpa
+.emacs.d/elpa/**
+
 # Machine-local Claude Code permission overrides. Only this file: the rest of
 # dot_claude/ is managed. Never add ~/.claude/.credentials.json or the state
 # under projects/, sessions/, history.jsonl and friends -- this repo is public.
