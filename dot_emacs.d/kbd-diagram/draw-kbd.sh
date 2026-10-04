@@ -1,15 +1,19 @@
 #!/bin/sh
 # Draw my keybindings.
 #
-# Writes <layout>.txt: one keyboard whose every cell lists all the modifier
-# layers, boards for the function keys and the navigation cluster, and a
-# section per prefix key for what no board can hold. With --svg it also draws
-# ergoemacs-mode's SVG sheets, which look better and say less.
+# Writes <layout>.svg and <layout>.png: one picture holding a board for the
+# function keys, the four rows of the main keyboard with every modifier layer
+# stacked in each key cell, a board for the navigation cluster, and a section
+# per prefix key for what no board can hold.
 #
-# Usage: ./draw-kbd.sh [--svg] [layout]        (default layout: us)
+# Usage: ./draw-kbd.sh [--txt] [--ergo] [layout]      (default layout: us)
+#   --txt   also write <layout>.txt, the same boards in box-drawing characters
+#   --ergo  also draw ergoemacs-mode's own sheets, which look better and say
+#           less: four layers per key and no boxes for the arrows
+#
 # Env:   ERGOEMACS_SRC  checkout of ergoemacs-mode   (default ~/dev/ergoemacs-mode)
 #        KBD_OUT        output directory             (default this directory)
-#        KBD_INIT       init file to draw             (default ~/.emacs.d/init.el)
+#        KBD_INIT       init file to draw            (default ~/.emacs.d/init.el)
 
 set -eu
 
@@ -17,18 +21,22 @@ here=$(cd "$(dirname "$0")" && pwd)
 : "${ERGOEMACS_SRC:=$HOME/dev/ergoemacs-mode}"
 : "${KBD_OUT:=$here}"
 
-svg=
-case ${1:-} in
-    --svg) svg=1; shift ;;
-esac
+ergo=
+while [ $# -gt 0 ]; do
+    case $1 in
+        --txt)  export KBD_TXT=1;  shift ;;
+        --ergo) export KBD_ERGO=1; ergo=1; shift ;;
+        --*)    echo "draw-kbd: unknown option $1" >&2; exit 2 ;;
+        *)      break ;;
+    esac
+done
 layout=${1:-us}
 
 export ERGOEMACS_SRC KBD_OUT
 export KBD_LAYOUT="$layout"
-[ -n "$svg" ] && export KBD_SVG=1
 
-if [ ! -f "$ERGOEMACS_SRC/kbd-ergo.svg" ]; then
-    echo "draw-kbd: no kbd-ergo.svg under $ERGOEMACS_SRC" >&2
+if [ ! -f "$ERGOEMACS_SRC/ergoemacs-layouts.el" ]; then
+    echo "draw-kbd: no ergoemacs-layouts.el under $ERGOEMACS_SRC" >&2
     echo "draw-kbd: clone https://github.com/ergoemacs/ergoemacs-mode or set ERGOEMACS_SRC" >&2
     exit 1
 fi
@@ -38,10 +46,8 @@ fi
 # bindings from the ones Emacs ships with.
 emacs -Q --batch -l "$here/draw-kbd.el" 2>&1 | grep -v '^Loading ' || true
 
-txt="$KBD_OUT/$layout.txt"
-[ -f "$txt" ] || { echo "draw-kbd: $txt was not produced" >&2; exit 1; }
-echo "draw-kbd: wrote $txt"
-[ -z "$svg" ] && exit 0
+svg="$KBD_OUT/$layout.svg"
+[ -f "$svg" ] || { echo "draw-kbd: $svg was not produced" >&2; exit 1; }
 
 # Rasterise with whatever is installed.  ImageMagick's `convert' is deliberately
 # last: without its rsvg delegate it renders these files as garbage.
@@ -52,7 +58,7 @@ rasterise() {
     # and no dead margin.
     _w=$(sed -n 's/.*[^-]width="\([0-9.]*\)".*/\1/p' "$_svg" | head -1 | cut -d. -f1)
     _h=$(sed -n 's/.*[^-]height="\([0-9.]*\)".*/\1/p' "$_svg" | head -1 | cut -d. -f1)
-    : "${_w:=1178}" "${_h:=613}"
+    : "${_w:=1600}" "${_h:=1200}"
 
     if command -v inkscape >/dev/null 2>&1; then
         inkscape "$_svg" -o "$_png"
@@ -72,6 +78,9 @@ rasterise() {
     echo "draw-kbd: wrote $_svg and $_png"
 }
 
-for f in "$KBD_OUT/$layout.svg" "$KBD_OUT/$layout"-*.svg; do
-    [ -f "$f" ] && rasterise "$f"
-done
+rasterise "$svg"
+if [ -n "$ergo" ]; then
+    for f in "$KBD_OUT/$layout"-ergo*.svg; do
+        [ -f "$f" ] && rasterise "$f"
+    done
+fi

@@ -1,13 +1,14 @@
 # Keyboard diagram of my Emacs bindings
 
-Draws the bindings from `~/.emacs.d/init.el` as a keyboard, in one text file.
+Draws the bindings from `~/.emacs.d/init.el` as one picture.
 
 ## Usage
 
 ```sh
-./draw-kbd.sh            # us layout -> us.txt, next to this README
-./draw-kbd.sh dvorak     # any layout name from ergoemacs-layouts.el
-./draw-kbd.sh --svg      # also draw the ergoemacs SVG sheets
+./draw-kbd.sh                  # us layout -> us.svg + us.png, next to this README
+./draw-kbd.sh dvorak           # any layout name from ergoemacs-layouts.el
+./draw-kbd.sh --txt            # also us.txt, the same boards in box characters
+./draw-kbd.sh --ergo           # also ergoemacs-mode's own sheets
 ```
 
 | Variable        | Default                | Meaning                         |
@@ -18,71 +19,84 @@ Draws the bindings from `~/.emacs.d/init.el` as a keyboard, in one text file.
 
 The checkout is the only prerequisite: `git clone
 https://github.com/ergoemacs/ergoemacs-mode ~/dev/ergoemacs-mode`.  Nothing
-needs to be byte-compiled or installed.
+needs to be byte-compiled or installed, and `ergoemacs-mode` is never turned
+on — it is there for the layout vectors and the label tables, and turning it on
+would replace the very bindings we are trying to draw.
 
 ## What comes out
 
-`us.txt`, about 100 lines and 200 columns wide, holding in order:
+`us.svg`, about 1560x1130, holding in order:
 
 - a board for the function keys,
-- the four rows of the main keyboard, every cell listing all its layers,
+- the four rows of the main keyboard, every cell stacking all its layers,
 - a board for the navigation cluster,
+- the legend,
 - a section per prefix key for what no board can hold,
-- a count of what was drawn.
 
-```
-┌────────────┬────────────┬────────────┬────────────┐
-│ e          │ r          │ t          │ y          │
-│M  ⌫ word   │M  ⌦ word   │M  transpos…│M  yank pop │
-│MS          │MS projecti…│MS          │MS          │
-│C  → line   │C  rep      │C  transpose│C  ⌧ line   │
-│CS          │CS          │CS          │CS          │
-│CM end of d…│CM revert   │CM transpos…│CM          │
-└────────────┴────────────┴────────────┴────────────┘
-```
+and `us.png`, the same thing rasterised by whichever of inkscape,
+rsvg-convert, headless chromium or ImageMagick `convert` is installed.
 
-A blank means nothing is bound; `λ` means an anonymous command; `Prefix` means
-a prefix key, whose contents are in a section further down.
+Each cell row is coloured by its modifier, following the ergoemacs picture:
+blue Alt, red Alt+Shift, green Ctrl, magenta Ctrl+Shift, brown Ctrl+Alt.  A
+greyed tag with nothing after it means nothing is bound; `λ` means an anonymous
+command; `Prefix` means a prefix key, whose contents are in a section further
+down.
 
 The boards show the whole global map, Emacs's bindings included, because that
 is what a reference chart is for.  The sections at the bottom are the opposite:
 only what `init.el` itself added, since listing every stock `C-x` binding would
 bury the handful that are mine.
 
+## Three backends, one model
+
+`draw-kbd--cell-data` resolves one key's layers into (TAG . LABEL) pairs and
+records every key it looked up.  That is the whole model; each backend only
+decides how to draw a cell and what to do with the leftovers.
+
+| Function         | Flag     | Draws                                      |
+|------------------|----------|--------------------------------------------|
+| `draw-kbd-svg`   | default  | `<rect>` and `<text>`, in colour           |
+| `draw-kbd-ascii` | `--txt`  | box-drawing characters, ~100x200           |
+| `draw-kbd-ergo`  | `--ergo` | ergoemacs-mode's `kbd-ergo.svg` template   |
+
+Adding a row to `draw-kbd-layers` grows every board in every backend at once.
+
 ## Tuning it
 
-Everything worth changing is a defvar at the top of `draw-kbd.el`:
+| Variable                      | Does                                        |
+|-------------------------------|---------------------------------------------|
+| `draw-kbd-layers`             | the rows inside each key cell               |
+| `draw-kbd-nav-layers`         | the same, for the named keys                |
+| `draw-kbd-fkey-layers`        | the same, for the function keys             |
+| `draw-kbd-nav-keys`           | which named keys get a box                  |
+| `draw-kbd-key-names`          | their cap legends                           |
+| `draw-kbd-layer-names`        | what the legend calls each row              |
+| `draw-kbd-labels`             | short names for commands ergoemacs-mode     |
+|                               | has never heard of                          |
+| `draw-kbd-svg-layer-colors`   | the colour of each row                      |
+| `draw-kbd-svg-label-width`    | how much room a command name gets           |
+| `draw-kbd-svg-font-size`      | and how big it is                           |
 
-| Variable                       | Does                                        |
-|--------------------------------|---------------------------------------------|
-| `draw-kbd-ascii-layers`        | the rows inside each key cell               |
-| `draw-kbd-ascii-nav-layers`    | the same, for the named keys                |
-| `draw-kbd-ascii-fkey-layers`   | the same, for the function keys             |
-| `draw-kbd-ascii-nav-keys`      | which named keys get a box                  |
-| `draw-kbd-ascii-key-names`     | their cap legends                           |
-| `draw-kbd-ascii-label-width`   | how much room a command name gets           |
-| `draw-kbd-labels`              | short names for commands ergoemacs-mode     |
-|                                | has never heard of                          |
+Labels come from `ergoemacs-function-short-names` first, then from the command
+name with the usual prefixes stripped, truncated to the label width.  The cell
+font is monospace on purpose: it makes truncating by character count honest,
+which is what lets the cell width be computed rather than measured.
 
-Add a row to `draw-kbd-ascii-layers` and every board grows one.  Labels come
-from `ergoemacs-function-short-names` first, then from the command name with
-the usual prefixes stripped, truncated to `draw-kbd-ascii-label-width`.
+## Why not ergoemacs-mode's own picture
 
-## Why text and not the picture
+It is where this started — `--ergo` still draws it, and it is the picture at
+the bottom of <https://ergoemacs.github.io/>.  It fills numbered placeholders
+in an Inkscape SVG, `kbd-ergo.svg`, which has room for four layers per key and
+no boxes at all for the arrows.  Of the 103 bindings my `init.el` adds to stock
+Emacs it drew 65, and the rest needed a list beside the picture.  Drawing the
+SVG directly has no such ceiling.
 
-ergoemacs-mode draws the keyboard picture at the bottom of
-<https://ergoemacs.github.io/> by filling placeholders in an Inkscape SVG,
-`kbd-ergo.svg`.  It is a nicer thing to look at, and `--svg` still produces it,
-but it has room for four layers per key and no boxes at all for the arrows, so
-it cannot show everything: of the 103 bindings my `init.el` adds to stock
-Emacs, the sheets drew 65.  Text has no such ceiling, and it greps and diffs.
-
-With `--svg` you get `us.svg` / `us.png` (Alt, Alt+Shift, Ctrl, Ctrl+Shift) and
-`us-ctrl-meta.svg` / `.png`, whose `draw-kbd-extra-layers` re-points the Alt
-rows at `control meta` and the Ctrl rows at `hyper`.  That trick works because
-the four layers are only a convention: each slot reaches
-`ergoemacs-theme--svg-elt` as (INDEX . MODIFIERS) and is resolved with
-`event-convert-list`, which takes any modifiers.
+`--ergo` writes `us-ergo.svg` (Alt, Alt+Shift, Ctrl, Ctrl+Shift) and
+`us-ergo-ctrl-meta.svg`, whose `draw-kbd-ergo-layers` re-points the Alt rows at
+`control meta` and the Ctrl rows at `hyper`.  That trick works because the four
+layers are only a convention: each slot reaches `ergoemacs-theme--svg-elt` as
+(INDEX . MODIFIERS) and is resolved with `event-convert-list`, which takes any
+modifiers.
 
 ## Why it is in the chezmoi repo but not applied
 
@@ -100,9 +114,9 @@ committing them.
 row is then a `lookup-key` in the live global map, and the key it looked up is
 recorded, so whatever is left over at the end is exactly what no board showed.
 
-`ergoemacs-mode` is loaded but **never turned on** — it is there for the layout
-vectors and the label tables, and turning it on would replace the very
-bindings we are trying to draw.
+The layout vectors turn out to be a 4x15 grid already, rows padded with empty
+strings, unshifted then shifted at +60, so the physical arrangement comes for
+free and a renderer only has to place it.
 
 ## Things to know
 
@@ -120,10 +134,12 @@ bindings we are trying to draw.
 
 ## Upstream quirks
 
+Both only affect `--ergo`.
+
 - `draw-kbd.el` defines `ergoemacs-M-O-binding`, which `ergoemacs-theme-engine.el`
   still reads although commit `dc2e1a6` dropped its `defvar`.  Without it the
-  `--svg` path dies with *"Symbol's value as variable is void"*.
-- ergoemacs-mode's own per-prefix sheets (`full-p`) render empty.
+  sheets die with *"Symbol's value as variable is void"*.
+- ergoemacs-mode's per-prefix sheets (`full-p`) render empty.
   `ergoemacs-theme--svg-elt` does
 
       (or (lookup-key ergoemacs-override-keymap key)
