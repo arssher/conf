@@ -10,7 +10,11 @@
 ;;
 ;; The template only has room for four layers per key:
 ;;   Alt+key, Alt+Shift+key, Ctrl+key, Ctrl+Shift+key
-;; C-M- bindings and prefix sequences beyond the first key are not drawn.
+;; Prefix sequences beyond their first key are not drawn at all.  The layers
+;; themselves are only a convention of the template, though -- each slot ends up
+;; in `ergoemacs-theme--svg-elt' as (INDEX . MODIFIERS) and is resolved with
+;; `event-convert-list', which takes any modifiers.  So a second sheet is made
+;; by re-pointing the slots at other modifiers; see `draw-kbd-extra-layers'.
 
 ;;; Code:
 
@@ -48,6 +52,32 @@
     (my-scroll-up-one "↑ 1 line"))
   "Extra entries pushed in front of `ergoemacs-function-short-names'.")
 
+(defvar draw-kbd-extra-layers
+  '((nil     control meta)
+    (meta    control meta)
+    (control hyper))
+  "Modifiers the extra sheet shows, keyed by the layer the template means.
+The template's own four layers are nil (the plain function-key row), `meta'
+(the two Alt rows) and `control' (the two Ctrl rows); Shift is carried by the
+character, not by a modifier, so each entry covers both of its rows.  Set this
+to nil to skip the extra sheet.")
+
+(defvar draw-kbd-extra-name "Ctrl+Alt layer"
+  "Title suffix for the extra sheet.")
+
+(defvar draw-kbd-extra-suffix "-ctrl-meta"
+  "Appended to the layout name to make the extra sheet's file name.")
+
+(defvar draw-kbd-extra-legend
+  '((meta          . "Ctrl+Alt+ == control meta")
+    (meta-shift    . "Ctrl+Alt+⇧Shift+ == control meta shift")
+    (control       . "Hyper+ == hyper")
+    (control-shift . "Hyper+⇧Shift+ == hyper shift"))
+  "Legend lines for the extra sheet, replacing the template's Alt/Ctrl ones.
+These are written out verbatim: the legend slots are too narrow for
+`ergoemacs-theme--svg-elt', which truncates anything it formats to 10
+characters.")
+
 ;; ergoemacs-theme-engine.el still refers to this variable, but the defvar was
 ;; dropped in commit dc2e1a6, so generation dies without it.
 (defvar ergoemacs-M-O-binding nil)
@@ -73,6 +103,48 @@ toggling the modes off, because `(recentf-mode -1)' itself calls
 (add-to-list 'load-path draw-kbd-ergoemacs-src)
 (require 'ergoemacs-mode)
 
+(defun draw-kbd--remap (elt lay)
+  "Re-point one parsed template slot ELT at the `draw-kbd-extra-layers' modifiers.
+A (:text . STRING) cons means \"write STRING here verbatim\"; everything else is
+left for `ergoemacs-theme--svg-elt'."
+  (cond
+   ((eq elt 'title)
+    (cons :text (format "%s (%s) %s" lay draw-kbd-title draw-kbd-extra-name)))
+   ((and (symbolp elt) (assq elt draw-kbd-extra-legend))
+    (cons :text (cdr (assq elt draw-kbd-extra-legend))))
+   ((consp elt)
+    (let* ((mods (cdr elt))
+           (layer (cond ((memq 'control mods) 'control)
+                        ((memq 'meta mods) 'meta)))
+           (to (cdr (assq layer draw-kbd-extra-layers))))
+      (if to
+          (cons (car elt) (append to (and (memq 'shift mods) '(shift))))
+        elt)))
+   (t elt)))
+
+(defun draw-kbd--write (elts layout lay file)
+  "Write the parsed template ELTS out to FILE for LAYOUT, named LAY."
+  (with-temp-file file
+    (dolist (w elts)
+      (cond
+       ((stringp w) (insert w))
+       ((and (consp w) (eq (car w) :text))
+        (insert ">" (ergoemacs-translate--svg-quote (cdr w)) "<"))
+       (t (insert ">" (ergoemacs-theme--svg-elt w layout lay) "<"))))))
+
+(defun draw-kbd-extra (layout lay)
+  "Write the extra-layer sheet, reusing the template `draw-kbd' already parsed.
+Return its path, or nil when `draw-kbd-extra-layers' is empty."
+  (when draw-kbd-extra-layers
+    (let ((file (expand-file-name (concat lay draw-kbd-extra-suffix ".svg")
+                                  draw-kbd-output)))
+      (draw-kbd--write (mapcar (lambda (w)
+                                 (if (stringp w) w (draw-kbd--remap w lay)))
+                               ergoemacs-theme--svg)
+                       layout lay file)
+      (message "draw-kbd: wrote %s" file)
+      file)))
+
 (defun draw-kbd ()
   "Render the current global keymap onto the ergoemacs keyboard template.
 Return the path of the SVG written into `draw-kbd-output'."
@@ -94,7 +166,10 @@ Return the path of the SVG written into `draw-kbd-output'."
     (copy-file generated final t)
     (delete-directory user-emacs-directory t)
     (message "draw-kbd: wrote %s" final)
-    final))
+    ;; `ergoemacs-theme--svg' leaves the parsed template in the variable of the
+    ;; same name, so the extra sheet costs only a second pass over that list.
+    (cons final (draw-kbd-extra (symbol-value (ergoemacs :layout draw-kbd-layout))
+                                draw-kbd-layout))))
 
 (draw-kbd)
 

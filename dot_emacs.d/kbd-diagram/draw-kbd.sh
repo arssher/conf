@@ -31,29 +31,38 @@ emacs -Q --batch \
       -l "$here/draw-kbd.el" 2>&1 | grep -v '^Loading ' || true
 
 svg="$KBD_OUT/$layout.svg"
-png="$KBD_OUT/$layout.png"
 [ -f "$svg" ] || { echo "draw-kbd: $svg was not produced" >&2; exit 1; }
 
 # Rasterise with whatever is installed.  ImageMagick's `convert' is deliberately
 # last: without its rsvg delegate it renders this file as garbage.
-w=$(sed -n 's/.*[^-]width="\([0-9.]*\)".*/\1/p' "$svg" | head -1 | cut -d. -f1)
-h=$(sed -n 's/.*[^-]height="\([0-9.]*\)".*/\1/p' "$svg" | head -1 | cut -d. -f1)
-: "${w:=1178}" "${h:=613}"
+rasterise() {
+    _svg=$1
+    _png=${_svg%.svg}.png
+    # Size the headless window from the SVG root, so the shot has no scrollbar
+    # and no dead margin.
+    _w=$(sed -n 's/.*[^-]width="\([0-9.]*\)".*/\1/p' "$_svg" | head -1 | cut -d. -f1)
+    _h=$(sed -n 's/.*[^-]height="\([0-9.]*\)".*/\1/p' "$_svg" | head -1 | cut -d. -f1)
+    : "${_w:=1178}" "${_h:=613}"
 
-if command -v inkscape >/dev/null 2>&1; then
-    inkscape "$svg" -o "$png"
-elif command -v rsvg-convert >/dev/null 2>&1; then
-    rsvg-convert -o "$png" "$svg"
-elif command -v chromium >/dev/null 2>&1 || command -v google-chrome >/dev/null 2>&1; then
-    browser=$(command -v chromium || command -v google-chrome)
-    "$browser" --headless --disable-gpu --hide-scrollbars \
-               --default-background-color=FFFFFFFF \
-               --window-size="$w,$h" --screenshot="$png" "file://$svg" 2>/dev/null
-elif command -v convert >/dev/null 2>&1; then
-    convert -density 150 -background white "$svg" "$png"
-else
-    echo "draw-kbd: wrote $svg (no SVG rasteriser found, skipping PNG)" >&2
-    exit 0
-fi
+    if command -v inkscape >/dev/null 2>&1; then
+        inkscape "$_svg" -o "$_png"
+    elif command -v rsvg-convert >/dev/null 2>&1; then
+        rsvg-convert -o "$_png" "$_svg"
+    elif command -v chromium >/dev/null 2>&1 || command -v google-chrome >/dev/null 2>&1; then
+        _browser=$(command -v chromium || command -v google-chrome)
+        "$_browser" --headless --disable-gpu --hide-scrollbars \
+                    --default-background-color=FFFFFFFF \
+                    --window-size="$_w,$_h" --screenshot="$_png" "file://$_svg" 2>/dev/null
+    elif command -v convert >/dev/null 2>&1; then
+        convert -density 150 -background white "$_svg" "$_png"
+    else
+        echo "draw-kbd: no SVG rasteriser found, leaving $_svg unconverted" >&2
+        return 0
+    fi
+    echo "draw-kbd: wrote $_svg and $_png"
+}
 
-echo "draw-kbd: wrote $svg and $png"
+# The main sheet plus every extra-layer sheet draw-kbd.el emitted beside it.
+for f in "$KBD_OUT/$layout.svg" "$KBD_OUT/$layout"-*.svg; do
+    [ -f "$f" ] && rasterise "$f"
+done

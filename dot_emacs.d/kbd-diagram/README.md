@@ -9,9 +9,16 @@ of <https://ergoemacs.github.io/>.
 ## Usage
 
 ```sh
-./draw-kbd.sh            # us layout -> us.svg + us.png, next to this README
+./draw-kbd.sh            # us layout, next to this README
 ./draw-kbd.sh dvorak     # any layout name from ergoemacs-layouts.el
 ```
+
+Two sheets come out of each run:
+
+| File                   | Shows                                            |
+|------------------------|--------------------------------------------------|
+| `us.svg` / `.png`      | Alt, Alt+Shift, Ctrl, Ctrl+Shift                  |
+| `us-ctrl-meta.svg`     | Ctrl+Alt, Ctrl+Alt+Shift, and Hyper if ever bound |
 
 | Variable        | Default                | Meaning                        |
 |-----------------|------------------------|--------------------------------|
@@ -53,9 +60,18 @@ that `~/.emacs.d` needs in order to work.  So `.chezmoiignore` lists
 
 - **Labels are truncated to 10 characters.**  Long command names show up as
   `ggtags nex…`; give them an entry in `draw-kbd-labels` in `draw-kbd.el`.
-- **The template has four layers per key** — Alt, Alt+Shift, Ctrl, Ctrl+Shift.
-  `C-M-` bindings have nowhere to go, and a prefix key shows only as
-  "Prefix Key"; the keys under it are not drawn.
+- **The template has four layers per key.**  Which four is only a convention:
+  each slot reaches `ergoemacs-theme--svg-elt` as (INDEX . MODIFIERS) and is
+  resolved with `event-convert-list`, which accepts any modifiers.  That is how
+  the second sheet works — `draw-kbd-extra-layers` re-points the Alt rows at
+  `control meta` and the Ctrl rows at `hyper`.  Edit it to chase some other
+  combination, or set it to nil for one sheet only.
+- **Prefix sequences are still not drawn.**  A prefix key shows only as
+  "Prefix Key"; the keys under it are not drawn anywhere.  ergoemacs-mode has a
+  `full-p` mode meant for exactly this, which emits `<theme>-<layout>-C-x.svg`
+  and friends, but the sheets come out blank — see "Upstream quirks" below.
+  Even working, it would only cover *modified* second keys (`C-x C-u`); plain
+  ones like `C-x 4` have no slot, because there is no unmodified layer.
 - **Keys remapped through `input-decode-map`** (the `C-i` → `H-i` trick in
   `init.el`) are drawn as the raw keymap has them, not as they are typed.
 - `draw-kbd-inhibit-state-writes` detaches `savehist-autosave` and
@@ -63,6 +79,18 @@ that `~/.emacs.d` needs in order to work.  So `.chezmoiignore` lists
   Emacs leaves `~/.emacs.d/savehist` and `~/.emacs.d/recentf` byte-identical.
   It detaches the hooks by hand instead of turning the modes off, because
   `(recentf-mode -1)` itself calls `recentf-save-list`.
+## Upstream quirks
+
 - `draw-kbd.el` defines `ergoemacs-M-O-binding`, which `ergoemacs-theme-engine.el`
   still reads although commit `dc2e1a6` dropped its `defvar`.  Without it
   generation dies with *"Symbol's value as variable is void"*.
+- The per-prefix sheets (`full-p`) render empty.  `ergoemacs-theme--svg-elt`
+  does
+
+      (or (lookup-key ergoemacs-override-keymap key)
+          (lookup-key (current-global-map) key))
+
+  and for a two-event sequence the first `lookup-key` returns the integer 1
+  ("key sequence too long") rather than nil.  `or` takes that as a hit, the
+  global map is never consulted, and the integer is blanked a line later.  A
+  single-event key escapes it because a miss there returns nil.
