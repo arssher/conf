@@ -27,7 +27,7 @@ would replace the very bindings we are trying to draw.
 
 ## What comes out
 
-`us.svg`, about 1560x770, holding in order:
+`us.svg`, about 1850x920, holding in order:
 
 - a board for the function keys,
 - the four rows of the main keyboard, every cell stacking all its layers,
@@ -37,7 +37,7 @@ would replace the very bindings we are trying to draw.
   across the width rather than run down the page,
 
 and `us.png`, the same thing rasterised at `--scale` pixels per SVG unit — 2
-by default, so 3128x1536 — by whichever of inkscape, rsvg-convert, headless
+by default, so 3694x1832 — by whichever of inkscape, rsvg-convert, headless
 chromium or ImageMagick `convert` is installed.  Each takes the scale
 differently: inkscape and `convert` as dots per inch against the SVG's nominal
 96, rsvg-convert as a zoom, chromium as a device pixel ratio over a window
@@ -83,7 +83,12 @@ Adding a row to `draw-kbd-layers` grows every board in every backend at once.
 |                               | has never heard of                          |
 | `draw-kbd-svg-layer-colors`   | the colour of each row                      |
 | `draw-kbd-svg-label-width`    | how much room a command name gets           |
-| `draw-kbd-svg-font-size`      | and how big it is                           |
+| `draw-kbd-svg-font-size`      | how big everything is                       |
+
+`draw-kbd-svg-font-size` is the one knob for the size of the whole picture:
+line height, cell padding, cell width, the heading, the legend spacing and the
+canvas are all derived from it, so raising it scales the drawing rather than
+making the text collide with the boxes.
 
 Labels come from `ergoemacs-function-short-names` first, then from the command
 name with the usual prefixes stripped, truncated to the label width.  The cell

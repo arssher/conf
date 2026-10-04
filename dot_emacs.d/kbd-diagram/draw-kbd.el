@@ -291,9 +291,12 @@ Alt binding reads back as a two-key sequence."
 (defvar draw-kbd-svg-font "'DejaVu Sans Mono','Liberation Mono',monospace"
   "Cells are monospace so that truncating by character count is honest.")
 
-(defvar draw-kbd-svg-font-size 11)
-(defvar draw-kbd-svg-line-h 13)
-(defvar draw-kbd-svg-pad 5)
+(defvar draw-kbd-svg-font-size 13
+  "Cell text size.  Everything else on the picture is derived from it, so this
+is the one knob for how big the whole thing comes out.")
+
+(defvar draw-kbd-svg-line-ratio 1.25
+  "Line height as a multiple of `draw-kbd-svg-font-size'.")
 (defvar draw-kbd-svg-gap 10 "Vertical space between boards.")
 (defvar draw-kbd-svg-row-indent 14 "Stagger of each keyboard row.")
 
@@ -315,12 +318,20 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
   "Advance width of the monospace cell font."
   (* draw-kbd-svg-font-size 0.602))
 
+(defun draw-kbd--svg-line-h ()
+  "Baseline-to-baseline distance inside a cell."
+  (round (* draw-kbd-svg-font-size draw-kbd-svg-line-ratio)))
+
+(defun draw-kbd--svg-pad ()
+  "Breathing room between a cell's border and its text."
+  (max 3 (round (* draw-kbd-svg-font-size 0.45))))
+
 (defun draw-kbd--svg-cell-w ()
-  (+ (* 2 draw-kbd-svg-pad)
+  (+ (* 2 (draw-kbd--svg-pad))
      (* (draw-kbd--svg-char-w) (+ 3 draw-kbd-svg-label-width))))
 
 (defun draw-kbd--svg-cell-h (layers)
-  (+ (* 2 draw-kbd-svg-pad) (* draw-kbd-svg-line-h (1+ (length layers)))))
+  (+ (* 2 (draw-kbd--svg-pad)) (* (draw-kbd--svg-line-h) (1+ (length layers)))))
 
 (defun draw-kbd--svg-cell (x y head rows layers)
   "One key cell at X,Y with cap legend HEAD and (TAG . LABEL) ROWS."
@@ -333,7 +344,7 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                      " rx=\"3\" fill=\"#fafafa\" stroke=\"#999\"/>")
              (- w 1) (- h 1))
      (format "<text x=\"%d\" y=\"%d\" font-weight=\"bold\" fill=\"#000\">%s</text>"
-             draw-kbd-svg-pad (+ draw-kbd-svg-pad draw-kbd-svg-font-size)
+             (draw-kbd--svg-pad) (+ (draw-kbd--svg-pad) draw-kbd-svg-font-size)
              (draw-kbd--svg-esc head))
      (mapconcat
       (lambda (row)
@@ -344,20 +355,20 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                        )
               ;; Nothing bound: just the tag, so the row still reads as a row.
               (format "<text x=\"%d\" y=\"%d\" fill=\"#bbb\">%s</text>"
-                      draw-kbd-svg-pad
-                      (+ draw-kbd-svg-pad draw-kbd-svg-font-size
-                         (* i draw-kbd-svg-line-h))
+                      (draw-kbd--svg-pad)
+                      (+ (draw-kbd--svg-pad) draw-kbd-svg-font-size
+                         (* i (draw-kbd--svg-line-h)))
                       (draw-kbd--svg-esc (car row)))
             (concat
              (format "<text x=\"%d\" y=\"%d\" fill=\"#aaa\">%s</text>"
-                     draw-kbd-svg-pad
-                     (+ draw-kbd-svg-pad draw-kbd-svg-font-size
-                        (* i draw-kbd-svg-line-h))
+                     (draw-kbd--svg-pad)
+                     (+ (draw-kbd--svg-pad) draw-kbd-svg-font-size
+                        (* i (draw-kbd--svg-line-h)))
                      (draw-kbd--svg-esc (car row)))
              (format "<text x=\"%.1f\" y=\"%d\" fill=\"%s\">%s</text>"
-                     (+ draw-kbd-svg-pad (* 3 (draw-kbd--svg-char-w)))
-                     (+ draw-kbd-svg-pad draw-kbd-svg-font-size
-                        (* i draw-kbd-svg-line-h))
+                     (+ (draw-kbd--svg-pad) (* 3 (draw-kbd--svg-char-w)))
+                     (+ (draw-kbd--svg-pad) draw-kbd-svg-font-size
+                        (* i (draw-kbd--svg-line-h)))
                      colour (draw-kbd--svg-esc (cdr row)))))))
       rows "")
      "</g>")))
@@ -367,7 +378,8 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
   (let* ((seen (make-hash-table :test 'equal))
          (w (draw-kbd--svg-cell-w))
          (file (expand-file-name (concat lay ".svg") draw-kbd-output))
-         (y 56.0)
+         ;; Clear of the heading and its subtitle, both sized from the font.
+         (y (* draw-kbd-svg-font-size 4.2))
          (max-x 0)
          body)
     (cl-loop for board in (draw-kbd--boards layout)
@@ -402,9 +414,18 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                         lx y (or (cdr (assoc tag draw-kbd-svg-layer-colors)) "#222")
                         tag name)
                 body)
-          (setq lx (+ lx 140))))
+          ;; Step by the widest legend entry rather than a fixed amount, so
+          ;; the row survives a bigger font.
+          (setq lx (+ lx (* (draw-kbd--svg-char-w)
+                            (+ 4 (apply #'max
+                                        (mapcar (lambda (l)
+                                                  (let ((tg (string-trim (car l))))
+                                                    (length (format "%s = %s" tg
+                                                                    (or (cdr (assoc tg draw-kbd-layer-names))
+                                                                        tg)))))
+                                                draw-kbd-layers))))))))
       (setq max-x (max max-x lx))
-      (setq y (+ y (* 2 draw-kbd-svg-line-h))))
+      (setq y (+ y (* 2 (draw-kbd--svg-line-h)))))
     ;; The sections are short and many, so they are packed into shelves across
     ;; the width of the keyboard rather than run down the page.
     (let* ((sections (draw-kbd--sections seen))
@@ -421,7 +442,7 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                       (indent 2))
                  (list sec
                        (* cw (max headw (+ indent keyw 1 cmdw)))   ; width
-                       (* draw-kbd-svg-line-h (1+ (length rows)))  ; height
+                       (* (draw-kbd--svg-line-h) (1+ (length rows)))  ; height
                        (* cw indent)                               ; key column
                        (* cw (+ indent keyw 1)))))                 ; command column
              sections)))
@@ -431,7 +452,7 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                               "  Only my own bindings, not Emacs's:</text>")
                       y)
               body)
-        (setq y (+ y (* 2 draw-kbd-svg-line-h)))
+        (setq y (+ y (* 2 (draw-kbd--svg-line-h))))
         (let ((x 0) (shelf 0))
           (dolist (b blocks)
             (cl-destructuring-bind (sec w h key-x cmd-x) b
@@ -439,7 +460,7 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                 (setq y (+ y shelf gap-y) x 0 shelf 0))
               (push (format (concat "<text x=\"%.1f\" y=\"%.1f\""
                                     " font-weight=\"bold\">%s (%d)</text>")
-                            x (+ y draw-kbd-svg-line-h)
+                            x (+ y (draw-kbd--svg-line-h))
                             (draw-kbd--svg-esc (car sec)) (length (cdr sec)))
                     body)
               (cl-loop for row in (cdr sec)
@@ -448,9 +469,9 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                                                 " fill=\"#333\">%s</text>"
                                                 "<text x=\"%.1f\" y=\"%.1f\""
                                                 " fill=\"#333\">%s</text>")
-                                        (+ x key-x) (+ y (* i draw-kbd-svg-line-h))
+                                        (+ x key-x) (+ y (* i (draw-kbd--svg-line-h)))
                                         (draw-kbd--svg-esc (car row))
-                                        (+ x cmd-x) (+ y (* i draw-kbd-svg-line-h))
+                                        (+ x cmd-x) (+ y (* i (draw-kbd--svg-line-h)))
                                         (draw-kbd--svg-esc (cdr row)))
                                 body))
               (setq shelf (max shelf h)
@@ -468,11 +489,14 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                 (format "<rect width=\"%d\" height=\"%d\" fill=\"#ffffff\"/>\n"
                         width height)
                 "<g transform=\"translate(12,12)\">\n"
-                (format (concat "<text x=\"0\" y=\"16\" font-size=\"17\""
+                (format (concat "<text x=\"0\" y=\"%d\" font-size=\"%d\""
                                 " font-weight=\"bold\" fill=\"#000\">%s (%s)</text>\n")
+                        (round (* draw-kbd-svg-font-size 1.4))
+                        (round (* draw-kbd-svg-font-size 1.5))
                         (draw-kbd--svg-esc lay) (draw-kbd--svg-esc draw-kbd-title))
-                (format (concat "<text x=\"0\" y=\"34\" fill=\"#666\">"
+                (format (concat "<text x=\"0\" y=\"%d\" fill=\"#666\">"
                                 "the global keymap after loading %s, %s</text>\n")
+                        (round (* draw-kbd-svg-font-size 2.9))
                         (draw-kbd--svg-esc (abbreviate-file-name draw-kbd-init-file))
                         (format-time-string "%Y-%m-%d"))
                 (mapconcat #'identity (nreverse body) "\n")
