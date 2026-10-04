@@ -405,27 +405,57 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
           (setq lx (+ lx 140))))
       (setq max-x (max max-x lx))
       (setq y (+ y (* 2 draw-kbd-svg-line-h))))
-    (let ((sections (draw-kbd--sections seen)))
-      (when sections
+    ;; The sections are short and many, so they are packed into shelves across
+    ;; the width of the keyboard rather than run down the page.
+    (let* ((sections (draw-kbd--sections seen))
+           (cw (draw-kbd--svg-char-w))
+           (gap-x 28)
+           (gap-y 10)
+           (blocks
+            (mapcar
+             (lambda (sec)
+               (let* ((rows (cdr sec))
+                      (keyw (apply #'max 0 (mapcar (lambda (r) (length (car r))) rows)))
+                      (cmdw (apply #'max 0 (mapcar (lambda (r) (length (cdr r))) rows)))
+                      (headw (length (format "%s (%d)" (car sec) (length rows))))
+                      (indent 2))
+                 (list sec
+                       (* cw (max headw (+ indent keyw 1 cmdw)))   ; width
+                       (* draw-kbd-svg-line-h (1+ (length rows)))  ; height
+                       (* cw indent)                               ; key column
+                       (* cw (+ indent keyw 1)))))                 ; command column
+             sections)))
+      (when blocks
         (push (format (concat "<text x=\"0\" y=\"%.1f\" fill=\"#000\""
                               " font-weight=\"bold\">Not on a board above."
                               "  Only my own bindings, not Emacs's:</text>")
                       y)
               body)
         (setq y (+ y (* 2 draw-kbd-svg-line-h)))
-        (dolist (section sections)
-          (push (format "<text x=\"0\" y=\"%.1f\" font-weight=\"bold\">%s (%d)</text>"
-                        y (draw-kbd--svg-esc (car section)) (length (cdr section)))
-                body)
-          (setq y (+ y draw-kbd-svg-line-h))
-          (dolist (row (cdr section))
-            (push (format (concat "<text x=\"12\" y=\"%.1f\" fill=\"#333\">%s</text>"
-                                  "<text x=\"200\" y=\"%.1f\" fill=\"#333\">%s</text>")
-                          y (draw-kbd--svg-esc (car row))
-                          y (draw-kbd--svg-esc (cdr row)))
-                  body)
-            (setq y (+ y draw-kbd-svg-line-h)))
-          (setq y (+ y (/ draw-kbd-svg-line-h 2))))))
+        (let ((x 0) (shelf 0))
+          (dolist (b blocks)
+            (cl-destructuring-bind (sec w h key-x cmd-x) b
+              (when (and (> x 0) (> (+ x w) max-x))
+                (setq y (+ y shelf gap-y) x 0 shelf 0))
+              (push (format (concat "<text x=\"%.1f\" y=\"%.1f\""
+                                    " font-weight=\"bold\">%s (%d)</text>")
+                            x (+ y draw-kbd-svg-line-h)
+                            (draw-kbd--svg-esc (car sec)) (length (cdr sec)))
+                    body)
+              (cl-loop for row in (cdr sec)
+                       for i from 2
+                       do (push (format (concat "<text x=\"%.1f\" y=\"%.1f\""
+                                                " fill=\"#333\">%s</text>"
+                                                "<text x=\"%.1f\" y=\"%.1f\""
+                                                " fill=\"#333\">%s</text>")
+                                        (+ x key-x) (+ y (* i draw-kbd-svg-line-h))
+                                        (draw-kbd--svg-esc (car row))
+                                        (+ x cmd-x) (+ y (* i draw-kbd-svg-line-h))
+                                        (draw-kbd--svg-esc (cdr row)))
+                                body))
+              (setq shelf (max shelf h)
+                    x (+ x w gap-x))))
+          (setq y (+ y shelf)))))
     (let ((width (+ max-x 24))
           (height (+ y 16)))
       (with-temp-file file
@@ -485,6 +515,44 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                                   "│"))
          (list (concat pad "└" (mapconcat (lambda (_) bar) cells "┴") "┘")))))))
 
+(defun draw-kbd--zip (blocks gap)
+  "Lay BLOCKS, each (WIDTH . LINES), side by side separated by GAP spaces."
+  (let ((h (apply #'max (mapcar (lambda (b) (length (cdr b))) blocks)))
+        (sep (make-string gap ?\s)))
+    (cl-loop for i below h
+             collect (string-trim-right
+                      (mapconcat (lambda (b)
+                                   (draw-kbd--pad (or (nth i (cdr b)) "") (car b)))
+                                 blocks sep)))))
+
+(defun draw-kbd--ascii-sections (sections width)
+  "Pack SECTIONS into shelves at most WIDTH columns wide."
+  (let* ((gap 3)
+         (blocks
+          (mapcar
+           (lambda (sec)
+             (let* ((rows (cdr sec))
+                    (keyw (apply #'max 0 (mapcar (lambda (r) (length (car r))) rows)))
+                    (lines (cons (format "%s (%d)" (car sec) (length rows))
+                                 (mapcar (lambda (r)
+                                           (format "  %s %s"
+                                                   (draw-kbd--pad (car r) keyw)
+                                                   (cdr r)))
+                                         rows))))
+               (cons (apply #'max (mapcar #'string-width lines)) lines)))
+           sections))
+         out shelf (shelf-w 0))
+    (dolist (b blocks)
+      (cond
+       ((null shelf) (setq shelf (list b) shelf-w (car b)))
+       ((> (+ shelf-w gap (car b)) width)
+        (setq out (append out (draw-kbd--zip shelf gap) (list ""))
+              shelf (list b) shelf-w (car b)))
+       (t (setq shelf (append shelf (list b))
+                shelf-w (+ shelf-w gap (car b))))))
+    (when shelf (setq out (append out (draw-kbd--zip shelf gap))))
+    out))
+
 (defun draw-kbd-ascii (layout lay)
   "Write the text board.  Return its path."
   (let* ((width (+ 3 draw-kbd-ascii-label-width))
@@ -518,11 +586,11 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
       (let ((sections (draw-kbd--sections seen)))
         (when sections
           (insert "\nNot on a board above.  Only my own bindings are listed"
-                  " here, not Emacs's:\n"))
-        (dolist (section sections)
-          (insert (format "\n%s (%d)\n" (car section) (length (cdr section))))
-          (dolist (row (cdr section))
-            (insert (format "  %-22s %s\n" (car row) (cdr row))))))
+                  " here, not Emacs's:\n\n")
+          ;; Packed across the width of the boards, not run down the page.
+          (dolist (line (draw-kbd--ascii-sections
+                         sections (apply #'max (mapcar #'string-width body))))
+            (insert line "\n"))))
       (insert (format "\n%d bound keys are drawn on the boards above.\n"
                       (hash-table-count seen))))
     (message "draw-kbd: wrote %s" file)

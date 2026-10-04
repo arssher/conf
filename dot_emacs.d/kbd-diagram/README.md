@@ -25,13 +25,14 @@ would replace the very bindings we are trying to draw.
 
 ## What comes out
 
-`us.svg`, about 1560x1130, holding in order:
+`us.svg`, about 1560x770, holding in order:
 
 - a board for the function keys,
 - the four rows of the main keyboard, every cell stacking all its layers,
 - a board for the navigation cluster,
 - the legend,
-- a section per prefix key for what no board can hold,
+- a section per prefix key for what no board can hold, packed into shelves
+  across the width rather than run down the page,
 
 and `us.png`, the same thing rasterised by whichever of inkscape,
 rsvg-convert, headless chromium or ImageMagick `convert` is installed.
@@ -56,7 +57,7 @@ decides how to draw a cell and what to do with the leftovers.
 | Function         | Flag     | Draws                                      |
 |------------------|----------|--------------------------------------------|
 | `draw-kbd-svg`   | default  | `<rect>` and `<text>`, in colour           |
-| `draw-kbd-ascii` | `--txt`  | box-drawing characters, ~100x200           |
+| `draw-kbd-ascii` | `--txt`  | box-drawing characters, ~70x200            |
 | `draw-kbd-ergo`  | `--ergo` | ergoemacs-mode's `kbd-ergo.svg` template   |
 
 Adding a row to `draw-kbd-layers` grows every board in every backend at once.
