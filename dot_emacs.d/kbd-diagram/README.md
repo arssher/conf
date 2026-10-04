@@ -27,17 +27,18 @@ would replace the very bindings we are trying to draw.
 
 ## What comes out
 
-`us.svg`, about 2110x1070, holding in order:
+`us.svg`, about 2530x1080, holding:
 
-- a board for the function keys,
-- the four rows of the main keyboard, every cell stacking all its layers,
-- a board for the navigation cluster,
+- the keyboard, laid out the way a real one is: function row along the top,
+  Backspace at the end of the number row, Tab before `q`, Return after `'`,
+  the space bar below, and the Insert/Home/PgUp block with the arrows parked
+  off to the right — every cell stacking all its layers,
 - the legend,
 - a section per prefix key for what no board can hold, packed into shelves
   across the width rather than run down the page,
 
 and `us.png`, the same thing rasterised at `--scale` pixels per SVG unit — 2
-by default, so 4226x2148 — by whichever of inkscape, rsvg-convert, headless
+by default, so 5066x2164 — by whichever of inkscape, rsvg-convert, headless
 chromium or ImageMagick `convert` is installed.  Each takes the scale
 differently: inkscape and `convert` as dots per inch against the SVG's nominal
 96, rsvg-convert as a zoom, chromium as a device pixel ratio over a window
@@ -64,10 +65,13 @@ decides how to draw a cell and what to do with the leftovers.
 | Function         | Flag     | Draws                                      |
 |------------------|----------|--------------------------------------------|
 | `draw-kbd-svg`   | default  | `<rect>` and `<text>`, in colour           |
-| `draw-kbd-ascii` | `--txt`  | box-drawing characters, ~70x200            |
+| `draw-kbd-ascii` | `--txt`  | box-drawing characters, ~66x235            |
 | `draw-kbd-ergo`  | `--ergo` | ergoemacs-mode's `kbd-ergo.svg` template   |
 
-Adding a row to `draw-kbd-layers` grows every board in every backend at once.
+Adding a row to `draw-kbd-layers` grows every key in every backend at once, and
+`draw-kbd--keyboard` is the one place that says where a key sits — rows of
+segments, each pinned to a column in key widths, so moving a key or adding one
+that is not drawn yet is a line there rather than a change to a renderer.
 
 ## Tuning it
 
@@ -75,8 +79,6 @@ Adding a row to `draw-kbd-layers` grows every board in every backend at once.
 |-------------------------------|---------------------------------------------|
 | `draw-kbd-layers`             | the rows inside each key cell               |
 | `draw-kbd-nav-layers`         | the same, for the named keys                |
-| `draw-kbd-fkey-layers`        | the same, for the function keys             |
-| `draw-kbd-nav-keys`           | which named keys get a box                  |
 | `draw-kbd-key-names`          | their cap legends                           |
 | `draw-kbd-layer-names`        | what the legend calls each row              |
 | `draw-kbd-labels`             | short names for commands ergoemacs-mode     |

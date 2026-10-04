@@ -80,25 +80,16 @@ different character rather than a modifier -- except on a named key like
 <left>, where there is no shifted character and `shift' is added to MODIFIERS
 instead.  Add a row here and every board grows one.")
 
-(defvar draw-kbd-fkey-layers
-  '(("  " ()             nil)
-    ("M " (meta)         nil)
-    ("C " (control)      nil)
-    ("CM" (control meta) nil))
-  "Cell rows for the function keys, which are worth showing unmodified too.")
-
 (defvar draw-kbd-nav-layers
   '(("  " ()             nil)
     ("S " ()             t)
     ("M " (meta)         nil)
     ("C " (control)      nil)
     ("CM" (control meta) nil))
-  "Cell rows for the named keys, which are worth showing plain and shifted.")
-
-(defvar draw-kbd-nav-keys
-  '(?\s tab return backspace delete insert
-    home end prior next up down left right print)
-  "The keys drawn on the navigation board, in order.")
+  "Cell rows for every named key, the function keys included: unlike a letter,
+they are worth showing unmodified, and Shift makes no new character of them so
+it has to be a modifier.  Same number of rows as `draw-kbd-layers\', so the two
+kinds of key sit side by side at the same height.")
 
 (defvar draw-kbd-key-names
   '((?\s . "SPC") (tab . "TAB") (return . "RET") (backspace . "⌫")
@@ -227,19 +218,43 @@ and shifted at +60, so the physical arrangement comes for free."
            collect (list c (string-to-char c)
                          (and s (not (string= s "")) (string-to-char s)))))
 
-(defun draw-kbd--named-row (keys)
-  "Key descriptors for named KEYS, which have no shifted character."
-  (mapcar (lambda (k) (list (draw-kbd--key-name k) k nil)) keys))
+(defun draw-kbd--named (keys layers)
+  "Cells for named KEYS, which have no shifted character."
+  (mapcar (lambda (k) (list (draw-kbd--key-name k) k nil layers)) keys))
 
-(defun draw-kbd--boards (layout)
-  "Every board, as (LAYERS . KEY-DESCRIPTORS) in drawing order."
-  (append
-   (list (cons draw-kbd-fkey-layers
-               (draw-kbd--named-row
-                (cl-loop for n from 1 to 12 collect (intern (format "f%d" n))))))
-   (cl-loop for row below 4
-            collect (cons draw-kbd-layers (draw-kbd--char-row layout row)))
-   (list (cons draw-kbd-nav-layers (draw-kbd--named-row draw-kbd-nav-keys)))))
+(defun draw-kbd--keyboard (layout)
+  "The physical arrangement of the picture.
+A list of rows; each row is a list of segments (COLUMN . CELLS); each cell is
+(HEAD BASE SHIFTED LAYERS).  COLUMN is in key widths from the left edge, so a
+segment can be parked to the right the way the navigation cluster is on a real
+keyboard, and fractions give the stagger of the home and bottom rows.
+
+This is the place to edit if a key is in the wrong spot, or if you want one
+that is not drawn at all.  Named keys carry `draw-kbd-nav-layers\' because
+Shift makes no new character of them, while the character keys carry
+`draw-kbd-layers\'; the two have the same number of rows, so they sit side by
+side in one row at the same height."
+  (let ((m draw-kbd-layers)
+        (n draw-kbd-nav-layers))
+    (cl-flet ((chars (row) (mapcar (lambda (k) (append k (list m)))
+                                   (draw-kbd--char-row layout row))))
+      (list
+       ;; Esc is left out on purpose: as the meta prefix it would only ever say
+       ;; "Prefix", and every M- binding is already drawn on its own key.
+       (list (cons 0 (draw-kbd--named
+                      (cl-loop for i from 1 to 12
+                               collect (intern (format "f%d" i)))
+                      n))
+             (cons 15 (draw-kbd--named '(print) n)))
+       (list (cons 0 (append (chars 0) (draw-kbd--named '(backspace) n)))
+             (cons 15 (draw-kbd--named '(insert home prior) n)))
+       (list (cons 0 (append (draw-kbd--named '(tab) n) (chars 1)))
+             (cons 15 (draw-kbd--named '(delete end next) n)))
+       (list (cons 0.5 (append (chars 2) (draw-kbd--named '(return) n))))
+       (list (cons 1 (chars 3))
+             (cons 16 (draw-kbd--named '(up) n)))
+       (list (cons 4 (draw-kbd--named '(?\s) n))
+             (cons 15 (draw-kbd--named '(left down right) n)))))))
 
 (defun draw-kbd--normalize (key)
   "Fold an ESC-prefixed sequence in KEY back into a single meta event.
@@ -408,30 +423,29 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
          (y (* draw-kbd-svg-font-size 4.2))
          (max-x 0)
          body)
-    (cl-loop for board in (draw-kbd--boards layout)
-             for n from 0
-             do (let* ((layers (car board))
-                       (keys (cdr board))
-                       ;; The function-key and navigation boards are their own
-                       ;; thing; only the four letter rows stagger.
-                       (indent (if (and (> n 0) (< n 5))
-                                   (* (1- n) (draw-kbd--svg-row-indent))
-                                 0))
-                       (x indent))
-                  (dolist (k keys)
-                    (push (draw-kbd--svg-cell x y (nth 0 k)
-                                              (draw-kbd--cell-data
-                                               (nth 1 k) (nth 2 k) layers
-                                               draw-kbd-svg-label-width seen)
-                                              layers)
-                          body)
-                    (setq x (+ x w (draw-kbd--svg-key-gap))))
-                  ;; x has run past the last key by one gap.
-                  (setq max-x (max max-x (- x (draw-kbd--svg-key-gap))))
-                  (setq y (+ y (draw-kbd--svg-cell-h layers)
-                             (if (memq n '(0 4))
-                                 (draw-kbd--svg-board-gap)
-                               (draw-kbd--svg-key-gap))))))
+    (let ((unit (+ w (draw-kbd--svg-key-gap))))
+      (cl-loop for row in (draw-kbd--keyboard layout)
+               for n from 0
+               do (let ((row-h 0))
+                    (dolist (seg row)
+                      (let ((x (* (car seg) unit)))
+                        (dolist (cell (cdr seg))
+                          (let ((layers (nth 3 cell)))
+                            (push (draw-kbd--svg-cell
+                                   x y (nth 0 cell)
+                                   (draw-kbd--cell-data
+                                    (nth 1 cell) (nth 2 cell) layers
+                                    draw-kbd-svg-label-width seen)
+                                   layers)
+                                  body)
+                            (setq row-h (max row-h (draw-kbd--svg-cell-h layers))
+                                  x (+ x unit))))
+                        ;; x has run past the last key of the segment by one gap.
+                        (setq max-x (max max-x (- x (draw-kbd--svg-key-gap))))))
+                    ;; A real keyboard has a gap under the function row only.
+                    (setq y (+ y row-h (if (= n 0)
+                                           (draw-kbd--svg-board-gap)
+                                         (draw-kbd--svg-key-gap)))))))
     ;; Legend, then the prefix sections, then size the canvas to fit.
     (let ((lx 0))
       (setq y (+ y (draw-kbd--svg-board-gap)))
@@ -538,35 +552,44 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
 (defvar draw-kbd-ascii-label-width 9
   "Characters available to a command name inside a text key cell.")
 
-(defvar draw-kbd-ascii-row-indent 3
-  "Characters each text keyboard row is indented past the one above it.")
-
 (defun draw-kbd--pad (s width)
   "Pad S with spaces to WIDTH columns, by display width, not character count."
   (concat s (make-string (max 0 (- width (string-width s))) ?\s)))
 
-(defun draw-kbd--ascii-board (keys layers width indent seen)
-  "Lines for one boxed board."
-  (let ((cells (mapcar
-                (lambda (k)
-                  (cons (draw-kbd--pad (concat " " (nth 0 k)) width)
-                        (mapcar (lambda (r)
-                                  (draw-kbd--pad (format "%s %s" (car r) (cdr r))
-                                                 width))
-                                (draw-kbd--cell-data
-                                 (nth 1 k) (nth 2 k) layers
-                                 draw-kbd-ascii-label-width seen))))
-                keys)))
-    (when cells
-      (let ((pad (make-string indent ?\s))
-            (bar (make-string width ?─)))
-        (append
-         (list (concat pad "┌" (mapconcat (lambda (_) bar) cells "┬") "┐"))
-         (cl-loop for i below (length (car cells))
-                  collect (concat pad "│"
-                                  (mapconcat (lambda (c) (nth i c)) cells "│")
-                                  "│"))
-         (list (concat pad "└" (mapconcat (lambda (_) bar) cells "┴") "┘")))))))
+(defun draw-kbd--ascii-overlay (lines block offset)
+  "Place BLOCK's lines at OFFSET columns, extending LINES as needed."
+  (cl-loop for i below (max (length lines) (length block))
+           collect (let ((base (or (nth i lines) ""))
+                         (add (nth i block)))
+                     (if add (concat (draw-kbd--pad base offset) add) base))))
+
+(defun draw-kbd--ascii-row (row width seen)
+  "Lines for one keyboard ROW of segments."
+  (let ((unit (1+ width))
+        lines)
+    (dolist (seg row lines)
+      (let* ((cells (mapcar
+                     (lambda (cell)
+                       (let ((layers (nth 3 cell)))
+                         (cons (draw-kbd--pad (concat " " (nth 0 cell)) width)
+                               (mapcar (lambda (r)
+                                         (draw-kbd--pad
+                                          (format "%s %s" (car r) (cdr r)) width))
+                                       (draw-kbd--cell-data
+                                        (nth 1 cell) (nth 2 cell) layers
+                                        draw-kbd-ascii-label-width seen)))))
+                     (cdr seg)))
+             (bar (make-string width ?─))
+             (block (append
+                     (list (concat "┌" (mapconcat (lambda (_) bar) cells "┬") "┐"))
+                     (cl-loop for i below (length (car cells))
+                              collect (concat "│"
+                                              (mapconcat (lambda (c) (nth i c))
+                                                         cells "│")
+                                              "│"))
+                     (list (concat "└" (mapconcat (lambda (_) bar) cells "┴") "┘")))))
+        (setq lines (draw-kbd--ascii-overlay lines block
+                                             (round (* (car seg) unit))))))))
 
 (defun draw-kbd--zip (blocks gap)
   "Lay BLOCKS, each (WIDTH . LINES), side by side separated by GAP spaces."
@@ -612,17 +635,11 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
          (seen (make-hash-table :test 'equal))
          (file (expand-file-name (concat lay ".txt") draw-kbd-output))
          body)
-    (cl-loop for board in (draw-kbd--boards layout)
+    (cl-loop for row in (draw-kbd--keyboard layout)
              for n from 0
-             do (setq body
-                      (append body
-                              (draw-kbd--ascii-board
-                               (cdr board) (car board) width
-                               (if (and (> n 0) (< n 5))
-                                   (* (1- n) draw-kbd-ascii-row-indent)
-                                 0)
-                               seen)
-                              (if (memq n '(0 4)) (list "") nil))))
+             do (setq body (append body
+                                   (draw-kbd--ascii-row row width seen)
+                                   (if (= n 0) (list "") nil))))
     (with-temp-file file
       (insert (format "The global keymap after loading %s\n"
                       (abbreviate-file-name draw-kbd-init-file))
