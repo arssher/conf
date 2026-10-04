@@ -15,7 +15,7 @@ GTAGS
 **/.claude/settings.local.json
 
 # Diagrams produced by dot_emacs.d/kbd-diagram/draw-kbd.sh. Regenerate them,
-# do not commit them. (The README is .md, so *.txt is safe to take wholesale.)
+# do not commit them. (CLAUDE.md is the only .md here, so *.txt is safe to take wholesale.)
 dot_emacs.d/kbd-diagram/*.txt
 dot_emacs.d/kbd-diagram/*.svg
 dot_emacs.d/kbd-diagram/*.png

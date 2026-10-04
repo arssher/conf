@@ -7,7 +7,7 @@ Draws the bindings from `~/.emacs.d/init.el` as one picture.
 ```sh
 ./draw-kbd.sh                  # us layout -> us.svg, us_full.svg and their PNGs
 ./draw-kbd.sh dvorak           # any layout name from ergoemacs-layouts.el
-./draw-kbd.sh --txt            # also us.txt, the same boards in box characters
+./draw-kbd.sh --txt            # also us.txt and us_full.txt, in box characters
 ./draw-kbd.sh --ergo           # also ergoemacs-mode's own sheets
 ./draw-kbd.sh --scale 4        # a crisper PNG (default 2)
 ```
@@ -61,8 +61,8 @@ greyed tag with nothing after it means nothing is bound; `λ` means an anonymous
 command; `Prefix` means a prefix key, whose contents are in a section further
 down.
 
-The boards show the whole global map, Emacs's bindings included, because that
-is what a reference chart is for.  The sections at the bottom are the opposite:
+The keyboard shows the whole global map, Emacs's bindings included, because
+that is what a reference chart is for.  The sections below it are the opposite:
 only what `init.el` itself added, since listing every stock `C-x` binding would
 bury the handful that are mine.
 
@@ -81,7 +81,9 @@ decides how to draw a cell and what to do with the leftovers.
 Adding a row to `draw-kbd-layers` grows every key in every backend at once, and
 `draw-kbd--keyboard` is the one place that says where a key sits — rows of
 segments, each pinned to a column in key widths, so moving a key or adding one
-that is not drawn yet is a line there rather than a change to a renderer.
+that is not drawn yet is a line there rather than a change to a renderer.  It
+also takes the `full` flag that decides whether the right-hand cluster is
+drawn, which is the whole difference between `us.svg` and `us_full.svg`.
 
 ## Tuning it
 
@@ -99,7 +101,10 @@ that is not drawn yet is a line there rather than a change to a renderer.
 | `draw-kbd-svg-key-stroke`     | and its colour                              |
 | `draw-kbd-svg-key-fill`       | the fill behind a key                       |
 | `draw-kbd-svg-label-width`    | how much room a command name gets           |
+| `draw-kbd-svg-line-ratio`     | line height, per font size                  |
 | `draw-kbd-svg-font-size`      | how big everything is                       |
+| `draw-kbd-ascii-label-width`  | the same room, in the `--txt` backend       |
+| `draw-kbd-title`              | what the heading calls this                 |
 
 `draw-kbd-svg-font-size` is the one knob for the size of the whole picture:
 line height, cell padding, cell width, the gaps between keys, the border
@@ -142,7 +147,10 @@ committing them.
 `init.el` itself.  That order matters: it snapshots the stock global map before
 `init.el` runs, so the sections can tell your bindings from Emacs's.  Each cell
 row is then a `lookup-key` in the live global map, and the key it looked up is
-recorded, so whatever is left over at the end is exactly what no board showed.
+recorded, so whatever is left over at the end is exactly what the keyboard did
+not show.  `draw-kbd--pack` then lays those sections out: it tries every column
+count and keeps the shortest arrangement that fits the width, which is what
+stops one long section setting the height of everything beside it.
 
 The layout vectors turn out to be a 4x15 grid already, rows padded with empty
 strings, unshifted then shifted at +60, so the physical arrangement comes for
@@ -150,7 +158,7 @@ free and a renderer only has to place it.
 
 ## Things to know
 
-- **Prefix sequences cannot go on a board.**  A prefix key shows as `Prefix`
+- **Prefix sequences cannot go on the keyboard.**  A prefix key shows as `Prefix`
   and its contents get a section.  This is not a limitation of the format: a
   two-key sequence simply is not a key.
 - **`input-decode-map` is invisible here.**  The `C-i` → `H-i` trick in
