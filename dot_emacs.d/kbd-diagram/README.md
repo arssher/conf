@@ -5,7 +5,7 @@ Draws the bindings from `~/.emacs.d/init.el` as one picture.
 ## Usage
 
 ```sh
-./draw-kbd.sh                  # us layout -> us.svg + us.png, next to this README
+./draw-kbd.sh                  # us layout -> us.svg, us_full.svg and their PNGs
 ./draw-kbd.sh dvorak           # any layout name from ergoemacs-layouts.el
 ./draw-kbd.sh --txt            # also us.txt, the same boards in box characters
 ./draw-kbd.sh --ergo           # also ergoemacs-mode's own sheets
@@ -27,18 +27,28 @@ would replace the very bindings we are trying to draw.
 
 ## What comes out
 
-`us.svg`, about 2530x1080, holding:
+Two pictures:
+
+| File            | Keyboard                                              |
+|-----------------|-------------------------------------------------------|
+| `us.svg`        | the main block alone, about 1970x1190                 |
+| `us_full.svg`   | plus Print, Ins/Home/PgUp, Del/End/PgDn, arrows; 2530x1080 |
+
+The right-hand cluster is wide and rarely interesting, so it is off by default.
+Nothing is lost by that: whatever is bound on those keys is listed under the
+short keyboard instead, which is why `us.svg` is narrower but a little taller.
+
+Each holds:
 
 - the keyboard, laid out the way a real one is: function row along the top,
   Backspace at the end of the number row, Tab before `q`, Return after `'`,
-  the space bar below, and the Insert/Home/PgUp block with the arrows parked
-  off to the right — every cell stacking all its layers,
+  and the space bar below — every cell stacking all its layers,
 - the legend,
-- a section per prefix key for what no board can hold, packed into shelves
-  across the width rather than run down the page,
+- a section per prefix key for what no key can hold, in balanced columns
+  rather than run down the page,
 
-and `us.png`, the same thing rasterised at `--scale` pixels per SVG unit — 2
-by default, so 5066x2164 — by whichever of inkscape, rsvg-convert, headless
+and a PNG of each, rasterised at `--scale` pixels per SVG unit — 2 by default,
+so 3946x2380 and 5066x2164 — by whichever of inkscape, rsvg-convert, headless
 chromium or ImageMagick `convert` is installed.  Each takes the scale
 differently: inkscape and `convert` as dots per inch against the SVG's nominal
 96, rsvg-convert as a zoom, chromium as a device pixel ratio over a window
@@ -65,7 +75,7 @@ decides how to draw a cell and what to do with the leftovers.
 | Function         | Flag     | Draws                                      |
 |------------------|----------|--------------------------------------------|
 | `draw-kbd-svg`   | default  | `<rect>` and `<text>`, in colour           |
-| `draw-kbd-ascii` | `--txt`  | box-drawing characters, ~66x235            |
+| `draw-kbd-ascii` | `--txt`  | box-drawing characters, us.txt + us_full.txt |
 | `draw-kbd-ergo`  | `--ergo` | ergoemacs-mode's `kbd-ergo.svg` template   |
 
 Adding a row to `draw-kbd-layers` grows every key in every backend at once, and

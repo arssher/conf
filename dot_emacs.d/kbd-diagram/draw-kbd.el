@@ -222,12 +222,17 @@ and shifted at +60, so the physical arrangement comes for free."
   "Cells for named KEYS, which have no shifted character."
   (mapcar (lambda (k) (list (draw-kbd--key-name k) k nil layers)) keys))
 
-(defun draw-kbd--keyboard (layout)
+(defun draw-kbd--keyboard (layout &optional full)
   "The physical arrangement of the picture.
 A list of rows; each row is a list of segments (COLUMN . CELLS); each cell is
 (HEAD BASE SHIFTED LAYERS).  COLUMN is in key widths from the left edge, so a
 segment can be parked to the right the way the navigation cluster is on a real
 keyboard, and fractions give the stagger of the home and bottom rows.
+
+Without FULL the blocks parked to the right -- Print, the Insert/Home/PgUp and
+Delete/End/PgDn pairs, and the arrows -- are left off.  They are wide and
+rarely interesting, and whatever is bound on them still gets listed below the
+keyboard, so the short picture loses nothing but space.
 
 This is the place to edit if a key is in the wrong spot, or if you want one
 that is not drawn at all.  Named keys carry `draw-kbd-nav-layers\' because
@@ -237,24 +242,72 @@ side in one row at the same height."
   (let ((m draw-kbd-layers)
         (n draw-kbd-nav-layers))
     (cl-flet ((chars (row) (mapcar (lambda (k) (append k (list m)))
-                                   (draw-kbd--char-row layout row))))
+                                   (draw-kbd--char-row layout row)))
+              (right (col keys) (and full (list (cons col (draw-kbd--named keys n))))))
       (list
        ;; Esc is left out on purpose: as the meta prefix it would only ever say
        ;; "Prefix", and every M- binding is already drawn on its own key.
-       (list (cons 0 (draw-kbd--named
-                      (cl-loop for i from 1 to 12
-                               collect (intern (format "f%d" i)))
-                      n))
-             (cons 15 (draw-kbd--named '(print) n)))
-       (list (cons 0 (append (chars 0) (draw-kbd--named '(backspace) n)))
-             (cons 15 (draw-kbd--named '(insert home prior) n)))
-       (list (cons 0 (append (draw-kbd--named '(tab) n) (chars 1)))
-             (cons 15 (draw-kbd--named '(delete end next) n)))
+       (append (list (cons 0 (draw-kbd--named
+                              (cl-loop for i from 1 to 12
+                                       collect (intern (format "f%d" i)))
+                              n)))
+               (right 15 '(print)))
+       (append (list (cons 0 (append (chars 0) (draw-kbd--named '(backspace) n))))
+               (right 15 '(insert home prior)))
+       (append (list (cons 0 (append (draw-kbd--named '(tab) n) (chars 1))))
+               (right 15 '(delete end next)))
        (list (cons 0.5 (append (chars 2) (draw-kbd--named '(return) n))))
-       (list (cons 1 (chars 3))
-             (cons 16 (draw-kbd--named '(up) n)))
-       (list (cons 4 (draw-kbd--named '(?\s) n))
-             (cons 15 (draw-kbd--named '(left down right) n)))))))
+       (append (list (cons 1 (chars 3)))
+               (right 16 '(up)))
+       (append (list (cons 4 (draw-kbd--named '(?\s) n)))
+               (right 15 '(left down right)))))))
+
+(defun draw-kbd--pack (blocks avail gap-x gap-y)
+  "Lay BLOCKS out in columns no wider than AVAIL.
+Each block is (WIDTH HEIGHT . PAYLOAD).  Returns (PLACED TOTAL-W TOTAL-H),
+where PLACED is a list of (X Y . PAYLOAD).
+
+Every column count is tried and the shortest layout that fits wins, which is
+what keeps one tall block from setting the height of a whole row: it gets a
+column to itself and the short ones stack beside it.  Blocks keep their order,
+so a prefix stays where you would look for it."
+  (let* ((n (length blocks))
+         (total (+ (apply #'+ (mapcar #'cadr blocks)) (* gap-y (max 0 (1- n)))))
+         best)
+    (cl-loop
+     for k from 1 to (max 1 n)
+     do (let ((target (/ total (float k)))
+              cols cur (curh 0))
+          (dolist (b blocks)
+            (if (and cur (> (+ curh gap-y (cadr b)) target))
+                (setq cols (cons (nreverse cur) cols) cur (list b) curh (cadr b))
+              (setq curh (if cur (+ curh gap-y (cadr b)) (cadr b))
+                    cur (cons b cur))))
+          (when cur (setq cols (cons (nreverse cur) cols)))
+          (setq cols (nreverse cols))
+          (let* ((widths (mapcar (lambda (c) (apply #'max (mapcar #'car c))) cols))
+                 (w (+ (apply #'+ widths) (* gap-x (1- (length cols)))))
+                 (h (apply #'max
+                           (mapcar (lambda (c)
+                                     (+ (apply #'+ (mapcar #'cadr c))
+                                        (* gap-y (1- (length c)))))
+                                   cols))))
+            (when (and (<= w avail)
+                       (or (null best) (< h (nth 2 best))))
+              (setq best (list cols w h))))))
+    ;; Nothing fits the width: one block per row is always legible.
+    (unless best
+      (setq best (list (list blocks)
+                       (apply #'max (mapcar #'car blocks))
+                       total)))
+    (let ((x 0) placed)
+      (dolist (col (nth 0 best))
+        (let ((y 0) (colw (apply #'max (mapcar #'car col))))
+          (dolist (b col)
+            (push (cons x (cons y (cddr b))) placed)
+            (setq y (+ y (cadr b) gap-y)))
+          (setq x (+ x colw gap-x))))
+      (list (nreverse placed) (nth 1 best) (nth 2 best)))))
 
 (defun draw-kbd--normalize (key)
   "Fold an ESC-prefixed sequence in KEY back into a single meta event.
@@ -414,17 +467,21 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
       rows "")
      "</g>")))
 
-(defun draw-kbd-svg (layout lay)
+(defun draw-kbd--name (lay full ext)
+  "File name for LAY, suffixed when FULL."
+  (expand-file-name (concat lay (if full "_full" "") ext) draw-kbd-output))
+
+(defun draw-kbd-svg (layout lay &optional full)
   "Write the picture.  Return its path."
   (let* ((seen (make-hash-table :test 'equal))
          (w (draw-kbd--svg-cell-w))
-         (file (expand-file-name (concat lay ".svg") draw-kbd-output))
+         (file (draw-kbd--name lay full ".svg"))
          ;; Clear of the heading and its subtitle, both sized from the font.
          (y (* draw-kbd-svg-font-size 4.2))
          (max-x 0)
          body)
     (let ((unit (+ w (draw-kbd--svg-key-gap))))
-      (cl-loop for row in (draw-kbd--keyboard layout)
+      (cl-loop for row in (draw-kbd--keyboard layout full)
                for n from 0
                do (let ((row-h 0))
                     (dolist (seg row)
@@ -469,12 +526,11 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                                                 draw-kbd-layers))))))))
       (setq max-x (max max-x lx))
       (setq y (+ y (* 2 (draw-kbd--svg-line-h)))))
-    ;; The sections are short and many, so they are packed into shelves across
-    ;; the width of the keyboard rather than run down the page.
+    ;; The sections are short and many, so they go in columns beside the
+    ;; keyboard rather than down the page.
     (let* ((sections (draw-kbd--sections seen))
            (cw (draw-kbd--svg-char-w))
-           (gap-x 28)
-           (gap-y 10)
+           (lh (draw-kbd--svg-line-h))
            (blocks
             (mapcar
              (lambda (sec)
@@ -483,27 +539,24 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                       (cmdw (apply #'max 0 (mapcar (lambda (r) (length (cdr r))) rows)))
                       (headw (length (format "%s (%d)" (car sec) (length rows))))
                       (indent 2))
-                 (list sec
-                       (* cw (max headw (+ indent keyw 1 cmdw)))   ; width
-                       (* (draw-kbd--svg-line-h) (1+ (length rows)))  ; height
-                       (* cw indent)                               ; key column
-                       (* cw (+ indent keyw 1)))))                 ; command column
+                 (list (* cw (max headw (+ indent keyw 1 cmdw)))
+                       (* lh (1+ (length rows)))
+                       sec (* cw indent) (* cw (+ indent keyw 1)))))
              sections)))
       (when blocks
         (push (format (concat "<text x=\"0\" y=\"%.1f\" fill=\"#000\""
-                              " font-weight=\"bold\">Not on a board above."
+                              " font-weight=\"bold\">Not on the keyboard above."
                               "  Only my own bindings, not Emacs's:</text>")
                       y)
               body)
-        (setq y (+ y (* 2 (draw-kbd--svg-line-h))))
-        (let ((x 0) (shelf 0))
-          (dolist (b blocks)
-            (cl-destructuring-bind (sec w h key-x cmd-x) b
-              (when (and (> x 0) (> (+ x w) max-x))
-                (setq y (+ y shelf gap-y) x 0 shelf 0))
+        (setq y (+ y (* 2 lh)))
+        (cl-destructuring-bind (placed pw ph)
+            (draw-kbd--pack blocks max-x (* 3 cw) lh)
+          (dolist (p placed)
+            (cl-destructuring-bind (bx by sec key-x cmd-x) p
               (push (format (concat "<text x=\"%.1f\" y=\"%.1f\""
                                     " font-weight=\"bold\">%s (%d)</text>")
-                            x (+ y (draw-kbd--svg-line-h))
+                            bx (+ y by lh)
                             (draw-kbd--svg-esc (car sec)) (length (cdr sec)))
                     body)
               (cl-loop for row in (cdr sec)
@@ -512,14 +565,13 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                                                 " fill=\"#333\">%s</text>"
                                                 "<text x=\"%.1f\" y=\"%.1f\""
                                                 " fill=\"#333\">%s</text>")
-                                        (+ x key-x) (+ y (* i (draw-kbd--svg-line-h)))
+                                        (+ bx key-x) (+ y by (* i lh))
                                         (draw-kbd--svg-esc (car row))
-                                        (+ x cmd-x) (+ y (* i (draw-kbd--svg-line-h)))
+                                        (+ bx cmd-x) (+ y by (* i lh))
                                         (draw-kbd--svg-esc (cdr row)))
-                                body))
-              (setq shelf (max shelf h)
-                    x (+ x w gap-x))))
-          (setq y (+ y shelf)))))
+                                body))))
+          (setq max-x (max max-x pw)
+                y (+ y ph)))))
     (let ((width (+ max-x 24))
           (height (+ y 16)))
       (with-temp-file file
@@ -602,7 +654,7 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                                  blocks sep)))))
 
 (defun draw-kbd--ascii-sections (sections width)
-  "Pack SECTIONS into shelves at most WIDTH columns wide."
+  "Pack SECTIONS into columns at most WIDTH columns wide."
   (let* ((gap 3)
          (blocks
           (mapcar
@@ -615,27 +667,27 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                                                    (draw-kbd--pad (car r) keyw)
                                                    (cdr r)))
                                          rows))))
-               (cons (apply #'max (mapcar #'string-width lines)) lines)))
-           sections))
-         out shelf (shelf-w 0))
-    (dolist (b blocks)
-      (cond
-       ((null shelf) (setq shelf (list b) shelf-w (car b)))
-       ((> (+ shelf-w gap (car b)) width)
-        (setq out (append out (draw-kbd--zip shelf gap) (list ""))
-              shelf (list b) shelf-w (car b)))
-       (t (setq shelf (append shelf (list b))
-                shelf-w (+ shelf-w gap (car b))))))
-    (when shelf (setq out (append out (draw-kbd--zip shelf gap))))
-    out))
+               (list (apply #'max (mapcar #'string-width lines))
+                     (length lines)
+                     lines)))
+           sections)))
+    (cl-destructuring-bind (placed _pw ph) (draw-kbd--pack blocks width gap 1)
+      (let ((out (make-list ph "")))
+        (dolist (p placed)
+          (cl-destructuring-bind (bx by lines) p
+            (cl-loop for line in lines
+                     for i from by
+                     do (setf (nth i out)
+                              (concat (draw-kbd--pad (nth i out) bx) line)))))
+        (mapcar #'string-trim-right out)))))
 
-(defun draw-kbd-ascii (layout lay)
+(defun draw-kbd-ascii (layout lay &optional full)
   "Write the text board.  Return its path."
   (let* ((width (+ 3 draw-kbd-ascii-label-width))
          (seen (make-hash-table :test 'equal))
-         (file (expand-file-name (concat lay ".txt") draw-kbd-output))
+         (file (draw-kbd--name lay full ".txt"))
          body)
-    (cl-loop for row in (draw-kbd--keyboard layout)
+    (cl-loop for row in (draw-kbd--keyboard layout full)
              for n from 0
              do (setq body (append body
                                    (draw-kbd--ascii-row row width seen)
@@ -655,8 +707,8 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
       (dolist (line body) (insert line "\n"))
       (let ((sections (draw-kbd--sections seen)))
         (when sections
-          (insert "\nNot on a board above.  Only my own bindings are listed"
-                  " here, not Emacs's:\n\n")
+          (insert "\nNot on the keyboard above.  Only my own bindings are"
+                  " listed here, not Emacs's:\n\n")
           ;; Packed across the width of the boards, not run down the page.
           (dolist (line (draw-kbd--ascii-sections
                          sections (apply #'max (mapcar #'string-width body))))
@@ -740,8 +792,10 @@ characters.")
   (let* ((ergoemacs-function-short-names
           (append draw-kbd-labels ergoemacs-function-short-names))
          (layout (symbol-value (ergoemacs :layout draw-kbd-layout))))
-    (append (list (draw-kbd-svg layout draw-kbd-layout))
-            (and draw-kbd-txt-p (list (draw-kbd-ascii layout draw-kbd-layout)))
+    (append (list (draw-kbd-svg layout draw-kbd-layout)
+                  (draw-kbd-svg layout draw-kbd-layout t))
+            (and draw-kbd-txt-p (list (draw-kbd-ascii layout draw-kbd-layout)
+                                      (draw-kbd-ascii layout draw-kbd-layout t)))
             (and draw-kbd-ergo-p (draw-kbd-ergo draw-kbd-layout)))))
 
 (draw-kbd)

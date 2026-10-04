@@ -1,10 +1,11 @@
 #!/bin/sh
 # Draw my keybindings.
 #
-# Writes <layout>.svg and <layout>.png: one picture holding a board for the
-# function keys, the four rows of the main keyboard with every modifier layer
-# stacked in each key cell, a board for the navigation cluster, and a section
-# per prefix key for what no board can hold.
+# Writes <layout>.svg and <layout>.png: the keyboard with every modifier layer
+# stacked in each key cell, and a section per prefix key for what no key can
+# hold. Also <layout>_full.svg, the same with Print, Insert/Home/PgUp,
+# Delete/End/PgDn and the arrows, which are wide and rarely interesting --
+# whatever is bound on them is listed under the short picture anyway.
 #
 # Usage: ./draw-kbd.sh [--txt] [--ergo] [--scale N] [layout]   (default: us)
 #   --txt      also write <layout>.txt, the same boards in box-drawing characters
@@ -95,7 +96,9 @@ rasterise() {
     echo "draw-kbd: wrote $_svg and $_png ($((_w * scale))x$((_h * scale)))"
 }
 
-rasterise "$svg"
+for f in "$svg" "$KBD_OUT/${layout}_full.svg"; do
+    [ -f "$f" ] && rasterise "$f"
+done
 if [ -n "$ergo" ]; then
     for f in "$KBD_OUT/$layout"-ergo*.svg; do
         [ -f "$f" ] && rasterise "$f"
