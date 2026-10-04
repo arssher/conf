@@ -1,10 +1,12 @@
 #!/bin/sh
-# Draw my keybindings on a keyboard picture.
+# Draw my keybindings.
 #
-# Loads ~/.emacs.d/init.el in batch mode, paints the resulting global keymap
-# onto ergoemacs-mode's SVG keyboard template, and rasterises it to PNG.
+# Writes <layout>.txt: one keyboard whose every cell lists all the modifier
+# layers, boards for the function keys and the navigation cluster, and a
+# section per prefix key for what no board can hold. With --svg it also draws
+# ergoemacs-mode's SVG sheets, which look better and say less.
 #
-# Usage: ./draw-kbd.sh [layout]          (default layout: us)
+# Usage: ./draw-kbd.sh [--svg] [layout]        (default layout: us)
 # Env:   ERGOEMACS_SRC  checkout of ergoemacs-mode   (default ~/dev/ergoemacs-mode)
 #        KBD_OUT        output directory             (default this directory)
 #        KBD_INIT       init file to draw             (default ~/.emacs.d/init.el)
@@ -14,10 +16,16 @@ set -eu
 here=$(cd "$(dirname "$0")" && pwd)
 : "${ERGOEMACS_SRC:=$HOME/dev/ergoemacs-mode}"
 : "${KBD_OUT:=$here}"
+
+svg=
+case ${1:-} in
+    --svg) svg=1; shift ;;
+esac
 layout=${1:-us}
 
 export ERGOEMACS_SRC KBD_OUT
 export KBD_LAYOUT="$layout"
+[ -n "$svg" ] && export KBD_SVG=1
 
 if [ ! -f "$ERGOEMACS_SRC/kbd-ergo.svg" ]; then
     echo "draw-kbd: no kbd-ergo.svg under $ERGOEMACS_SRC" >&2
@@ -30,11 +38,13 @@ fi
 # bindings from the ones Emacs ships with.
 emacs -Q --batch -l "$here/draw-kbd.el" 2>&1 | grep -v '^Loading ' || true
 
-svg="$KBD_OUT/$layout.svg"
-[ -f "$svg" ] || { echo "draw-kbd: $svg was not produced" >&2; exit 1; }
+txt="$KBD_OUT/$layout.txt"
+[ -f "$txt" ] || { echo "draw-kbd: $txt was not produced" >&2; exit 1; }
+echo "draw-kbd: wrote $txt"
+[ -z "$svg" ] && exit 0
 
 # Rasterise with whatever is installed.  ImageMagick's `convert' is deliberately
-# last: without its rsvg delegate it renders this file as garbage.
+# last: without its rsvg delegate it renders these files as garbage.
 rasterise() {
     _svg=$1
     _png=${_svg%.svg}.png
@@ -62,10 +72,6 @@ rasterise() {
     echo "draw-kbd: wrote $_svg and $_png"
 }
 
-# The main sheet plus every extra-layer sheet draw-kbd.el emitted beside it.
 for f in "$KBD_OUT/$layout.svg" "$KBD_OUT/$layout"-*.svg; do
     [ -f "$f" ] && rasterise "$f"
 done
-
-leftovers="$KBD_OUT/$layout-not-drawn.txt"
-[ -f "$leftovers" ] && echo "draw-kbd: $(sed -n 's/^  not drawn  *//p' "$leftovers") bindings are listed in $leftovers"

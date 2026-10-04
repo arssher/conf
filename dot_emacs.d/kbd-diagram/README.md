@@ -1,49 +1,18 @@
 # Keyboard diagram of my Emacs bindings
 
-Paints the bindings from `~/.emacs.d/init.el` onto the SVG keyboard template
-that ships with [ergoemacs-mode][], the same picture that appears at the bottom
-of <https://ergoemacs.github.io/>.
-
-[ergoemacs-mode]: https://github.com/ergoemacs/ergoemacs-mode
+Draws the bindings from `~/.emacs.d/init.el` as a keyboard, in one text file.
 
 ## Usage
 
 ```sh
-./draw-kbd.sh            # us layout, next to this README
+./draw-kbd.sh            # us layout -> us.txt, next to this README
 ./draw-kbd.sh dvorak     # any layout name from ergoemacs-layouts.el
+./draw-kbd.sh --svg      # also draw the ergoemacs SVG sheets
 ```
-
-Two sheets come out of each run:
-
-| File                   | Shows                                             |
-|------------------------|---------------------------------------------------|
-| `us.svg` / `.png`      | Alt, Alt+Shift, Ctrl, Ctrl+Shift                  |
-| `us-ctrl-meta.svg`     | Ctrl+Alt, Ctrl+Alt+Shift, and Hyper if ever bound |
-| `us-not-drawn.txt`     | every binding the two sheets leave out            |
-
-The listing is the honest half of the picture.  A diagram you use as a
-reference is dangerous when it silently omits things, so each run diffs the
-global map against stock Emacs, drops what the sheets cover, and writes down
-the rest:
-
-```
-  drawn       65
-  not drawn   38
-
-Under a prefix key (25)
-  C-x 4                  my-split-root-window-below
-  ...
-No box for that key (13)
-  C-<left>               shrink-window-horizontally
-  ...
-```
-
-The third bucket it can print, "No slot for that modifier combination", is
-empty as long as `draw-kbd-extra-layers` covers what you actually bind.
 
 | Variable        | Default                | Meaning                         |
 |-----------------|------------------------|---------------------------------|
-| `ERGOEMACS_SRC` | `~/dev/ergoemacs-mode` | checkout supplying the template |
+| `ERGOEMACS_SRC` | `~/dev/ergoemacs-mode` | checkout supplying the layouts  |
 | `KBD_OUT`       | this directory         | where the output lands          |
 | `KBD_INIT`      | `~/.emacs.d/init.el`   | the init file to draw           |
 
@@ -51,66 +20,111 @@ The checkout is the only prerequisite: `git clone
 https://github.com/ergoemacs/ergoemacs-mode ~/dev/ergoemacs-mode`.  Nothing
 needs to be byte-compiled or installed.
 
-For the PNG the script uses the first of inkscape, rsvg-convert, headless
-chromium, or ImageMagick `convert` that it finds.  `convert` is last on purpose:
-without its rsvg delegate it renders this file as garbage.
+## What comes out
+
+`us.txt`, about 100 lines and 200 columns wide, holding in order:
+
+- a board for the function keys,
+- the four rows of the main keyboard, every cell listing all its layers,
+- a board for the navigation cluster,
+- a section per prefix key for what no board can hold,
+- a count of what was drawn.
+
+```
+┌────────────┬────────────┬────────────┬────────────┐
+│ e          │ r          │ t          │ y          │
+│M  ⌫ word   │M  ⌦ word   │M  transpos…│M  yank pop │
+│MS          │MS projecti…│MS          │MS          │
+│C  → line   │C  rep      │C  transpose│C  ⌧ line   │
+│CS          │CS          │CS          │CS          │
+│CM end of d…│CM revert   │CM transpos…│CM          │
+└────────────┴────────────┴────────────┴────────────┘
+```
+
+A blank means nothing is bound; `λ` means an anonymous command; `Prefix` means
+a prefix key, whose contents are in a section further down.
+
+The boards show the whole global map, Emacs's bindings included, because that
+is what a reference chart is for.  The sections at the bottom are the opposite:
+only what `init.el` itself added, since listing every stock `C-x` binding would
+bury the handful that are mine.
+
+## Tuning it
+
+Everything worth changing is a defvar at the top of `draw-kbd.el`:
+
+| Variable                       | Does                                        |
+|--------------------------------|---------------------------------------------|
+| `draw-kbd-ascii-layers`        | the rows inside each key cell               |
+| `draw-kbd-ascii-nav-layers`    | the same, for the named keys                |
+| `draw-kbd-ascii-fkey-layers`   | the same, for the function keys             |
+| `draw-kbd-ascii-nav-keys`      | which named keys get a box                  |
+| `draw-kbd-ascii-key-names`     | their cap legends                           |
+| `draw-kbd-ascii-label-width`   | how much room a command name gets           |
+| `draw-kbd-labels`              | short names for commands ergoemacs-mode     |
+|                                | has never heard of                          |
+
+Add a row to `draw-kbd-ascii-layers` and every board grows one.  Labels come
+from `ergoemacs-function-short-names` first, then from the command name with
+the usual prefixes stripped, truncated to `draw-kbd-ascii-label-width`.
+
+## Why text and not the picture
+
+ergoemacs-mode draws the keyboard picture at the bottom of
+<https://ergoemacs.github.io/> by filling placeholders in an Inkscape SVG,
+`kbd-ergo.svg`.  It is a nicer thing to look at, and `--svg` still produces it,
+but it has room for four layers per key and no boxes at all for the arrows, so
+it cannot show everything: of the 103 bindings my `init.el` adds to stock
+Emacs, the sheets drew 65.  Text has no such ceiling, and it greps and diffs.
+
+With `--svg` you get `us.svg` / `us.png` (Alt, Alt+Shift, Ctrl, Ctrl+Shift) and
+`us-ctrl-meta.svg` / `.png`, whose `draw-kbd-extra-layers` re-points the Alt
+rows at `control meta` and the Ctrl rows at `hyper`.  That trick works because
+the four layers are only a convention: each slot reaches
+`ergoemacs-theme--svg-elt` as (INDEX . MODIFIERS) and is resolved with
+`event-convert-list`, which takes any modifiers.
 
 ## Why it is in the chezmoi repo but not applied
 
 This is a tool that *reads* the applied `~/.emacs.d/init.el`; it is not config
 that `~/.emacs.d` needs in order to work.  So `.chezmoiignore` lists
 `.emacs.d/kbd-diagram`, and it is run from the source tree.  The generated
-`*.svg` / `*.png` are gitignored — regenerate them rather than committing them.
+`*.txt`, `*.svg` and `*.png` are gitignored — regenerate them rather than
+committing them.
 
 ## How it works
 
 `draw-kbd.sh` runs `emacs -Q --batch -l draw-kbd.el`, and `draw-kbd.el` loads
 `init.el` itself.  That order matters: it snapshots the stock global map before
-`init.el` runs, so the listing can tell your bindings from the ones Emacs ships
-with.  It then:
+`init.el` runs, so the sections can tell your bindings from Emacs's.  Each cell
+row is then a `lookup-key` in the live global map, and the key it looked up is
+recorded, so whatever is left over at the end is exactly what no board showed.
 
-1. loads `ergoemacs-mode` but **never turns it on**.  `ergoemacs-theme--svg`
-   looks each key up in `ergoemacs-override-keymap` and then falls back to
-   `(current-global-map)` — with the mode off the first is empty, so what gets
-   painted is exactly what `init.el` bound;
-2. walks `kbd-ergo.svg`, whose `>M17<`, `>C77<`, `>T17<`, `>NF1<` … placeholders
-   stand for "Alt+ this key", "Ctrl+Shift+ this key", the key's own character,
-   and the function-key labels;
-3. labels each binding from `ergoemacs-function-short-names`, with
-   `draw-kbd-labels` prepended for commands ergoemacs-mode has never heard of;
-4. writes into a throwaway temp directory, so no run can read a stale cache or
-   leave `ergoemacs-extras/` behind, and copies the result here.
+`ergoemacs-mode` is loaded but **never turned on** — it is there for the layout
+vectors and the label tables, and turning it on would replace the very
+bindings we are trying to draw.
 
 ## Things to know
 
-- **Labels are truncated to 10 characters.**  Long command names show up as
-  `ggtags nex…`; give them an entry in `draw-kbd-labels` in `draw-kbd.el`.
-- **The template has four layers per key.**  Which four is only a convention:
-  each slot reaches `ergoemacs-theme--svg-elt` as (INDEX . MODIFIERS) and is
-  resolved with `event-convert-list`, which accepts any modifiers.  That is how
-  the second sheet works — `draw-kbd-extra-layers` re-points the Alt rows at
-  `control meta` and the Ctrl rows at `hyper`.  Edit it to chase some other
-  combination, or set it to nil for one sheet only.
-- **Prefix sequences are still not drawn** on a sheet; they are listed in
-  `*-not-drawn.txt` instead.  A prefix key shows only as "Prefix Key".  ergoemacs-mode has a
-  `full-p` mode meant for exactly this, which emits `<theme>-<layout>-C-x.svg`
-  and friends, but the sheets come out blank — see "Upstream quirks" below.
-  Even working, it would only cover *modified* second keys (`C-x C-u`); plain
-  ones like `C-x 4` have no slot, because there is no unmodified layer.
-- **Keys remapped through `input-decode-map`** (the `C-i` → `H-i` trick in
-  `init.el`) are drawn as the raw keymap has them, not as they are typed.
+- **Prefix sequences cannot go on a board.**  A prefix key shows as `Prefix`
+  and its contents get a section.  This is not a limitation of the format: a
+  two-key sequence simply is not a key.
+- **`input-decode-map` is invisible here.**  The `C-i` → `H-i` trick in
+  `init.el` is a translation, not a binding, so the board shows the raw keymap.
+  It is also inside a `window-system` guard, which a batch Emacs never enters.
 - `draw-kbd-inhibit-state-writes` detaches `savehist-autosave` and
-  `recentf-save-list` from `kill-emacs-hook` before generating, so the batch
-  Emacs leaves `~/.emacs.d/savehist` and `~/.emacs.d/recentf` byte-identical.
-  It detaches the hooks by hand instead of turning the modes off, because
+  `recentf-save-list` from `kill-emacs-hook` before drawing, so the batch Emacs
+  leaves `~/.emacs.d/savehist` and `~/.emacs.d/recentf` byte-identical.  It
+  detaches the hooks by hand instead of turning the modes off, because
   `(recentf-mode -1)` itself calls `recentf-save-list`.
+
 ## Upstream quirks
 
 - `draw-kbd.el` defines `ergoemacs-M-O-binding`, which `ergoemacs-theme-engine.el`
-  still reads although commit `dc2e1a6` dropped its `defvar`.  Without it
-  generation dies with *"Symbol's value as variable is void"*.
-- The per-prefix sheets (`full-p`) render empty.  `ergoemacs-theme--svg-elt`
-  does
+  still reads although commit `dc2e1a6` dropped its `defvar`.  Without it the
+  `--svg` path dies with *"Symbol's value as variable is void"*.
+- ergoemacs-mode's own per-prefix sheets (`full-p`) render empty.
+  `ergoemacs-theme--svg-elt` does
 
       (or (lookup-key ergoemacs-override-keymap key)
           (lookup-key (current-global-map) key))
