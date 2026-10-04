@@ -15,6 +15,12 @@ vscode
 .bash_scripts/archive
 .bash_scripts/archive/**
 
+# Keyboard-diagram generator. Repo-only: it is a tool that reads the applied
+# ~/.emacs.d/init.el, not config that ~/.emacs.d needs. Run it from the source
+# tree. Its generated .svg/.png are gitignored.
+.emacs.d/kbd-diagram
+.emacs.d/kbd-diagram/**
+
 # Machine-local Claude Code permission overrides. Only this file: the rest of
 # dot_claude/ is managed. Never add ~/.claude/.credentials.json or the state
 # under projects/, sessions/, history.jsonl and friends -- this repo is public.

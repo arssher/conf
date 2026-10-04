@@ -13,3 +13,8 @@ GTAGS
 
 # machine-local Claude Code permission overrides; this repo is public
 **/.claude/settings.local.json
+
+# Diagrams produced by dot_emacs.d/kbd-diagram/draw-kbd.sh. Regenerate them,
+# do not commit them.
+dot_emacs.d/kbd-diagram/*.svg
+dot_emacs.d/kbd-diagram/*.png
