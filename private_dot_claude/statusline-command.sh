@@ -2,14 +2,14 @@
 # Claude Code status line.
 #
 # Renders, left to right:
-#   user@host  Model <context window size> | Git branch | Tokens (% used) | Directory
+#   user@host  Model <context window size> | Git branch | Tokens (% context, % session, % week) | Directory
 #
 # Example:
-#   ars@nonlibrem  Opus 5 1m | main | 492.5k tokens (49%) | ~/projects/foo
+#   ars@nonlibrem  Opus 5 1m | main | 492.5k tokens (49% ww, 7% curr_s, 28% curr_w) | ~/projects/foo
 #
 # Segments degrade independently: outside a git repository the branch reads
-# "no git", and the window size and percentage are omitted entirely when the
-# payload does not carry them — no empty brackets, no stray separators.
+# "no git", and the window size and any of the percentages are omitted
+# entirely when the payload does not carry them — no empty brackets, no stray separators.
 #
 # Wiring — "statusLine" in ~/.claude/settings.json:
 #   { "type": "command", "command": "bash ~/.claude/statusline-command.sh" }
@@ -47,6 +47,13 @@ pct=$(jq -r '.context_window.used_percentage // empty' <<<"$input")
 
 # Total size of the context window, shown beside the model name.
 size=$(jq -r '.context_window.context_window_size // empty' <<<"$input")
+
+# Rate-limit usage, both 0-100 integers. Confirmed against a live payload
+# (v2.1.288). These are plan quota, not context: five_hour is the rolling
+# 5-hour window /usage labels "current session", seven_day the weekly one.
+# Both carry a sibling .resets_at (unix seconds) if a countdown is ever wanted.
+sess_pct=$(jq -r '.rate_limits.five_hour.used_percentage // empty' <<<"$input")
+week_pct=$(jq -r '.rate_limits.seven_day.used_percentage // empty' <<<"$input")
 
 # --- chroot marker ------------------------------------------------------
 # Debian convention: if the system is a chroot, /etc/debian_chroot holds its
@@ -94,10 +101,23 @@ if [ -n "$size" ] && [ "$size" != "null" ]; then
   ctx="${esc}[90m ${short}${esc}[0m"
 fi
 
-usage="$tok tokens"
-if [ -n "$pct" ] && [ "$pct" != "null" ]; then
-  usage=$(awk -v t="$tok" -v p="$pct" 'BEGIN{printf "%s tokens (%.0f%%)", t, p}')
-fi
+# Three percentages, comma-separated inside one set of parentheses:
+#   ww     = context window in use
+#   curr_s = 5-hour ("current session") quota
+#   curr_w = 7-day ("current week") quota
+# Each is appended only when the payload supplied it, so a build that sends
+# no rate limits still renders "465.2k tokens (49% ww)" and one that sends
+# nothing at all renders a bare "465.2k tokens" — never "(%)" or ", ".
+parts=""
+add_pct() {
+  [ -z "$1" ] || [ "$1" = "null" ] && return
+  parts="${parts:+$parts, }$(awk -v p="$1" 'BEGIN{printf "%.0f%%", p}') $2"
+}
+add_pct "$pct" ww
+add_pct "$sess_pct" curr_s
+add_pct "$week_pct" curr_w
+
+usage="$tok tokens${parts:+ ($parts)}"
 
 # --- render -------------------------------------------------------------
 # ANSI colours: 01;32 green user@host, 36 cyan model, 33 yellow branch,

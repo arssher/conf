@@ -8,5 +8,5 @@
     "command": "bash ~/.claude/statusline-command.sh"
   },
   "theme": "dark",
-  "showTurnDuration": false
+  "showTurnDuration": true
 }
