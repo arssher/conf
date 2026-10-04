@@ -90,6 +90,8 @@
 ;; Try to write C-letter keys first, then M-letter, then M-big_letter,
 ;; then C-M-letter
 
+;; See kbd-diagram for a picture of result.
+
 ;; Basic, global keys
 
 ;; The F keys row

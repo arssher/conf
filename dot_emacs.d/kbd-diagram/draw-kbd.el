@@ -297,8 +297,14 @@ is the one knob for how big the whole thing comes out.")
 
 (defvar draw-kbd-svg-line-ratio 1.25
   "Line height as a multiple of `draw-kbd-svg-font-size'.")
-(defvar draw-kbd-svg-gap 10 "Vertical space between boards.")
-(defvar draw-kbd-svg-row-indent 14 "Stagger of each keyboard row.")
+(defvar draw-kbd-svg-gap-ratio 0.75
+  "Space between neighbouring keys, as a multiple of the font size.")
+
+(defvar draw-kbd-svg-stroke-ratio 0.14
+  "Key border weight, as a multiple of the font size.")
+
+(defvar draw-kbd-svg-key-stroke "#5a5a5a" "Colour of a key's border.")
+(defvar draw-kbd-svg-key-fill "#fafafa" "Fill of a key.")
 
 (defvar draw-kbd-svg-layer-colors
   '(("M"  . "#1a4b9c") ("MS" . "#b31a1a")
@@ -326,6 +332,22 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
   "Breathing room between a cell's border and its text."
   (max 3 (round (* draw-kbd-svg-font-size 0.45))))
 
+(defun draw-kbd--svg-key-gap ()
+  "Space between neighbouring keys, across and down."
+  (max 2 (round (* draw-kbd-svg-font-size draw-kbd-svg-gap-ratio))))
+
+(defun draw-kbd--svg-stroke ()
+  "Weight of a key's border."
+  (max 1.0 (* draw-kbd-svg-font-size draw-kbd-svg-stroke-ratio)))
+
+(defun draw-kbd--svg-board-gap ()
+  "Space between one board and the next."
+  (* 2 (draw-kbd--svg-key-gap)))
+
+(defun draw-kbd--svg-row-indent ()
+  "Stagger of each keyboard row past the one above it."
+  (round draw-kbd-svg-font-size))
+
 (defun draw-kbd--svg-cell-w ()
   (+ (* 2 (draw-kbd--svg-pad))
      (* (draw-kbd--svg-char-w) (+ 3 draw-kbd-svg-label-width))))
@@ -340,9 +362,13 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
         (i 0))
     (concat
      (format "<g transform=\"translate(%.1f,%.1f)\">" x y)
-     (format (concat "<rect x=\".5\" y=\".5\" width=\"%.1f\" height=\"%.1f\""
-                     " rx=\"3\" fill=\"#fafafa\" stroke=\"#999\"/>")
-             (- w 1) (- h 1))
+     ;; Inset by half the stroke, or the border is clipped by the cell's edge.
+     (let ((sw (draw-kbd--svg-stroke)))
+       (format (concat "<rect x=\"%.2f\" y=\"%.2f\" width=\"%.1f\""
+                       " height=\"%.1f\" rx=\"4\" fill=\"%s\""
+                       " stroke=\"%s\" stroke-width=\"%.2f\"/>")
+               (/ sw 2) (/ sw 2) (- w sw) (- h sw)
+               draw-kbd-svg-key-fill draw-kbd-svg-key-stroke sw))
      (format "<text x=\"%d\" y=\"%d\" font-weight=\"bold\" fill=\"#000\">%s</text>"
              (draw-kbd--svg-pad) (+ (draw-kbd--svg-pad) draw-kbd-svg-font-size)
              (draw-kbd--svg-esc head))
@@ -389,7 +415,7 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                        ;; The function-key and navigation boards are their own
                        ;; thing; only the four letter rows stagger.
                        (indent (if (and (> n 0) (< n 5))
-                                   (* (1- n) draw-kbd-svg-row-indent)
+                                   (* (1- n) (draw-kbd--svg-row-indent))
                                  0))
                        (x indent))
                   (dolist (k keys)
@@ -399,13 +425,16 @@ Alt+Shift, green Ctrl, magenta Ctrl+Shift.")
                                                draw-kbd-svg-label-width seen)
                                               layers)
                           body)
-                    (setq x (+ x w)))
-                  (setq max-x (max max-x x))
+                    (setq x (+ x w (draw-kbd--svg-key-gap))))
+                  ;; x has run past the last key by one gap.
+                  (setq max-x (max max-x (- x (draw-kbd--svg-key-gap))))
                   (setq y (+ y (draw-kbd--svg-cell-h layers)
-                             (if (memq n '(0 4)) draw-kbd-svg-gap 2)))))
+                             (if (memq n '(0 4))
+                                 (draw-kbd--svg-board-gap)
+                               (draw-kbd--svg-key-gap))))))
     ;; Legend, then the prefix sections, then size the canvas to fit.
     (let ((lx 0))
-      (setq y (+ y draw-kbd-svg-gap))
+      (setq y (+ y (draw-kbd--svg-board-gap)))
       (dolist (layer draw-kbd-layers)
         (let* ((tag (string-trim (car layer)))
                (name (or (cdr (assoc tag draw-kbd-layer-names)) tag)))
