@@ -264,8 +264,11 @@
 (require 'speedbar)
 (require 'advice)
 (require 'cl-lib)
-(eval-when-compile
-  (require 'cl))
+;; Local change: upstream also had (eval-when-compile (require 'cl)) here, for
+;; `incf'. This file is loaded as source, and `eval-when-compile' evaluates its
+;; body when interpreted, so that require ran on every start and Emacs 29+
+;; answered it with "Package cl is deprecated" in *Messages*. The two `incf'
+;; calls below are `cl-incf' now, which cl-lib above provides.
 
 ;;; Code:
 
@@ -578,9 +581,9 @@ If WINDOW is nil, get current window."
     (walk-windows
      (lambda (w)
        (with-selected-window w
-         (incf window-number)
+         (cl-incf window-number)
          (if (window-dedicated-p w)
-             (incf dedicated-window-number)))))
+             (cl-incf dedicated-window-number)))))
     (if (and (> dedicated-window-number 0)
              (= (- window-number dedicated-window-number) 1))
         t nil)))
