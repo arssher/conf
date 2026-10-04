@@ -18,3 +18,4 @@ GTAGS
 # do not commit them.
 dot_emacs.d/kbd-diagram/*.svg
 dot_emacs.d/kbd-diagram/*.png
+dot_emacs.d/kbd-diagram/*-not-drawn.txt

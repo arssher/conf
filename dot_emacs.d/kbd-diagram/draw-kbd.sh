@@ -7,6 +7,7 @@
 # Usage: ./draw-kbd.sh [layout]          (default layout: us)
 # Env:   ERGOEMACS_SRC  checkout of ergoemacs-mode   (default ~/dev/ergoemacs-mode)
 #        KBD_OUT        output directory             (default this directory)
+#        KBD_INIT       init file to draw             (default ~/.emacs.d/init.el)
 
 set -eu
 
@@ -24,11 +25,10 @@ if [ ! -f "$ERGOEMACS_SRC/kbd-ergo.svg" ]; then
     exit 1
 fi
 
-# -Q keeps the batch Emacs from loading init.el twice; we load it explicitly so
-# that a failure in it is visible instead of silently skipped.
-emacs -Q --batch \
-      -l "$HOME/.emacs.d/init.el" \
-      -l "$here/draw-kbd.el" 2>&1 | grep -v '^Loading ' || true
+# -Q so that nothing but the init file under test is loaded. draw-kbd.el loads
+# that file itself, after snapshotting the stock global map, so it can tell my
+# bindings from the ones Emacs ships with.
+emacs -Q --batch -l "$here/draw-kbd.el" 2>&1 | grep -v '^Loading ' || true
 
 svg="$KBD_OUT/$layout.svg"
 [ -f "$svg" ] || { echo "draw-kbd: $svg was not produced" >&2; exit 1; }
@@ -66,3 +66,6 @@ rasterise() {
 for f in "$KBD_OUT/$layout.svg" "$KBD_OUT/$layout"-*.svg; do
     [ -f "$f" ] && rasterise "$f"
 done
+
+leftovers="$KBD_OUT/$layout-not-drawn.txt"
+[ -f "$leftovers" ] && echo "draw-kbd: $(sed -n 's/^  not drawn  *//p' "$leftovers") bindings are listed in $leftovers"

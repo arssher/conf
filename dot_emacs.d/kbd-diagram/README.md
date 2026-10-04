@@ -15,15 +15,37 @@ of <https://ergoemacs.github.io/>.
 
 Two sheets come out of each run:
 
-| File                   | Shows                                            |
-|------------------------|--------------------------------------------------|
+| File                   | Shows                                             |
+|------------------------|---------------------------------------------------|
 | `us.svg` / `.png`      | Alt, Alt+Shift, Ctrl, Ctrl+Shift                  |
 | `us-ctrl-meta.svg`     | Ctrl+Alt, Ctrl+Alt+Shift, and Hyper if ever bound |
+| `us-not-drawn.txt`     | every binding the two sheets leave out            |
 
-| Variable        | Default                | Meaning                        |
-|-----------------|------------------------|--------------------------------|
+The listing is the honest half of the picture.  A diagram you use as a
+reference is dangerous when it silently omits things, so each run diffs the
+global map against stock Emacs, drops what the sheets cover, and writes down
+the rest:
+
+```
+  drawn       65
+  not drawn   38
+
+Under a prefix key (25)
+  C-x 4                  my-split-root-window-below
+  ...
+No box for that key (13)
+  C-<left>               shrink-window-horizontally
+  ...
+```
+
+The third bucket it can print, "No slot for that modifier combination", is
+empty as long as `draw-kbd-extra-layers` covers what you actually bind.
+
+| Variable        | Default                | Meaning                         |
+|-----------------|------------------------|---------------------------------|
 | `ERGOEMACS_SRC` | `~/dev/ergoemacs-mode` | checkout supplying the template |
 | `KBD_OUT`       | this directory         | where the output lands          |
+| `KBD_INIT`      | `~/.emacs.d/init.el`   | the init file to draw           |
 
 The checkout is the only prerequisite: `git clone
 https://github.com/ergoemacs/ergoemacs-mode ~/dev/ergoemacs-mode`.  Nothing
@@ -42,7 +64,10 @@ that `~/.emacs.d` needs in order to work.  So `.chezmoiignore` lists
 
 ## How it works
 
-`draw-kbd.sh` batch-loads `init.el`, then loads `draw-kbd.el`, which:
+`draw-kbd.sh` runs `emacs -Q --batch -l draw-kbd.el`, and `draw-kbd.el` loads
+`init.el` itself.  That order matters: it snapshots the stock global map before
+`init.el` runs, so the listing can tell your bindings from the ones Emacs ships
+with.  It then:
 
 1. loads `ergoemacs-mode` but **never turns it on**.  `ergoemacs-theme--svg`
    looks each key up in `ergoemacs-override-keymap` and then falls back to
@@ -66,8 +91,8 @@ that `~/.emacs.d` needs in order to work.  So `.chezmoiignore` lists
   the second sheet works — `draw-kbd-extra-layers` re-points the Alt rows at
   `control meta` and the Ctrl rows at `hyper`.  Edit it to chase some other
   combination, or set it to nil for one sheet only.
-- **Prefix sequences are still not drawn.**  A prefix key shows only as
-  "Prefix Key"; the keys under it are not drawn anywhere.  ergoemacs-mode has a
+- **Prefix sequences are still not drawn** on a sheet; they are listed in
+  `*-not-drawn.txt` instead.  A prefix key shows only as "Prefix Key".  ergoemacs-mode has a
   `full-p` mode meant for exactly this, which emits `<theme>-<layout>-C-x.svg`
   and friends, but the sheets come out blank — see "Upstream quirks" below.
   Even working, it would only cover *modified* second keys (`C-x C-u`); plain
