@@ -16,3 +16,16 @@
 # ghostty shortcut survives on the right thumb: right cmd + d still splits,
 # + f still searches, + k still clears.
 macos-option-as-alt = left
+
+# Tabs on the thumb: left cmd + m goes left, left cmd + , goes right.
+#
+# Bound on alt rather than super for the same reason as everything else here --
+# super would take right cmd too, and right cmd has to keep cmd+m minimise and
+# cmd+, open_config. Karabiner turns left cmd + m into left option + m for
+# terminal apps, option-as-alt above makes that alt+m, and this catches it.
+#
+# Taking alt+m and alt+, from the shell costs nothing: neither .inputrc nor
+# .zshrc binds m or comma, by design -- they are left for the mac shortcuts.
+# ctrl+tab and ctrl+shift+tab still switch tabs as they did.
+keybind = alt+m=previous_tab
+keybind = alt+comma=next_tab
