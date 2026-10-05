@@ -109,8 +109,17 @@ brew install --cask karabiner-elements
 brew install vim git rsync curl wget htop jq
 brew install ghostty
 
+# bash as a program, not as the login shell: there is deliberately no chsh
+# here, zsh stays the shell on mac. /etc/shells only makes brew's bash a
+# permitted one, for a later chsh or for tools that consult the list.
+#
+# $(brew --prefix) rather than $BREW, even though line 15 sets it: this file is
+# read and pasted from piecemeal, so a line that only works after line 15 has
+# run is a line that appends "/bin/bash" to /etc/shells instead. Guarded as
+# well, because that is how a duplicate got in there once already.
 brew install bash
-echo "$BREW/bin/bash" | sudo tee -a /etc/shells
+BASH_PATH="$(brew --prefix)/bin/bash"
+grep -qxF "$BASH_PATH" /etc/shells || echo "$BASH_PATH" | sudo tee -a /etc/shells
 
 # Build tooling. clang comes with the command line tools; gdb is not worth the
 # fight on mac (codesigning, no apple silicon support), use lldb, which means
