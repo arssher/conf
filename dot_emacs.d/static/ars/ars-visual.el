@@ -85,4 +85,23 @@ the frame will be maximized after disabling fullscreen state."
    )
 )
 
+(defvar ars-default-font "Ubuntu Mono" "Default face font, used only if installed")
+
+(defun ars-apply-default-font (&optional frame)
+  "Set the default face to `ars-default-font' if this machine has that font.
+Does nothing when it is missing: macOS ships no Ubuntu Mono until the
+font-ubuntu-mono cask is installed, and naming a font that is not there makes
+every new graphical frame complain.
+
+`find-font' needs a live display to answer and returns nil for everything
+without one -- even for fonts that are installed -- so this cannot simply be
+checked once at startup: a daemon has no display until a client frame turns
+up.  Hence the `after-make-frame-functions' hook in visual.el, and the FRAME
+argument here."
+  (when (and (display-graphic-p frame)
+	     (find-font (font-spec :name ars-default-font) frame))
+    ;; t for the frames yet to be made, FRAME for the one in hand
+    (set-face-attribute 'default t :font ars-default-font)
+    (set-face-attribute 'default frame :font ars-default-font)))
+
 (provide 'ars-visual)

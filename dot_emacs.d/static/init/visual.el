@@ -34,7 +34,11 @@
 
 
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
-(set-face-attribute 'default t :font "Ubuntu Mono")
+;; Ubuntu Mono where it is installed, the stock font where it is not. Once for
+;; the frame a plain GUI start already has, and on the hook for the ones a
+;; daemon's clients bring later -- see ars-apply-default-font for why both.
+(add-hook 'after-make-frame-functions #'ars-apply-default-font)
+(ars-apply-default-font)
 ;; set theme
 (ars-toggle-theme "dark")
 
