@@ -63,3 +63,10 @@ etc/**
 .config/terminator
 .config/environment.d
 {{ end }}
+
+# The other direction: macOS-only targets, skipped on linux. Karabiner is a mac
+# app, so its config would only sit unread in ~/.config there.
+{{ if ne .chezmoi.os "darwin" }}
+.config/karabiner
+.config/karabiner/**
+{{ end }}
