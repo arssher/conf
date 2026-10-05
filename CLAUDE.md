@@ -14,7 +14,9 @@ not fold it into this file.
 ## Working here
 
 - Editing a file here changes nothing until `chezmoi apply`.  Show `chezmoi
-  diff` first and let the user run the apply.
+  diff` first, so the change is reviewable, then run the apply yourself -- a
+  change cannot be tested until it is applied.  Committing and pushing still
+  wait to be asked for.
 - When the user has edited the live file instead, `chezmoi re-add` brings it
   back into the source.  Don't copy it over by hand.
 - Source names carry attributes: `dot_` for a leading dot, `private_` for 0700,
