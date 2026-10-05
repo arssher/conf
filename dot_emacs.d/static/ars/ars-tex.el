@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 (require 'tex)
 
 (defun TeX-command-default (name)

@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; Stuff for remote editing
 
 ;; autoreload remote files

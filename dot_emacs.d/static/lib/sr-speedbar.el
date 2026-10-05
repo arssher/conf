@@ -1,4 +1,4 @@
-;;; sr-speedbar.el --- Same frame speedbar
+;;; sr-speedbar.el --- Same frame speedbar  -*- lexical-binding: t -*-
 
 ;; Author: Sebastian Rose <sebastian_rose@gmx.de>
 ;; Maintainer: Sebastian Rose <sebastian_rose@gmx.de>

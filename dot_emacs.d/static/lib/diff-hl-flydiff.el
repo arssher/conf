@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; Copyright (C) 2015, 2016 Free Software Foundation, Inc.
 
 ;; Author:   Jonathan Hayase <PythonNut@gmail.com>

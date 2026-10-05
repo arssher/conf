@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; gnus stuff
 ;; move it to .gnus.el?
 

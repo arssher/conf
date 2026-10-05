@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; Packaging stuff and basic things
 
 ;; Here we will keep elpa packages

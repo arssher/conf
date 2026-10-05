@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 (defun comment-idea ()
 "Provides a comment command like jetbrains idea's.
 WARN: Currently it works only when transient-mark-mode is on."

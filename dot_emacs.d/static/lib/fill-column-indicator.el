@@ -1,4 +1,4 @@
-;;; fill-column-indicator.el --- Graphically indicate the fill column
+;;; fill-column-indicator.el --- Graphically indicate the fill column  -*- lexical-binding: t -*-
 
 ;; Copyright (c) 2011-2014 Alp Aker
 

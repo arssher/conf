@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; go
 ;; load go-guru
 (require 'go-guru)

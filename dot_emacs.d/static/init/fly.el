@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; Syntax checking and other checks on the fly
 
 ;; enable flychecker

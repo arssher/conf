@@ -1,4 +1,4 @@
-;;; wombat-modified-theme.el --- Custom face theme for Emacs
+;;; wombat-modified-theme.el --- Custom face theme for Emacs  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2011-2016 Free Software Foundation, Inc.
 

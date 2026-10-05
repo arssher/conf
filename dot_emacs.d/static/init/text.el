@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; Text processing
 
 (transient-mark-mode 1) ; Highlight the region when the mark is active

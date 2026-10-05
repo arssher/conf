@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; GDB stuff
 
 (require 'ars-gdb-stuff)

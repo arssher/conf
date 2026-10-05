@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; Visual things, colours, fonts, etc
 
 ;; don't show welcome screen

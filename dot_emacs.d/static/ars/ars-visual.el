@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; functions for adding window on right or below
 (defun my-split-root-window (size direction)
   (split-window (frame-root-window)

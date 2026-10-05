@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; show line number in edebug backtraces, see
 ;; https://emacs.stackexchange.com/questions/7852/show-line-number-on-error
 (with-eval-after-load 'debug

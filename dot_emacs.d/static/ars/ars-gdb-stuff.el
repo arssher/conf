@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 (setq pgpath "/home/ars/postgres/install/vanilla/bin/postgres")
 
 (defun pg-gdblive()

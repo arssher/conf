@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; Backuping and restoring things, generally anything that remembers
 ;; something and later uses it
 

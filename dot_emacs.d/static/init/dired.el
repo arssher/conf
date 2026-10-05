@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; dired things
 ;; load dired-x library. I use it to quickly rename files
 ;; not sure it is a right way to load it...

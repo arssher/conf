@@ -1,4 +1,4 @@
-;;; gmail2bbdb.el --- import email and name into bbdb from vcard.
+;;; gmail2bbdb.el --- import email and name into bbdb from vcard.  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2014, 2015 Chen Bin
 ;; Author: Chen Bin <chenbin.sh@gmail.com>

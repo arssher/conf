@@ -1,4 +1,4 @@
-;; -*- mode: emacs-lisp -*-
+;; -*- mode: emacs-lisp; lexical-binding: t -*-
 
 ;; This file contains code to set up Emacs to edit PostgreSQL source
 ;; code.  Copy these snippets into your .emacs file or equivalent, or

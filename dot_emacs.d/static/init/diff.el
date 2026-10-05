@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; Ediff stuff
 
 ;; Keep control buffer in the same frame as diff buffers

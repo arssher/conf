@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; misc functions
 
 ;; Source: http://www.emacswiki.org/emacs-en/download/misc-cmds.el

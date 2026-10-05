@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; Current implementation of diff-hunk-text is broken: it doesn't handle lines
 ;; containing only newlines in patches: it removes the newline and then goes one
 ;; line forward more, skipping the next one.

@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 (defun ggtags-recreate ()
   "Delete and create ggtags again. Doesn't work."
   (interactive)

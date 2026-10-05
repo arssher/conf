@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; whatever doesn't seem to deserve its own file
 
 ;; don't create lockfiles provoking warnings like

@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; I need:
 ;; * threading
 ;; * Ability to goto thread of current message

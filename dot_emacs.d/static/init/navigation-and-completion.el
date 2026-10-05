@@ -1,3 +1,4 @@
+;;; -*- lexical-binding: t -*-
 ;; Navigation/autocompletion
 
 ;; Autocompletion (non-code)
