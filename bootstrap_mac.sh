@@ -38,6 +38,16 @@ curl -fsSL https://claude.ai/install.sh | bash
 # learn it, set the mapping in the panel for that keyboard and read it back:
 #   defaults -currentHost read -g | grep -A6 modifiermapping
 # If a write does not take effect right away, log out and back in.
+#
+# Once karabiner runs, this stops being what does the work. Karabiner seizes
+# the physical keyboard and re-emits through its own virtual one (vendor 1452,
+# product 592), so a mapping keyed to the internal keyboard's 0-0-0 is
+# addressed to a device the system no longer gets events from, and caps lock
+# goes back to being caps lock. The rule therefore also lives in
+# karabiner.json, as a simple_modification. Keep this line anyway: it is what
+# applies when karabiner is not in the path -- the login window, before the
+# driver loads, karabiner disabled or removed -- and only one of the two can be
+# active at a time, so they never fight.
 defaults -currentHost write -g com.apple.keyboard.modifiermapping.0-0-0 \
   '({HIDKeyboardModifierMappingSrc=30064771129;HIDKeyboardModifierMappingDst=30064771300;})'
 
