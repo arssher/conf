@@ -27,12 +27,42 @@ curl -fsSL https://claude.ai/install.sh | bash
 #   restore_root.sh             root-owned config, needs sudo
 # restore_de.sh is linux desktop settings, nothing to restore here.
 
-# Emacs: the ns port, to stay on the same version as linux. emacs-plus builds
-# from source and carries native-comp and the system-appearance patch. The
-# official cask is the prebuilt alternative when the build is not worth the
-# wait -- brew install --cask emacs -- but check what it actually ships:
+# Emacs: the ns port, to stay on the same version as linux. emacs-plus carries
+# native-comp and the system-appearance patch. The cask is a prebuilt binary of
+# that same formula built with default options -- which is all this machine
+# wants -- so it skips a long source build and installs into /Applications
+# itself.
+#
+# brew trust comes first: a third-party tap's formula or cask will not even
+# load untrusted. Scoping it to the tap rather than one formula covers the cask
+# and the next emacs-plus@NN too -- and lets that tap's code run unprompted.
+brew tap d12frosted/emacs-plus
+brew trust d12frosted/emacs-plus
+brew install --cask emacs-plus-app
+# Check what it actually ships:
 #   emacs -Q --batch --eval '(message "%S" (native-comp-available-p))'
-brew tap d12frosted/emacs-plus && brew install emacs-plus --with-native-comp
+#
+# Build from source instead when the prebuilt cannot give you something: the
+# --with-* options (x11, xwidgets, debug, imagemagick, mailutils, dbus), --HEAD,
+# or community patches from ~/.config/emacs-plus/build.yml, which are applied at
+# build time -- the cask reads build.yml for icons only.
+#   brew install emacs-plus     # not --with-native-comp: that option is gone,
+#                               # @31 always builds it, and brew errors out on
+#                               # an unknown option
+# A formula does not install into /Applications, so for Spotlight and the Dock:
+#   ln -s "$BREW/opt/emacs-plus@31/Emacs.app" /Applications/
+#   ln -s "$BREW/opt/emacs-plus@31/Emacs Client.app" /Applications/
+# Never both at once: each ships emacs/emacsclient in $BREW/bin and brew cannot
+# declare a formula-to-cask conflict. The cask deliberately leaves an existing
+# bin/emacs alone, so a stale link from the other one wins silently. Uninstall
+# the one you are leaving before installing the other.
+#
+# emacsformacosx.com is an unrelated third option -- brew install --cask
+# emacs-app -- a different build carrying none of the emacs-plus patches. The
+# cask used to be named plain "emacs", which still resolves with a rename
+# warning.
+
+# start emacs, ensure it loads
 
 # visual.el asks for Ubuntu Mono, which macOS does not ship
 brew install --cask font-ubuntu-mono
