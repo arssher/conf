@@ -21,6 +21,26 @@ chezmoi init --ssh --apply arssher/conf
 # rooster's perch
 curl -fsSL https://claude.ai/install.sh | bash
 
+# caps lock -> control, as on linux. Early, because everything below is typed.
+# This is exactly what System Settings -> Keyboard -> Keyboard Shortcuts ->
+# Modifier Keys writes: the line was captured by setting it in the panel once
+# and reading the value back, and writing it again is idempotent. So a fresh
+# machine needs no clicking for it.
+#
+# The numbers are HID usage codes on page 0x07: 0x700000039 is caps lock and
+# 0x7000000E4 is RIGHT control -- which is what the panel picks, not 0xE0, the
+# left one. Emacs is fine with that because ns-right-control-modifier defaults
+# to 'left, meaning "whatever the other control is"; don't set it to anything
+# else or caps lock stops acting as C- in emacs.
+#
+# The key is per keyboard. 0-0-0 identifies the internal apple keyboard, which
+# reports vendor 0 and product 0; a plugged-in one gets a key of its own. To
+# learn it, set the mapping in the panel for that keyboard and read it back:
+#   defaults -currentHost read -g | grep -A6 modifiermapping
+# If a write does not take effect right away, log out and back in.
+defaults -currentHost write -g com.apple.keyboard.modifiermapping.0-0-0 \
+  '({HIDKeyboardModifierMappingSrc=30064771129;HIDKeyboardModifierMappingDst=30064771300;})'
+
 # Secrets, history and work-specific scripts are not in the repo. Once whatever
 # syncs the private directory is up and CONFPATH points at it:
 #   restore_private.sh          $HOME bits

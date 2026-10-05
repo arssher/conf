@@ -170,8 +170,6 @@ http://forums.odforce.net/topic/28501-linux-disable-alt-left-mouse-button/
 macos stuff
 
 Done by hand, no cli for these:
-- caps lock -> control, and nothing else, in System Settings -> Keyboard ->
-  Keyboard Shortcuts -> Modifier Keys. It is per keyboard, set it for each.
 - "Use Option as Meta key" in the terminal profile, otherwise option
   composes characters and readline never sees \e.
 - three finger drag in Accessibility -> Pointer Control -> Trackpad Options,
