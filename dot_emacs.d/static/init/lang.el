@@ -121,7 +121,7 @@
   (add-hook 'rustic-mode-hook 'ars/rustic-mode-hook))
 
 (defun ars/rustic-mode-hook ()
-  so that run lsp-rename  works without having to confirm
+  "So that lsp-rename works without having to confirm."
   (setq-local buffer-save-without-query t))
 
 ;; C/C++
