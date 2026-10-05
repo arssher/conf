@@ -93,6 +93,24 @@
 
 ;; See kbd-diagram for a picture of result.
 
+;; On macOS the modifiers above have to be assigned first, because the ns port
+;; starts with cmd as Super and option as Meta -- the opposite geometry, with
+;; Meta away from the thumb. The two cmd keys are read separately, so:
+;;   left cmd  -> Meta, the thumb key, same as alt on linux
+;;   option    -> none, left to the system so it still composes (c) and --
+;;   right cmd -> Super, which keeps the stock s-c/s-v/s-s/s-q
+;; Karabiner does the same split for every other app, by remapping left cmd
+;; and excluding Emacs by bundle id; here it is emacs' own job. Nothing in
+;; this config binds s-, and the one H- use below is internal to
+;; input-decode-map, so neither collides.
+;;
+;; featurep rather than window-system: the latter is nil until a graphical
+;; frame exists, so a daemon would start with the defaults and never fix them.
+(when (featurep 'ns)
+  (setq ns-command-modifier 'meta
+        ns-alternate-modifier 'none
+        ns-right-command-modifier 'super))
+
 ;; Basic, global keys
 
 ;; The F keys row
