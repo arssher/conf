@@ -4,10 +4,15 @@
 # Writing "dot_bash_scripts/archive" would match nothing and the archive would
 # get applied into ~/.bash_scripts/archive.
 
-# Repo-only content: the readme, the notes for Claude Code (~/.claude/CLAUDE.md
-# is the one that belongs in $HOME, and it is managed under private_dot_claude),
-# the bootstrap scripts, and the vscode settings backup (kept in git for
-# paranoia; vscode normally syncs via the GH account).
+# Repo-only content: the notes about this repo, the bootstrap scripts, and the
+# vscode settings backup (kept in git for paranoia; vscode normally syncs via
+# the GH account).
+#
+# "CLAUDE.md" here is the one at the root, these notes about the source dir.
+# The pattern is anchored: unlike gitignore, a bare name matches only the top
+# level, so private_dot_claude/CLAUDE.md -- the user-level instructions, which
+# do belong in $HOME -- stays managed. Verify with `chezmoi managed` after
+# touching this.
 readme.txt
 CLAUDE.md
 bootstrap.sh
