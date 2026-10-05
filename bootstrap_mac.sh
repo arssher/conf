@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# macOS counterpart of bootstrap.sh. Same idea: not meant to be run top to
+# bottom, read it and run the bits you need. The keyboard section is the
+# interesting part, see dot_emacs.d/apple.txt for why it is set up that way.
+
+set -e
+
+# Command line tools first, everything below needs the compiler.
+xcode-select --install
+
+# homebrew. Installs to /opt/homebrew on apple silicon, /usr/local on intel;
+# BREW below is that prefix, several steps need it spelled out.
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+BREW="$(brew --prefix)"
+
+# lay down the dotfiles
+brew install chezmoi
+chezmoi init --ssh --apply arssher/conf
+
+# rooster's perch
+curl -fsSL https://claude.ai/install.sh | bash
+
+# Secrets, history and work-specific scripts are not in the repo. Once whatever
+# syncs the private directory is up and CONFPATH points at it:
+#   restore_private.sh          $HOME bits
+#   restore_root.sh             root-owned config, needs sudo
+# restore_de.sh is linux desktop settings, nothing to restore here.
+
+# Emacs: the ns port, to stay on the same version as linux. emacs-plus builds
+# from source and carries native-comp and the system-appearance patch. The
+# official cask is the prebuilt alternative when the build is not worth the
+# wait -- brew install --cask emacs -- but check what it actually ships:
+#   emacs -Q --batch --eval '(message "%S" (native-comp-available-p))'
+brew tap d12frosted/emacs-plus && brew install emacs-plus --with-native-comp
+
+# visual.el asks for Ubuntu Mono, which macOS does not ship
+brew install --cask font-ubuntu-mono
+
+# Keyboard. Karabiner does the left/right cmd split; goku turns compact EDN
+# into its verbose json, optional.
+brew install --cask karabiner-elements
+# brew install yqrashawn/goku/goku
+
+# basics
+brew install vim git rsync curl wget htop jq
+brew install ghostty
+
+brew install bash
+echo "$BREW/bin/bash" | sudo tee -a /etc/shells
+
+# Build tooling. clang comes with the command line tools; gdb is not worth the
+# fight on mac (codesigning, no apple silicon support), use lldb, which means
+# .gdbinit and the postgres pretty printers in .gdb stay linux-only.
+brew install llvm cmake pkgconf
+# lang server stuff
+brew install bear  # clangd ships with llvm above
+
+# pg stuff. Note bison and flex: macOS has ancient ones in /usr/bin, so the
+# brew versions must come first on PATH when building postgres.
+brew install readline zlib icu4c openssl@3 gettext libxml2 libxslt \
+     lz4 zstd krb5 openldap tcl-tk perl \
+     bison flex docbook docbook-xsl fop
+# export PATH="$BREW/opt/bison/bin:$BREW/opt/flex/bin:$PATH"
+
+brew install tmux
+
+# various desktop stuff
+brew install --cask google-chrome visual-studio-code slack iterm2 \
+     telegram keepassxc
+
+# mu/mu4e, and pass for secrets
+brew install mu isync pass
+
+# media
+brew install ffmpeg yt-dlp
+
+# install rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+cargo install cork
+
+# Limits. No /etc/sysctl.conf or security/limits.conf on mac; the shell limit
+# is what matters in practice and macOS defaults it low.
+ulimit -n
+# ulimit -n 524288 in .profile, or a LaunchDaemon with limit maxfiles for a
+# system wide one.
+
+# Cores land in /cores and are off by default; sudo sysctl -w kern.coredump=1
+# plus ulimit -c unlimited for a session. No core_pattern equivalent.

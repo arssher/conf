@@ -71,6 +71,17 @@ Things that are easy to get wrong:
   docs/, bootstrap/ and vscode/ are likewise tracked but not applied.
 
 
+Shortcuts:
+
+  Ergoemacs-inspired text manipulation shortcuts are supposed to be
+  mostly kept in sync in the following places:
+  - emacs
+  - readline's ~/.inputrc
+  - vscode
+  - ~/.zshrc
+  - libedit's ~/.editrc
+  - macos whenever possible through karabiner remaps:
+
 Content kept outside this repo:
 
   A separate private directory holds what does not belong in git here.
@@ -154,3 +165,17 @@ And point midi plugin in audicious to listed .sf2 file
 
 How to disable Alt+left mouse windows move
 http://forums.odforce.net/topic/28501-linux-disable-alt-left-mouse-button/
+
+------------------------------------------------------------
+macos stuff
+
+Done by hand, no cli for these:
+- caps lock -> control, and nothing else, in System Settings -> Keyboard ->
+  Keyboard Shortcuts -> Modifier Keys. It is per keyboard, set it for each.
+- "Use Option as Meta key" in the terminal profile, otherwise option
+  composes characters and readline never sees \e.
+- three finger drag in Accessibility -> Pointer Control -> Trackpad Options,
+  which pushes mission control and spaces to four fingers.
+
+see
+bootstrap_mac.sh
