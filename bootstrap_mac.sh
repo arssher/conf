@@ -2,7 +2,7 @@
 
 # macOS counterpart of bootstrap.sh. Same idea: not meant to be run top to
 # bottom, read it and run the bits you need. The keyboard section is the
-# interesting part, see dot_emacs.d/apple.txt for why it is set up that way.
+# interesting part.
 
 set -e
 
