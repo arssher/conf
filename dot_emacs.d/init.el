@@ -162,10 +162,22 @@
 ;; dirty hack to distinguish TAB and C-i, see
 ;; http://stackoverflow.com/questions/1792326/how-do-i-bind-a-command-to-c-i-without-changing-tab
 ;; accepted answer doesn't work
-(if (display-graphic-p)
-    (progn
-      (define-key input-decode-map (kbd "C-i") (kbd "H-i"))
-      (global-set-key (kbd "H-i") 'my-scroll-down-one)))
+;; The remap only makes sense on a graphical terminal, where C-i and TAB come
+;; in as separate events -- on a tty they are the same byte. And
+;; input-decode-map is terminal-local, so this cannot be done once at startup:
+;; a daemon has no terminal of its own yet, and each client brings another one.
+;; So per frame, the same shape as ars-apply-default-font.
+(defun ars-distinguish-c-i (&optional frame)
+  "Make C-i arrive as H-i on FRAME's terminal, if that terminal is graphical."
+  (when (display-graphic-p frame)
+    (with-selected-frame (or frame (selected-frame))
+      (define-key input-decode-map (kbd "C-i") (kbd "H-i")))))
+
+;; The H- binding is global and wants no terminal, so it is set unconditionally
+;; -- on a tty nothing ever produces H-i and it simply lies unused.
+(global-set-key (kbd "H-i") 'my-scroll-down-one)
+(add-hook 'after-make-frame-functions #'ars-distinguish-c-i)
+(ars-distinguish-c-i)
 (global-set-key (kbd "M-i") 'previous-line) ; ergo
 (global-set-key (kbd "M-I") 'drag-stuff-up)
 (global-set-key (kbd "M-o") 'forward-word) ; ergo
