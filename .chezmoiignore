@@ -65,8 +65,12 @@ etc/**
 {{ end }}
 
 # The other direction: macOS-only targets, skipped on linux. Karabiner is a mac
-# app, so its config would only sit unread in ~/.config there.
+# app, so its config would only sit unread in ~/.config there. Ghostty does run
+# on linux, but that config is all cmd binds and would collide with the window
+# manager, so it stays mac-only until there is reason to template it.
 {{ if ne .chezmoi.os "darwin" }}
 .config/karabiner
 .config/karabiner/**
+.config/ghostty
+.config/ghostty/**
 {{ end }}

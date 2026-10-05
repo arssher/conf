@@ -1,0 +1,18 @@
+# Ghostty. Mac-only, see .chezmoiignore.
+
+# Left option becomes Alt, so it sends ESC+key, which is what zsh and readline
+# bind -- see .zshrc and .inputrc. Right option is left alone and still
+# composes (c) and --, which is why this is "left" and not "true".
+#
+# This is half of the ergoemacs story in the terminal. The other half is in
+# karabiner, which maps left cmd + letter to left option + letter for terminal
+# apps, so the thumb means Meta here as it does in gui apps. It has to be
+# karabiner and not keybinds in this file: ghostty's `super` is the cmd
+# modifier on either side, with no left/right form -- left_super, super_left,
+# physical:super and cmd_left are all rejected -- so keybinds here would take
+# right cmd too, and right cmd is meant to stay the system's.
+#
+# Because only karabiner's fourteen letters move, and only on the left, every
+# ghostty shortcut survives on the right thumb: right cmd + d still splits,
+# + f still searches, + k still clears.
+macos-option-as-alt = left

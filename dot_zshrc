@@ -1,0 +1,56 @@
+# zsh, the login shell on macOS. Only the key bindings so far; the environment
+# still comes from .profile and .bashrc, which zsh does not read -- see the
+# note at the end.
+
+# ~/.local/bin on PATH. The claude installer had put this in the .zshrc it
+# created, and managing this file replaced that, so it is restored here -- it is
+# where claude itself lives. .profile adds the same directory for bash; the
+# guard is because .profile's own prepend is unconditional and PATH otherwise
+# grows with shell depth, which .bashrc already works around for its own entry.
+case ":${PATH}:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin:$PATH" ;;
+esac
+
+# emacs keymap, the same as .inputrc's `set editing-mode emacs`. Say it
+# explicitly: zsh picks the keymap from $EDITOR otherwise, and would land in
+# vi mode the moment that says vi.
+bindkey -e
+
+# Ergoemacs motion, the zsh half of .inputrc. The two files have to agree,
+# since one serves bash and the other zsh and the fingers do not know which
+# shell they are in. readme.txt lists the places this layout lives.
+#
+# The sequences are ESC+letter, because that is all a terminal can deliver --
+# cmd is never transmitted to the tty at all. Two things conspire to produce
+# them from the thumb, so it works here as it does in gui apps: karabiner maps
+# left cmd + letter to left option + letter in terminal apps, and ghostty's
+# macos-option-as-alt=left turns left option into ESC. It takes karabiner for
+# the first half because ghostty's cmd modifier has no left/right form, and
+# right cmd has to stay the system's.
+bindkey '\ee' backward-kill-word
+bindkey '\er' kill-word
+bindkey '\eu' backward-word
+bindkey '\eo' forward-word
+bindkey '\ed' backward-delete-char
+bindkey '\ef' delete-char
+bindkey '\eg' kill-line
+bindkey '\eG' backward-kill-line
+bindkey '\eh' beginning-of-line
+bindkey '\eH' end-of-line
+bindkey '\ej' backward-char
+bindkey '\el' forward-char
+
+# i and k are previous-history/next-history in .inputrc. zsh has those under
+# the same names, but the -line-or- variants move inside a multi-line buffer
+# first and only reach for history at its edges, which is what the binding
+# means to do.
+bindkey '\ei' up-line-or-history
+bindkey '\ek' down-line-or-history
+
+# Not here yet, and known missing: a zsh login shell gets none of the
+# environment .profile and .bashrc set up, so no ~/bin, no ~/.local/bin, no
+# ~/.bash_scripts/bin, no CONFPATH, no cargo or deno env. .profile is already
+# shell-agnostic -- its one bash-specific part is guarded by $BASH_VERSION --
+# so a .zprofile sourcing it would cover most of that; CONFPATH and
+# .bash_scripts/bin live in .bashrc and would have to move to .profile first.
