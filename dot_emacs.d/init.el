@@ -318,9 +318,13 @@
 (add-hook 'LaTeX-mode-hook '(lambda () (local-set-key (kbd "C-c C-a") 'TeX-texify)))
 
 ;; info mode
-(define-key Info-mode-map (kbd "i") 'my-scroll-down-one)
-(define-key Info-mode-map (kbd "k") 'my-scroll-up-one)
-(define-key Info-mode-map (kbd "o") 'Info-index) ; use o for index instead
+;; Info-mode-map only exists once info is loaded, and nothing above pulls it
+;; in, so these have to wait for it like the bookmark and markdown keys do.
+(with-eval-after-load "info"
+  (define-key Info-mode-map (kbd "i") 'my-scroll-down-one)
+  (define-key Info-mode-map (kbd "k") 'my-scroll-up-one)
+  (define-key Info-mode-map (kbd "o") 'Info-index) ; use o for index instead
+)
 
 ;; Markdown
 (with-eval-after-load "markdown-mode"
