@@ -27,6 +27,12 @@ curl -fsSL https://claude.ai/install.sh | bash
 #   restore_root.sh             root-owned config, needs sudo
 # restore_de.sh is linux desktop settings, nothing to restore here.
 
+# visual.el asks for Ubuntu Mono, which macOS does not ship. Before emacs on
+# purpose: the config falls back to the stock font when it is missing and only
+# reconsiders per frame, so a font installed afterwards reaches the frames made
+# from then on, not the ones already open.
+brew install --cask font-ubuntu-mono
+
 # Emacs: the ns port, to stay on the same version as linux. emacs-plus carries
 # native-comp and the system-appearance patch. The cask is a prebuilt binary of
 # that same formula built with default options -- which is all this machine
@@ -63,9 +69,6 @@ brew install --cask emacs-plus-app
 # warning.
 
 # start emacs, ensure it loads
-
-# visual.el asks for Ubuntu Mono, which macOS does not ship
-brew install --cask font-ubuntu-mono
 
 # Keyboard. Karabiner does the left/right cmd split; goku turns compact EDN
 # into its verbose json, optional.
