@@ -9,7 +9,7 @@
 ;; Don't ask confirmation on exit, see
 ;;http://emacs.stackexchange.com/questions/9322/how-can-i-quit-ediff-immediately-without-having-to-type-y
 (defun disable-y-or-n-p (orig-fun &rest args)
-  (cl-letf (((symbol-function 'y-or-n-p) (lambda (prompt) t)))
+  (cl-letf (((symbol-function 'y-or-n-p) (lambda (_prompt) t)))
     (apply orig-fun args)))
 (advice-add 'ediff-quit :around #'disable-y-or-n-p)
 

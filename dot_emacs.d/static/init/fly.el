@@ -35,10 +35,10 @@
 
 ;; Force emacs to take local vars needed for flycheck as safe with any
 ;; value; probably it is not very secure, but much more handy
-(put 'flycheck-clang-include-path 'safe-local-variable (lambda (xx) t))
-(put 'flycheck-clang-args 'safe-local-variable (lambda (xx) t))
-(put 'flycheck-gcc-include-path 'safe-local-variable (lambda (xx) t))
-(put 'flycheck-gcc-args 'safe-local-variable (lambda (xx) t))
+(put 'flycheck-clang-include-path 'safe-local-variable (lambda (_xx) t))
+(put 'flycheck-clang-args 'safe-local-variable (lambda (_xx) t))
+(put 'flycheck-gcc-include-path 'safe-local-variable (lambda (_xx) t))
+(put 'flycheck-gcc-args 'safe-local-variable (lambda (_xx) t))
 
 ;; highlight changed lines
 (require 'diff-hl-flydiff)
