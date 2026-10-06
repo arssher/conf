@@ -56,6 +56,11 @@ defaults -currentHost write -g com.apple.keyboard.modifiermapping.0-0-0 \
 # writes. Re-login required, and a half-applied state behaves erratically in
 # between.
 #
+# Off by choice -- tried it, the three finger swipe is worth more. Kept here
+# commented in case that changes; the swipes are the default so nothing needs
+# undoing, beyond setting them back to 2 if drag had been on, which turning it
+# off does not do by itself.
+#
 # Three fingers cannot mean both drag and swipe -- with both on the swipe wins,
 # which looks just like the drag not working -- so the three finger swipes go
 # off and spaces and mission control move to four fingers, already enabled.
@@ -66,12 +71,12 @@ defaults -currentHost write -g com.apple.keyboard.modifiermapping.0-0-0 \
 # macOS keeps com.apple.trackpad.* copies of all this in -currentHost -g too.
 # Setting them looks unnecessary, but it is untested -- this machine has them
 # set from when they were. Try them if the above does not take.
-for d in com.apple.AppleMultitouchTrackpad com.apple.driver.AppleBluetoothMultitouch.trackpad; do
-    defaults write "$d" Dragging -bool true
-    defaults write "$d" TrackpadThreeFingerDrag -bool true
-    defaults write "$d" TrackpadThreeFingerHorizSwipeGesture -int 0
-    defaults write "$d" TrackpadThreeFingerVertSwipeGesture -int 0
-done
+# for d in com.apple.AppleMultitouchTrackpad com.apple.driver.AppleBluetoothMultitouch.trackpad; do
+#     defaults write "$d" Dragging -bool true
+#     defaults write "$d" TrackpadThreeFingerDrag -bool true
+#     defaults write "$d" TrackpadThreeFingerHorizSwipeGesture -int 0
+#     defaults write "$d" TrackpadThreeFingerVertSwipeGesture -int 0
+# done
 
 # Secrets, history and work-specific scripts are not in the repo. Once whatever
 # syncs the private directory is up and CONFPATH points at it:

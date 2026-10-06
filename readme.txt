@@ -174,9 +174,9 @@ Done by hand, no cli for these:
   in.  Without it option composes characters and readline never sees \e.
   Ghostty needs no clicking: macos-option-as-alt is in its config.
 
-Three finger drag is scriptable; bootstrap_mac.sh does it.  Three fingers then
-move a window or select text, and spaces and mission control go to four, since
-three fingers cannot mean both.  Re-login required.
+Three finger drag is scriptable, and bootstrap_mac.sh carries the lines
+commented out.  Not used: three fingers cannot mean both drag and swipe, and
+the swipe is worth more.  Re-login required either way.
 
 see
 bootstrap_mac.sh
