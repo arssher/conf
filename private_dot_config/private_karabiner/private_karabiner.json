@@ -856,6 +856,37 @@
                                 "type": "basic"
                             }
                         ]
+                    },
+                    {
+                        "description": "right option is Hyper, ctrl+option+shift+cmd at once, for launching apps. It emits left_shift with the other three as modifiers, which is how a to event carries four. The cost is that right option stops composing accents. Nothing else was claiming it -- emacs composes on either option under ns-alternate-modifier 'none, ghostty leaves the right one composing with macos-option-as-alt=left -- karabiner just consumes it now. Left option still composes in emacs; in ghostty it is Alt already.",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "right_option",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "left_shift",
+                                        "modifiers": ["left_command", "left_control", "left_option"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Hyper + f opens firefox, or brings it forward if it is already running, which is what open does. The trigger is the four modifiers the Hyper rule emits rather than right_option itself, since by this point that key has become them. That those produced flags are visible to a later manipulator is not in the docs, which say only that key events do not chain and that one input event is manipulated by the first matching manipulator alone; it is tested though. So modifier state carries forward and key output does not -- the same asymmetry that lets left cmd + m emit left option + m in a terminal without setting off the app switch on left option + m. Absolute path to open because karabiner runs shell_command with a bare environment, and the bundle id rather than the name so a rename cannot break it. One rule per app is the pattern for the rest of them.",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "f",
+                                    "modifiers": { "mandatory": ["left_command", "left_control", "left_option", "left_shift"] }
+                                },
+                                "to": [{ "shell_command": "/usr/bin/open -b org.mozilla.firefox" }],
+                                "type": "basic"
+                            }
+                        ]
                     }
                 ]
             },
