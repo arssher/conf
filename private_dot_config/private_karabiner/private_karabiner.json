@@ -825,6 +825,37 @@
                                 "type": "basic"
                             }
                         ]
+                    },
+                    {
+                        "description": "left option + u and i switch spaces, left and right. They send mission control's ctrl+left and ctrl+right, which System Settings has enabled -- turn those off there and this rule goes quiet with nothing to show why. Global, like the app switch on option+m. The cost is the dead keys: option+u composed an umlaut and option+i a circumflex, and karabiner takes them before any app sees them, emacs included. In a terminal, physical option+u used to arrive as ESC u for backward-word; that now switches spaces, and backward-word stays on left cmd + u, which is the intended gesture anyway.",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "u",
+                                    "modifiers": { "mandatory": ["left_option"] }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "left_arrow",
+                                        "modifiers": ["left_control"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "i",
+                                    "modifiers": { "mandatory": ["left_option"] }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "right_arrow",
+                                        "modifiers": ["left_control"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
                     }
                 ]
             },
