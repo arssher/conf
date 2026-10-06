@@ -51,6 +51,28 @@ curl -fsSL https://claude.ai/install.sh | bash
 defaults -currentHost write -g com.apple.keyboard.modifiermapping.0-0-0 \
   '({HIDKeyboardModifierMappingSrc=30064771129;HIDKeyboardModifierMappingDst=30064771300;})'
 
+# Three finger drag: three fingers move a window or select text. The keys
+# System Settings -> Accessibility -> Pointer Control -> Trackpad Options
+# writes. Re-login required, and a half-applied state behaves erratically in
+# between.
+#
+# Three fingers cannot mean both drag and swipe -- with both on the swipe wins,
+# which looks just like the drag not working -- so the three finger swipes go
+# off and spaces and mission control move to four fingers, already enabled.
+# Dragging is the panel's checkbox, TrackpadThreeFingerDrag its style; the style
+# alone does nothing. Two domains: the built-in trackpad and a Magic Trackpad
+# keep their settings apart.
+#
+# macOS keeps com.apple.trackpad.* copies of all this in -currentHost -g too.
+# Setting them looks unnecessary, but it is untested -- this machine has them
+# set from when they were. Try them if the above does not take.
+for d in com.apple.AppleMultitouchTrackpad com.apple.driver.AppleBluetoothMultitouch.trackpad; do
+    defaults write "$d" Dragging -bool true
+    defaults write "$d" TrackpadThreeFingerDrag -bool true
+    defaults write "$d" TrackpadThreeFingerHorizSwipeGesture -int 0
+    defaults write "$d" TrackpadThreeFingerVertSwipeGesture -int 0
+done
+
 # Secrets, history and work-specific scripts are not in the repo. Once whatever
 # syncs the private directory is up and CONFPATH points at it:
 #   restore_private.sh          $HOME bits

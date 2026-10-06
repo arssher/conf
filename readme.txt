@@ -170,10 +170,13 @@ http://forums.odforce.net/topic/28501-linux-disable-alt-left-mouse-button/
 macos stuff
 
 Done by hand, no cli for these:
-- "Use Option as Meta key" in the terminal profile, otherwise option
-  composes characters and readline never sees \e.
-- three finger drag in Accessibility -> Pointer Control -> Trackpad Options,
-  which pushes mission control and spaces to four fingers.
+- "Use Option as Meta key", for a terminal that has no config file to put it
+  in.  Without it option composes characters and readline never sees \e.
+  Ghostty needs no clicking: macos-option-as-alt is in its config.
+
+Three finger drag is scriptable; bootstrap_mac.sh does it.  Three fingers then
+move a window or select text, and spaces and mission control go to four, since
+three fingers cannot mean both.  Re-login required.
 
 see
 bootstrap_mac.sh
