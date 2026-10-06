@@ -809,6 +809,53 @@
                         ]
                     },
                     {
+                        "description": "tab switching in firefox: left cmd + m and left cmd + , become cmd+option+left and cmd+option+right, which are firefox's own previous and next tab on mac. Not ctrl+tab, which can be set to recently-used order rather than positional. Same deal as the terminal rule: left cmd only, so right cmd keeps cmd+m minimise and cmd+, settings. Another browser is another bundle id here.",
+                        "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "bundle_identifiers": [
+                                            "^org\\.mozilla\\.firefox$"
+                                        ],
+                                        "type": "frontmost_application_if"
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "m",
+                                    "modifiers": { "mandatory": ["left_command"] }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "left_arrow",
+                                        "modifiers": ["left_command", "left_option"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "conditions": [
+                                    {
+                                        "bundle_identifiers": [
+                                            "^org\\.mozilla\\.firefox$"
+                                        ],
+                                        "type": "frontmost_application_if"
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "comma",
+                                    "modifiers": { "mandatory": ["left_command"] }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "right_arrow",
+                                        "modifiers": ["left_command", "left_option"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "left option + m switches apps: a quicker reach than cmd+tab, and left option was free -- it only composed a mu. Not scoped to any app, so it works everywhere. Indistinguishable from cmd+tab in use, the held switcher included: karabiner keeps left_command down for as long as m is held, so the window stays up and further presses walk it. The terminal tab rule above emits exactly this trigger, left option + m, and does not set it off: karabiner posts its output to the virtual keyboard without feeding it back through the rules, so the two coexist and left cmd + m still switches tabs in a terminal rather than switching apps. Tested, not assumed -- it is the kind of collision that would otherwise be silent.",
                         "manipulators": [
                             {
