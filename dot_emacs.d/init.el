@@ -132,8 +132,17 @@
 (global-set-key [f10] 'ars-toggle-theme) ; toggle theme
 (global-set-key [f11] 'toggle-frame-fullscreen)
 (global-set-key [f12] 'toggle-frame-maximized)
-;; M-insert now reloads init.el. Lambda here just passes closured load-file as a function
-(global-set-key [M-insert] '(lambda() (interactive) (load-file "~/.emacs.d/init.el")))
+;; M-insert reloads init.el. Mac keyboards have no insert key, so M-\ does it
+;; there as well -- at the cost of delete-horizontal-space, which nothing here
+;; uses. A named command rather than the lambda this used to be, so that both
+;; keys and M-x reach the same thing.
+(defun ars-reload-init ()
+  "Reload init.el."
+  (interactive)
+  (load-file (concat emacs-d "init.el")))
+(global-set-key [M-insert] #'ars-reload-init)
+(when (eq system-type 'darwin)
+  (global-set-key (kbd "M-\\") #'ars-reload-init))
 (global-set-key (kbd "C-M-<insert>") '(lambda() (interactive) (load-file "~/.gnus.el")))
 
 
