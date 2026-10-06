@@ -858,7 +858,7 @@
                         ]
                     },
                     {
-                        "description": "App launchers on right option. Right option + f opens firefox, or brings it forward if it is already running, which is what open does. One manipulator per app here. Deliberately not a Hyper layer: binding right option to ctrl+option+shift+cmd would spend the whole key, where a binding per letter costs only that letter's composed character -- right option keeps composing everything else and stays free for other uses. Absolute path to open because karabiner runs shell_command with a bare environment, and the bundle id rather than the name so a rename cannot break it.",
+                        "description": "App launchers on right option: f firefox, v vscode, g ghostty, t telegram, r emacs. open brings an app forward when it is already running rather than starting a second. One manipulator per app, so each costs only that letter's composed character -- emacs is on r rather than e to leave the dead keys alone, option + e i u n and backtick being the accents on a US layout. Deliberately not a Hyper layer: binding right option to ctrl+option+shift+cmd would spend the whole key, where a binding per letter costs only that letter's composed character -- right option keeps composing everything else and stays free for other uses. Absolute path to open because karabiner runs shell_command with a bare environment, and the bundle id rather than the name so a rename cannot break it.",
                         "manipulators": [
                             {
                                 "from": {
@@ -866,6 +866,38 @@
                                     "modifiers": { "mandatory": ["right_option"] }
                                 },
                                 "to": [{ "shell_command": "/usr/bin/open -b org.mozilla.firefox" }],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "v",
+                                    "modifiers": { "mandatory": ["right_option"] }
+                                },
+                                "to": [{ "shell_command": "/usr/bin/open -b com.microsoft.VSCode" }],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "g",
+                                    "modifiers": { "mandatory": ["right_option"] }
+                                },
+                                "to": [{ "shell_command": "/usr/bin/open -b com.mitchellh.ghostty" }],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "t",
+                                    "modifiers": { "mandatory": ["right_option"] }
+                                },
+                                "to": [{ "shell_command": "/usr/bin/open -b com.tdesktop.Telegram" }],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "r",
+                                    "modifiers": { "mandatory": ["right_option"] }
+                                },
+                                "to": [{ "shell_command": "/usr/bin/open -b org.gnu.Emacs" }],
                                 "type": "basic"
                             }
                         ]
