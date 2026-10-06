@@ -758,7 +758,7 @@
                         ]
                     },
                     {
-                        "description": "tab switching in terminals: left cmd + m and left cmd + , become left option + m and , which ghostty binds to previous_tab and next_tab. Left cmd only, so right cmd keeps cmd+m minimise and cmd+, open_config. m and comma are bound in neither .inputrc nor .zshrc, so nothing in the shell loses out.",
+                        "description": "tab switching in terminals: left cmd + m and left cmd + , become left option + m and , which ghostty binds to previous_tab and next_tab. Left cmd only, so right cmd keeps cmd+m minimise and cmd+, open_config. m and comma are bound in neither .inputrc nor .zshrc, so nothing in the shell loses out. The left option + m this emits is also the app-switch rule's trigger and does not set it off; that rule says why.",
                         "manipulators": [
                             {
                                 "conditions": [
@@ -802,6 +802,24 @@
                                     {
                                         "key_code": "comma",
                                         "modifiers": ["left_option"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "left option + m switches apps: a quicker reach than cmd+tab, and left option was free -- it only composed a mu. Not scoped to any app, so it works everywhere. Indistinguishable from cmd+tab in use, the held switcher included: karabiner keeps left_command down for as long as m is held, so the window stays up and further presses walk it. The terminal tab rule above emits exactly this trigger, left option + m, and does not set it off: karabiner posts its output to the virtual keyboard without feeding it back through the rules, so the two coexist and left cmd + m still switches tabs in a terminal rather than switching apps. Tested, not assumed -- it is the kind of collision that would otherwise be silent.",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "m",
+                                    "modifiers": { "mandatory": ["left_option"] }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "tab",
+                                        "modifiers": ["left_command"]
                                     }
                                 ],
                                 "type": "basic"
