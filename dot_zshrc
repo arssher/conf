@@ -216,6 +216,19 @@ zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
 
+# Colour the list by file type: directories, symlinks, executables, devices.
+# An empty value means "all the defaults", and the manual says those defaults
+# are GNU ls's own -- so this needs neither LS_COLORS nor GNU coreutils, which
+# this machine has not got. The ${(s.:.)LS_COLORS} form everyone copies is only
+# for reusing a scheme of your own.
+#
+# It applies wherever filenames are completed, not just to ls -- cat, vim, cp,
+# git add. Matches that are not files fall under the `no' capability, which
+# defaults to 0, so git subcommands, option flags and the kill listing stay
+# plain; colouring those would take =pattern= specifications, the one form that
+# matches any display string rather than only filenames.
+zstyle ':completion:*:default' list-colors ''
+
 # Offer . and .. , which zsh otherwise never does.
 zstyle ':completion:*' special-dirs true
 
