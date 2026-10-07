@@ -128,6 +128,18 @@ export LC_ALL="en_US.UTF-8"
 export VISUAL=emacs
 export EDITOR="$VISUAL"
 
+# Colour from BSD ls, the equivalent of always passing -G. Unconditional rather
+# than mac-only: GNU ls ignores it and takes --color instead, which .bashrc
+# arranges through dircolors.
+#
+# Safe in a file every shell reads -- per man ls, "colorization is silently
+# disabled if the output is not directed to a terminal", so a pipe or a script
+# sees no escapes. CLICOLOR_FORCE would defeat that and is deliberately unset.
+#
+# Which colours is LSCOLORS, left unset so BSD's own defaults apply. It is a
+# positional string of letter pairs, nothing like GNU's named LS_COLORS.
+export CLICOLOR=1
+
 # always dump core, including from something started remotely. Not an
 # environment variable, but inherited by children the same way, so it belongs
 # with them. Silent on macOS, where the hard limit is already unlimited and
