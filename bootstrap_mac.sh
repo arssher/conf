@@ -162,11 +162,11 @@ brew install readline zlib icu4c openssl@3 gettext libxml2 libxslt \
      bison flex docbook docbook-xsl fop
 # export PATH="$BREW/opt/bison/bin:$BREW/opt/flex/bin:$PATH"
 
-# zsh-autosuggestions: greys in the rest of a matching history line as you
-# type. .zshrc sources it from whichever of a few paths exists, so nothing
-# needs editing after installing it. Its companion zsh-syntax-highlighting is
-# deliberately not here yet.
-brew install zsh-autosuggestions
+# The two zsh plugins .zshrc looks for: autosuggestions greys in the rest of a
+# matching history line as you type, syntax-highlighting colours the line and
+# reddens a command that does not resolve. .zshrc sources each from whichever
+# of a few paths exists, so nothing needs editing after installing them.
+brew install zsh-autosuggestions zsh-syntax-highlighting
 
 brew install tmux
 

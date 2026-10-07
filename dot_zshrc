@@ -56,6 +56,11 @@ bindkey '\el' forward-char
 HISTFILE=~/.zsh_history
 # In memory, and in the file. No unlimited form exists in zsh, so: a big
 # number. The file is rewritten to trim itself once it is 20% past SAVEHIST.
+#
+# HISTSIZE being this large has one known cost: zsh-autosuggestions globs the
+# whole in-memory list for every lookup, which at a million entries measures
+# 35ms. The note by ZSH_AUTOSUGGEST_STRATEGY at the end of this file says what
+# to do about it, and it is not shrinking this number.
 HISTSIZE=1000000
 SAVEHIST=1000000
 
@@ -326,7 +331,22 @@ fi
 # commands into that, so the adjacency it relies on is not there. Its own
 # documented caveat, about HIST_IGNORE_ALL_DUPS and HIST_EXPIRE_DUPS_FIRST
 # reordering history, we do satisfy -- neither is set.
+#
+# One thing to watch. The history strategy globs the whole in-memory list, so
+# its cost grows with HISTSIZE: measured here, 0.1ms per lookup at a thousand
+# entries, 0.6ms at ten thousand, 6ms at a hundred thousand and 35ms at the
+# million HISTSIZE allows. Async fetching means that never blocks a keystroke,
+# but once the history fills up the suggestion will visibly trail the cursor.
+# If it ever does, drop `history' from the list below and leave completion --
+# shrinking HISTSIZE is the wrong trade, the deep history being the point.
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+
+# Stop looking for a suggestion past a thousand characters. Unlike
+# highlighting, the cost here does not come from the line's length -- it comes
+# from the size of the history being scanned, see HISTSIZE above -- so this is
+# less about speed than about not bothering: a prefix that long has no useful
+# match left to offer.
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=1000
 
 # The grey is ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8' by default, worth raising
 # if it reads too dark.
@@ -342,6 +362,66 @@ for _f in /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh \
     fi
 done
 unset _f
+
+# ------------------------------------------------------------
+# zsh-syntax-highlighting: colours the line as it is typed. Also zsh-users,
+# and independent of autosuggestions above -- neither needs the other -- but
+# the two are coupled at runtime, see the ordering note below.
+#
+# The useful part is unknown-token, fg=red,bold by default: a mistyped command
+# goes red before return is pressed. Beside it arg0 is green for a command that
+# resolves, path underlined for a file that exists, reserved-word yellow,
+# quoted strings yellow, globs and history expansions blue.
+#
+# One default to know about: comment is fg=black,bold, i.e. bright black, which
+# on a dark background can be all but unreadable. ZSH_HIGHLIGHT_STYLES[comment]
+# is the fix if it matters -- comments at an interactive prompt are rare enough
+# to ignore for now.
+#
+# main is the default and the only highlighter enabled unless asked; brackets
+# is added here, which pairs up (), [] and {} by colour and reddens an
+# unbalanced one. The other five shipped -- cursor, line, pattern, regexp, root
+# -- are off: pattern and regexp need rules written for them, the rest are
+# situational.
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
+
+# Sourced after autosuggestions, and that order is the one thing the two
+# plugins care about: both wrap the same ZLE widgets, and per the
+# autosuggestions source, "highlighting breaks if our widgets are wrapped by
+# zsh-syntax-highlighting widgets". Autosuggestions re-binds on every precmd
+# precisely to stay on the outside, which is why
+# ZSH_AUTOSUGGEST_MANUAL_REBIND must stay unset now that both are here.
+#
+# It re-highlights the whole buffer on every keystroke, so a long line -- a big
+# paste above all -- lags. Measured here, per pass: 0.4ms at 100 characters,
+# 0.7ms at 500, 1.1ms at 1000, 5.8ms at 5000, 33ms at 20000. Roughly linear
+# past 500.
+#
+# 1000 therefore: six times the longest command in this history, where the
+# median is 41 characters and the 99th percentile 157, and still only about a
+# millisecond. Past that the line is a pasted blob rather than something being
+# typed, which is exactly the case worth not highlighting.
+#
+# The path highlighting also stats files, which costs on a network filesystem.
+ZSH_HIGHLIGHT_MAXLENGTH=1000
+for _f in /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
+          /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
+          /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh; do
+    if [[ -r $_f ]]; then
+        source $_f
+        break
+    fi
+done
+unset _f
+
+# Plain red for a command that does not resolve, where the default is
+# fg=red,bold. Red alone is already unmistakable and the bold made it shout.
+#
+# After the source above, not before: the styles live in an associative array
+# that the plugin declares as it loads, and its own defaults are applied with
+# `: ${...:=}', which only fills in what is unset. Assigning afterwards simply
+# overwrites.
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=red'
 
 # Not here yet, compared with what .bashrc does for bash: the aliases from
 # .bash_scripts/aliases.sh, `stty -ixon' to free C-s, LESS and GCC_COLORS, and
