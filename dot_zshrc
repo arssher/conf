@@ -122,6 +122,26 @@ unsetopt HIST_BEEP
 # both; sharing is worth more.
 alias h='fc -l -t "[%F %T]"'
 
+# ------------------------------------------------------------
+# Prompt.
+#
+# Same shape and colours as .bashrc's PS1, so the two shells look alike: bold
+# green user@host, bold blue full path, then the prompt character.
+#
+# %n user, %m host up to the first dot (\u and \h), %~ the path with $HOME as
+# ~ (\w), %# the prompt character, % for a normal user and # for root (\$).
+#
+# The colour is guarded because zsh only half-degrades: on a terminal with no
+# colour it drops %B, but still emits the %F escape, so TERM=dumb would get
+# literal control codes. terminfo[colors] is unset there and 256 in a real
+# terminal. .bashrc makes the same check with `tput setaf 1'.
+zmodload zsh/terminfo
+if (( ${terminfo[colors]:-0} >= 8 )); then
+    PROMPT='%B%F{green}%n@%m%f %F{blue}%~ %#%f%b '
+else
+    PROMPT='%n@%m %~ %# '
+fi
+
 # Not here yet, compared with what .bashrc does for bash: the completion system
 # (compinit), a prompt, the aliases from .bash_scripts/aliases.sh, `stty -ixon`
 # to free C-s, and the pg_* helper functions.
