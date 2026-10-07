@@ -3,6 +3,15 @@
 # cannot drift apart. Nothing to source here -- .zshenv has already run by the
 # time this file does.
 
+# Re-read this file after editing it. Everything below is idempotent --
+# setopt, bindkey and alias all just overwrite -- so a second pass is safe.
+#
+# It does NOT re-read ~/.sh_env: that guards itself with an exported
+# SH_ENV_LOADED and is already set by the time any shell gets here. Use
+# source_env, defined there, for the environment. Nor does it undo anything --
+# a binding or option deleted from the file stays in effect until a new shell.
+alias shrc='source ~/.zshrc'
+
 # emacs keymap, the same as .inputrc's `set editing-mode emacs`. Say it
 # explicitly: zsh picks the keymap from $EDITOR otherwise, and would land in
 # vi mode the moment that says vi.
