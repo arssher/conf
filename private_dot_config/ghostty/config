@@ -8,7 +8,7 @@ font-family = Ubuntu Mono
 # at the same size, so this may want another point or two. cmd+plus and
 # cmd+minus adjust by one at runtime, so the way to retune is to find the size
 # there and write the number here -- cmd+0 goes back to whatever this says.
-font-size = 16
+font-size = 17
 
 # Left option becomes Alt, so it sends ESC+key, which is what zsh and readline
 # bind -- see .zshrc and .inputrc. Right option is left alone and still
