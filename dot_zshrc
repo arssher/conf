@@ -164,6 +164,13 @@ if [[ -d /opt/homebrew/share/zsh/site-functions ]]; then
     fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
 fi
 
+# zsh/complist implements the completion menu that `menu select' below asks
+# for. It would be autoloaded on first use anyway, but then its menuselect
+# keymap does not exist at startup and cannot be bound -- bindkey says "no such
+# keymap". Loading it here, before compinit as the manual advises, is what
+# makes the bindings at the end of this section possible.
+zmodload zsh/complist
+
 autoload -Uz compinit
 
 # -C is what skips the scan, along with the insecure-directory check. Measured
@@ -183,6 +190,70 @@ else
     compinit
 fi
 unset _zcompdump_fresh
+
+# zstyle is zsh's general settings lookup, not a completion thing: a value is
+# stored against a context pattern and whoever cares looks it up. Completion
+# contexts read
+# :completion:<function>:<completer>:<command>:<argument>:<tag>, matched
+# coarsely with ':completion:*' below except where a specific command is meant.
+
+# An arrow-key menu instead of a static list. Per the manual, a value
+# containing `select' starts menu selection unconditionally; it is the
+# zsh/complist module that implements it, and compinit loads that.
+zstyle ':completion:*' menu select
+
+# Case-insensitive as a fallback rather than as the rule. The empty first
+# element makes zsh try an exact match first and only retry with the m:
+# specification if that found nothing, so an exact hit is never buried among
+# case-variants. Then dow<TAB> still finds Downloads.
+zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
+
+# Group matches by what they are -- options, files, branches -- rather than one
+# flat list. group-name '' names each group after its tag, and format is what
+# actually prints the heading: on its own group-name only groups silently. %d
+# is the tag's description, and the colour escapes are the ones compadd -X
+# takes.
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
+
+# Offer . and .. , which zsh otherwise never does.
+zstyle ':completion:*' special-dirs true
+
+# Treat foo//bar as foo/bar -- "the usual behaviour of UNIX paths", says the
+# manual; by default file completion acts as if there were a * between them.
+zstyle ':completion:*' squeeze-slashes true
+
+# Rehash before completing an external command, so something brew has just
+# installed is offered without a manual `rehash'. The documented cost is a
+# slower search when a directory on PATH has slow file access.
+zstyle ':completion:*' rehash true
+
+# Cache the completions that are expensive to compute, brew's among them.
+# cache-path needs no setting: it already defaults to ~/.zcompcache.
+zstyle ':completion:*' use-cache on
+
+# kill <TAB> with enough columns to tell the processes apart.
+#
+# POSIX keyword names throughout. The usual form of this line asks for `cmd',
+# which is GNU ps; BSD ps does not know it, drops the column and carries on, so
+# the listing arrives with no command in it at all -- and _pids runs ps with
+# stderr sent to /dev/null, so `ps: cmd: keyword not found' never reaches the
+# screen. args is the portable spelling, likewise pcpu for %cpu, time for
+# cputime.
+#
+# Matched on the processes tag rather than on kill, so pkill, renice and wait
+# get the same listing. Note `ps <TAB>' does not use it: that completes ps's
+# own options, and only `ps -p <TAB>' reaches the tag.
+zstyle ':completion:*:processes' \
+    command 'ps -u $USER -o pid,pcpu,tty,time,args'
+
+# Menu selection runs in its own keymap, so the ergoemacs motion bound in main
+# does not reach it and the menu would be arrow-keys-only. Same four letters as
+# above: j and l move within a row, i and k between rows.
+bindkey -M menuselect '\ej' backward-char
+bindkey -M menuselect '\el' forward-char
+bindkey -M menuselect '\ei' up-line-or-history
+bindkey -M menuselect '\ek' down-line-or-history
 
 # ------------------------------------------------------------
 # Prompt.
