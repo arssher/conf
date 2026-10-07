@@ -225,9 +225,31 @@
 ;; The zxcv row:
 (global-set-key (kbd "C-z") 'undo-tree-undo)
 (global-set-key (kbd "C-S-z") 'undo-tree-redo)
-(global-set-key (kbd "M-c") 'forward-paragraph)
+;; x, c and v cut, copy and paste, so that left cmd + x/c/v on mac -- where cmd
+;; is Meta -- does what every other app does. cua already gives all three on
+;; C-x, C-c and C-v and those keep working; these are the same commands reached
+;; with the thumb. On linux simply a second way to do it.
+;;
+;; M-x costs execute-extended-command, but only the convention, not the
+;; command: M-a is it as well, a few lines above. Every manual and README says
+;; "M-x something", which now has to be read as M-a -- which is the habit here
+;; anyway. M-X, a different key, keeps execute-extended-command-for-buffer.
+;;
+;; M-x and M-c need nothing but global-set-key, cua binding neither. M-v does
+;; need the cua keymap, because cua has delete-selection-repeat-replace-region
+;; there and that map shadows the global one -- which is what the link below is
+;; about. cua-paste is also where C-v ends up: cua binds C-v to yank and then
+;; remaps yank to cua-paste.
+(global-set-key (kbd "M-x") 'cua-cut-region)
+(global-set-key (kbd "M-c") 'cua-copy-region)
 ;; cua is shadowing keys, http://stackoverflow.com/questions/34057023/how-do-you-rebind-a-key-set-by-cua-mode-in-emacs
-(define-key cua--cua-keys-keymap (kbd "M-v") 'backward-paragraph)
+(define-key cua--cua-keys-keymap (kbd "M-v") 'cua-paste)
+;; Paragraph motion, displaced from c and v by the above. 8 down and 9 up,
+;; which is the same pair and the same orientation karabiner emits for every
+;; other app, so one gesture means one thing everywhere. The cost is M-8 and
+;; M-9 as digit-argument; C-8, C-9 and C-u 8 still give a numeric prefix.
+(global-set-key (kbd "M-8") 'forward-paragraph)
+(global-set-key (kbd "M-9") 'backward-paragraph)
 (global-set-key (kbd "M-b") 'ivy-switch-buffer)
 (global-set-key (kbd "M-n") 'beginning-of-buffer)
 (global-set-key (kbd "M-N") 'end-of-buffer)

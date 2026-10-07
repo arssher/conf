@@ -234,7 +234,7 @@
                         ]
                     },
                     {
-                        "description": "ergoemacs paragraphs: left cmd + v/c up and down by paragraph.",
+                        "description": "ergoemacs paragraphs: left cmd + 8 down a paragraph, 9 up. Left key down, right key up, which is the way round c and v had it before. They were on c and v, and that cost cmd+c and cmd+v -- the two shortcuts with the strongest muscle memory on the machine -- and worse, made them scroll: what they emit is option+arrow, and firefox and telegram read that as scrolling rather than as a paragraph move. Digits are not system shortcuts on macOS, cmd+1 to cmd+9 being left to applications; the one real loss is that a browser puts tab N on cmd+1 to cmd+8 and the last tab on cmd+9. Left cmd only, as everywhere here, so right cmd keeps both.",
                         "manipulators": [
                             {
                                 "conditions": [
@@ -249,7 +249,7 @@
                                     }
                                 ],
                                 "from": {
-                                    "key_code": "v",
+                                    "key_code": "9",
                                     "modifiers": { "mandatory": ["left_command"] }
                                 },
                                 "to": [
@@ -273,7 +273,7 @@
                                     }
                                 ],
                                 "from": {
-                                    "key_code": "c",
+                                    "key_code": "8",
                                     "modifiers": { "mandatory": ["left_command"] }
                                 },
                                 "to": [
