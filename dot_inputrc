@@ -34,5 +34,5 @@ set editing-mode emacs
 # move inside a multi-line buffer before it reaches for history. readline also
 # has history-substring-search-backward/-forward, which match anywhere in the
 # line rather than at its start -- not used, because zsh ships no equivalent and
-# readme.txt wants these two files to agree.
+# the two files have to agree.
 

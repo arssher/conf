@@ -19,7 +19,7 @@ bindkey -e
 
 # Ergoemacs motion, the zsh half of .inputrc. The two files have to agree,
 # since one serves bash and the other zsh and the fingers do not know which
-# shell they are in. readme.txt lists the places this layout lives.
+# shell they are in.
 #
 # The sequences are ESC+letter, because that is all a terminal can deliver --
 # cmd is never transmitted to the tty at all. Two things conspire to produce
@@ -130,9 +130,9 @@ alias h='fc -l -t "[%F %T]"'
 # and up-line-or-search, which matches on the first word only.
 #
 # .inputrc has the readline equivalent, history-search-backward/-forward, so
-# the two agree as readme.txt wants. readline has no up-line-or- compound, so
-# its version searches unconditionally rather than walking a multi-line buffer
-# first; for single-line commands they behave the same.
+# the two agree. readline has no up-line-or- compound, so its version searches
+# unconditionally rather than walking a multi-line buffer first; for
+# single-line commands they behave the same.
 #
 # Contributed widgets, so they need autoloading and registering with zle -N
 # before bindkey will accept the names.
