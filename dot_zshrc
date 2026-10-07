@@ -288,6 +288,61 @@ else
     PROMPT='%n@%m %~ %# '
 fi
 
-# Not here yet, compared with what .bashrc does for bash: the completion system
-# (compinit), a prompt, the aliases from .bash_scripts/aliases.sh, `stty -ixon`
-# to free C-s, and the pg_* helper functions.
+# ------------------------------------------------------------
+# zsh-autosuggestions: while typing, the rest of a matching history line is
+# shown in grey ahead of the cursor. From zsh-users, and nothing to do with
+# oh-my-zsh, which is only where most people meet it.
+#
+# Last in the file by convention rather than necessity. It works by wrapping
+# ZLE widgets, but it does that from a precmd hook and by default repeats it on
+# every precmd -- deliberately, so it can wrap other wrappers, which is what
+# keeps it compatible with zsh-syntax-highlighting -- so widgets defined
+# anywhere in this file get picked up either way.
+# ZSH_AUTOSUGGEST_MANUAL_REBIND makes the wrapping happen once, which the
+# source says costs "a decent performance hit" less, at the price of the order
+# then mattering. Async fetching is on by itself: the plugin enables it for zsh
+# 5.0.8 and newer.
+#
+# Acceptance is bound by widget rather than by key, so it lands on the
+# ergoemacs bindings for nothing: ACCEPT_WIDGETS holds forward-char and
+# end-of-line, so M-l and M-H take the whole suggestion, and
+# PARTIAL_ACCEPT_WIDGETS holds forward-word, so M-o takes a word of it. A full
+# accept fires only with the cursor at the end of the line; anywhere else the
+# original widget runs instead, so M-l still just moves right.
+
+# Suggestions come from history first and then from what completion would
+# offer, so a flag or a path never typed before is still suggested. Each
+# strategy is tried in turn until one answers.
+#
+# The completion one is the expensive strategy: it forks a pseudo-terminal per
+# lookup and needs both compdef and the zsh/zpty module -- the first because
+# compinit runs further up this file, the second because zpty ships with zsh.
+# It only runs when history has nothing, which with a shared million-entry
+# history is seldom. Set before the source line, since the plugin's own default
+# is guarded by (( ! ${+ZSH_AUTOSUGGEST_STRATEGY} )).
+#
+# Not match_prev_cmd, which prefers whatever followed the command just run: it
+# reads the in-memory $history, and SHARE_HISTORY interleaves every terminal's
+# commands into that, so the adjacency it relies on is not there. Its own
+# documented caveat, about HIST_IGNORE_ALL_DUPS and HIST_EXPIRE_DUPS_FIRST
+# reordering history, we do satisfy -- neither is set.
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+
+# The grey is ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8' by default, worth raising
+# if it reads too dark.
+
+# A loop because the path differs per platform and the file may not be there at
+# all: brew on apple silicon, brew on intel, debian's own package.
+for _f in /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh \
+          /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh \
+          /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh; do
+    if [[ -r $_f ]]; then
+        source $_f
+        break
+    fi
+done
+unset _f
+
+# Not here yet, compared with what .bashrc does for bash: the aliases from
+# .bash_scripts/aliases.sh, `stty -ixon' to free C-s, LESS and GCC_COLORS, and
+# kubectl's completion.
