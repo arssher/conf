@@ -18,8 +18,9 @@
 #       `systemctl --user show-environment`, and neither it nor xbindkeys has
 #       CONFPATH, LC_ALL, EDITOR, LESS or GOPATH set. So do not put anything
 #       here expecting a GUI program to see it; use ~/.config/environment.d/.
-#       This is also why ~/.global_vars is deliberately not sourced here: it
-#       would reach the Xsession shell and nothing the desktop actually runs.
+#       ~/.sh_env, sourced below, therefore reaches the Xsession shell and
+#       nothing the desktop actually runs -- harmless, but it is no substitute
+#       for environment.d.
 #
 #   a login `sh` (dash on Debian)
 #       also reads it, which is why nothing here may use bashisms. Keep it
@@ -45,26 +46,19 @@
 # for ssh logins, install and configure the libpam-umask package.
 #umask 022
 
+# The shared environment -- PATH, CONFPATH, locale, editor, toolchains. First,
+# because a login `sh`/dash reads neither .zshenv nor .bashrc and this is its
+# only route to any of it. In bash it is also a no-op repeat of what .bashrc
+# does below: .sh_env guards itself with an exported SH_ENV_LOADED, so the
+# second read does nothing.
+if [ -f "$HOME/.sh_env" ]; then
+    . "$HOME/.sh_env"
+fi
+
 # if running bash
 if [ -n "$BASH_VERSION" ]; then
     # include .bashrc if it exists
     if [ -f "$HOME/.bashrc" ]; then
 	. "$HOME/.bashrc"
     fi
-fi
-
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
-
-# set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$HOME/.local/bin:$PATH"
-fi
-if [ -f "$HOME/.cargo/env" ]; then
-    . "$HOME/.cargo/env"
-fi
-if [ -f "$HOME/.deno/env" ]; then
-    . "$HOME/.deno/env"
 fi

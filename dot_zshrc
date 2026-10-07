@@ -1,16 +1,7 @@
-# zsh, the login shell on macOS. Only the key bindings so far; the environment
-# still comes from .profile and .bashrc, which zsh does not read -- see the
-# note at the end.
-
-# ~/.local/bin on PATH. The claude installer had put this in the .zshrc it
-# created, and managing this file replaced that, so it is restored here -- it is
-# where claude itself lives. .profile adds the same directory for bash; the
-# guard is because .profile's own prepend is unconditional and PATH otherwise
-# grows with shell depth, which .bashrc already works around for its own entry.
-case ":${PATH}:" in
-    *":$HOME/.local/bin:"*) ;;
-    *) export PATH="$HOME/.local/bin:$PATH" ;;
-esac
+# zsh, the login shell on macOS. Interactive settings only: the environment
+# arrives from ~/.sh_env via ~/.zshenv, which bash reads too, so the two shells
+# cannot drift apart. Nothing to source here -- .zshenv has already run by the
+# time this file does.
 
 # emacs keymap, the same as .inputrc's `set editing-mode emacs`. Say it
 # explicitly: zsh picks the keymap from $EDITOR otherwise, and would land in
@@ -48,9 +39,7 @@ bindkey '\el' forward-char
 bindkey '\ei' up-line-or-history
 bindkey '\ek' down-line-or-history
 
-# Not here yet, and known missing: a zsh login shell gets none of the
-# environment .profile and .bashrc set up, so no ~/bin, no ~/.local/bin, no
-# ~/.bash_scripts/bin, no CONFPATH, no cargo or deno env. .profile is already
-# shell-agnostic -- its one bash-specific part is guarded by $BASH_VERSION --
-# so a .zprofile sourcing it would cover most of that; CONFPATH and
-# .bash_scripts/bin live in .bashrc and would have to move to .profile first.
+# Still missing, compared with what .bashrc does for bash: history settings,
+# the completion system (compinit), a prompt, the aliases from
+# .bash_scripts/aliases.sh, `stty -ixon` to free C-s, and the pg_* helper
+# functions.

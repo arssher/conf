@@ -1,0 +1,144 @@
+# ~/.sh_env -- the environment every shell needs, in one place.
+#
+# Who sources it, and why that covers everything:
+#
+#   ~/.zshenv    every zsh -- login or not, interactive or not, scripts
+#                included. This is the widest reach any zsh file has.
+#   ~/.bashrc    every bash, from the top of the file, above the interactivity
+#                guard. Covers interactive shells and `ssh host 'command'`,
+#                which bash reads .bashrc for because stdin is a socket.
+#   ~/.profile   a login `sh`/dash, and a login bash -- neither reads .zshenv,
+#                and dash does not read .bashrc either.
+#
+# Between the three, no shell that matters misses it. The one gap is
+# `bash script.sh`, which reads only $BASH_ENV; scripts get the environment by
+# inheritance instead.
+#
+# POSIX only. A login `sh` on Debian is dash, so nothing here may use bashisms:
+# `[ ]` not `[[ ]]`, no arrays, no `source`, no `local`, no `+=`. It is also
+# read by zsh, where unquoted parameter expansion does NOT word-split -- so
+# every list below is spelled as literal quoted words rather than built in a
+# variable.
+#
+# It must stay silent and fast. scp, rsync and `ssh host cmd` all read it
+# through one of the three files above, and a single line of output on stdout
+# corrupts their protocols.
+#
+# Public, and lives in the dotfiles repo. The private counterpart is
+# ~/.global_vars, sourced at the end: same job, but for what must not be in a
+# public repo.
+
+# Guarded with an exported SH_ENV_LOADED, exactly the way .global_vars guards
+# itself. Exported on purpose: PATH then gets built once per session tree
+# rather than once per nested shell. The cost is that re-reading the file after
+# editing it needs the guard cleared first -- that is the `ser` alias in
+# .bashrc, mirroring `gvr`.
+# Re-read this file after editing it. A plain `. ~/.sh_env` is a no-op while
+# the guard below is set, and ~/.global_vars guards itself the same way with
+# GLOBAL_VARS_LOADED, so both have to be cleared -- which covers the private
+# half too, since this file sources it at the end.
+#
+# A function here rather than an alias in .bashrc: zsh then gets it as well,
+# from the one definition, and it works in a non-interactive shell, where
+# aliases are not expanded.
+#
+# Defined ABOVE the guard on purpose. The guard is exported, so in a nested
+# shell the rest of this file is skipped -- and a function, unlike the
+# environment, is not inherited. Below the guard it would be missing in exactly
+# the shells someone is most likely to type it in.
+source_env() {
+    unset SH_ENV_LOADED GLOBAL_VARS_LOADED
+    . "$HOME/.sh_env"
+}
+
+if [ -n "${SH_ENV_LOADED:-}" ]; then
+    return 0
+fi
+export SH_ENV_LOADED=1
+
+# ------------------------------------------------------------
+# PATH
+
+# Prepended, so these win over the system copies. Each is guarded against a
+# second entry anyway: the guard above normally makes that impossible, but the
+# file is also re-read by hand with SH_ENV_LOADED unset.
+for d in "$HOME/bin" "$HOME/.local/bin"; do
+    [ -d "$d" ] || continue
+    case ":${PATH}:" in
+        *":$d:"*) ;;
+        *) PATH="$d:$PATH" ;;
+    esac
+done
+unset d
+
+# Appended, not prepended: these are my own scripts and none of them should
+# shadow a system command of the same name.
+case ":${PATH}:" in
+    *":$HOME/.bash_scripts/bin:"*) ;;
+    *) PATH="$PATH:$HOME/.bash_scripts/bin" ;;
+esac
+
+export PATH
+
+# Toolchains, which are here for the PATH they bring. Last, so their own
+# directories end up in front of the ones above: cargo's and deno's env files
+# each prepend and export PATH themselves, and nvm manages its own.
+
+# nvm. Sourced rather than run, because `nvm` is a shell function: switching
+# node version means editing the current shell's PATH, which a subprocess
+# cannot do. Safe in a POSIX file -- upstream says it "works on any
+# POSIX-compliant shell (sh, dash, ksh, zsh, bash)". The completion beside it
+# is bash-specific and stays in .bashrc.
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+# rustup and deno each append their own source line to whatever rc files they
+# find -- for zsh that is ~/.zshenv, which chezmoi manages, so the installer's
+# edit would be reverted by the next apply. Sourcing them from here instead
+# keeps it in one place; bootstrap_mac.sh passes --no-modify-path to match.
+# Both env files guard their own prepend, so a second source is a no-op.
+if [ -f "$HOME/.cargo/env" ]; then
+    . "$HOME/.cargo/env"
+fi
+if [ -f "$HOME/.deno/env" ]; then
+    . "$HOME/.deno/env"
+fi
+
+# macOS note. /etc/zprofile runs `path_helper`, which rebuilds PATH from
+# /etc/paths and /etc/paths.d and moves anything already in PATH to the END.
+# .zshenv runs before it, and on mac every terminal tab is a login shell, so in
+# a terminal the prepends above come out *after* the system directories.
+# Nothing is dropped, and nothing above needs to outrank /usr/bin today, so
+# this is left as is. If something ever does, the fix is to clear the guard and
+# re-source from .zshrc, which runs after path_helper.
+
+# ------------------------------------------------------------
+# Plain environment
+
+# Where the private stash lives. Needed non-interactively, not just at a
+# prompt: the restore_*/backup_* names on PATH are symlinks to
+# private-dispatch.sh, which exits with an error when CONFPATH is unset -- and
+# chezmoi runs restore_private.sh from .chezmoiscripts, with no interactive
+# shell anywhere in sight. See restore_private.sh.
+export CONFPATH="$HOME/Dropbox/configs"
+
+export LC_ALL="en_US.UTF-8"
+
+# use emacs as an editor everywhere
+export VISUAL=emacs
+export EDITOR="$VISUAL"
+
+# always dump core, including from something started remotely. Not an
+# environment variable, but inherited by children the same way, so it belongs
+# with them. Silent on macOS, where the hard limit is already unlimited and
+# only the soft one is 0.
+ulimit -c unlimited
+
+# ------------------------------------------------------------
+# Private half: secrets and machine-specific bits, not in this repo. It guards
+# itself with an exported GLOBAL_VARS_LOADED and is re-read with the `gvr`
+# alias. Note it now reaches zsh and a login dash too, which it did not when
+# only .bashrc sourced it -- so it has to be POSIX as well.
+if [ -f "$HOME/.global_vars" ]; then
+    . "$HOME/.global_vars"
+fi

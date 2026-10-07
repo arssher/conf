@@ -71,6 +71,45 @@ Things that are easy to get wrong:
   docs/, bootstrap/ and vscode/ are likewise tracked but not applied.
 
 
+Shell startup files:
+
+  Two shells, one environment. ~/.sh_env holds everything both need -- PATH,
+  CONFPATH, locale, EDITOR, the core limit, nvm/cargo/deno -- and three files
+  source it so that no shell misses it:
+
+    ~/.zshenv    every zsh: login or not, interactive or not, scripts too
+    ~/.bashrc    every bash, from the top, above the interactivity guard
+    ~/.profile   a login sh/dash, plus a login bash, which then sources .bashrc
+
+  .sh_env must therefore stay POSIX and silent -- dash reads it, and output
+  from it corrupts scp and rsync. It guards itself with an exported
+  SH_ENV_LOADED so PATH is built once per session tree, not once per nested
+  shell. To re-read it after an edit, run source_env: a function it defines
+  itself, so both shells have it, which clears that guard and GLOBAL_VARS_LOADED
+  -- covering the private ~/.global_vars it sources at its end.
+
+  There is deliberately no ~/.zprofile. zsh reads every applicable startup
+  file rather than the first that exists, so nothing needs to source anything
+  else the way .profile sources .bashrc; and on macOS every terminal tab is a
+  login shell, so .zprofile would have had .zshrc's coverage one step earlier
+  for no gain.
+
+  The interactive halves stay per-shell: .bashrc below its `case $- in *i*)`
+  guard, and .zshrc, which is bindings only so far.
+
+  macOS gotcha: /etc/zprofile runs path_helper in every login shell, and it
+  moves anything already in PATH to the END. .zshenv runs before it, so in a
+  terminal the prepends land after the system directories. Nothing is dropped
+  and nothing currently needs to outrank /usr/bin, but it is why PATH order
+  differs between a terminal and `ssh mac 'command'`.
+
+  Installers write into these files: rustup appends to ~/.profile always and
+  to ~/.zshenv whenever zsh is on PATH, and the claude installer has written
+  ~/.zshrc before. Both are managed here, so such an append shows up as
+  `chezmoi diff` drift and is reverted by the next apply -- hence
+  --no-modify-path on the rustup line in bootstrap_mac.sh.
+
+
 Shortcuts:
 
   Ergoemacs-inspired text manipulation shortcuts are supposed to be

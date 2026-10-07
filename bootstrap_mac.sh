@@ -174,8 +174,13 @@ brew install mu isync pass
 # media
 brew install ffmpeg yt-dlp
 
-# install rust
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+# install rust. --no-modify-path because rustup otherwise appends
+# `. "$HOME/.cargo/env"` to every rc file it finds -- ~/.profile always, and
+# ~/.zshenv whenever zsh is on PATH, which on mac it always is. Both are
+# chezmoi-managed, so the append would be reverted by the next apply and show
+# up as drift in `chezmoi diff` until then. ~/.sh_env sources ~/.cargo/env
+# itself, guarded, so nothing is lost.
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path
 cargo install cork
 
 # Limits. No /etc/sysctl.conf or security/limits.conf on mac; the shell limit

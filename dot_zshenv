@@ -1,0 +1,19 @@
+# Read by every zsh: login or not, interactive or not, scripts included. That
+# reach is the point -- `ssh mac 'some command'` reads this file and nothing
+# else, so the environment has to arrive here rather than in a login file.
+#
+# There is deliberately no ~/.zprofile. zsh reads every applicable startup file
+# rather than the first that exists, so unlike bash's .profile -> .bashrc chain
+# nothing here needs to source anything else; and on macOS every terminal tab
+# is a login shell, so .zprofile would have had the same coverage as .zshrc,
+# one step earlier, for no gain. The only thing login-specific on this machine
+# is /etc/zprofile's path_helper, which .sh_env documents.
+#
+# Keep it silent: output from here corrupts scp and rsync.
+#
+# Note rustup writes `. "$HOME/.cargo/env"` into this file when it finds zsh on
+# PATH, which on mac is always. .sh_env sources cargo's env itself and
+# bootstrap_mac.sh passes --no-modify-path, so that append should never happen
+# -- if it shows up in `chezmoi diff`, that is where it came from.
+
+[ -f "$HOME/.sh_env" ] && . "$HOME/.sh_env"

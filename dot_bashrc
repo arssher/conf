@@ -12,8 +12,8 @@
 #   `ssh host 'some command'` -- non-interactive
 #       bash notices stdin is a socket and reads /etc/bash.bashrc and this file
 #       anyway. This is the only path that gives a remote command an
-#       environment, and it is why .global_vars is sourced below rather than
-#       after the interactivity guard. Does not happen when invoked as `sh`.
+#       environment, and it is why ~/.sh_env is sourced below rather than after
+#       the interactivity guard. Does not happen when invoked as `sh`.
 #
 # Who does NOT read this file:
 #
@@ -33,29 +33,18 @@
 # the terminal, and nothing that only makes sense at a prompt.
 # ===========================================================================
 
-if [ -f ~/.global_vars ]; then
-      source ~/.global_vars
+# Everything bash shares with zsh -- PATH, CONFPATH, locale, editor, core
+# limit, nvm/cargo/deno, and ~/.global_vars -- lives in one POSIX file that
+# ~/.zshenv sources as well, so the two shells cannot drift apart. It guards
+# itself with an exported SH_ENV_LOADED, so a nested shell and a login bash
+# (where .profile has already sourced it) read it only once.
+if [ -f ~/.sh_env ]; then
+    source ~/.sh_env
 fi
 
-export LC_ALL="en_US.UTF-8"
-
-# use emacs as an editor everywhere
-export VISUAL=emacs
-export EDITOR="$VISUAL"
-
-# always dump core, including from something started remotely
-ulimit -c unlimited
-
-# toolchains, for the PATH they add
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# The one piece that cannot move: nvm's completion is bash-specific, and
+# .sh_env has to stay POSIX. NVM_DIR comes from there.
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-if [ -f "$HOME/.cargo/env" ]; then
-    . "$HOME/.cargo/env"
-fi
-if [ -f "$HOME/.deno/env" ]; then
-    . "$HOME/.deno/env"
-fi
 
 # ------------------------------------------------------------
 # Stuff from default .bashrc
@@ -70,17 +59,6 @@ esac
 # PART 2 -- interactive shells only. Everything below this point is skipped by
 # the return above, so a script or a remote command never sees any of it.
 # ===========================================================================
-
-# Private conf not kept in the public dotfiles repo: secrets, ssh config,
-# shell/psql history, dconf dump, /etc bits. See restore_private.sh.
-export CONFPATH=~/Dropbox/configs
-
-# Appended only if absent: .bashrc is sourced by every interactive bash, and an
-# unconditional append grows PATH with shell depth. Same shape as .cargo/env.
-case ":${PATH}:" in
-    *:"$HOME/.bash_scripts/bin":*) ;;
-    *) PATH="$PATH:$HOME/.bash_scripts/bin" ;;
-esac
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -155,11 +133,9 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
-# Re-read ~/.global_vars after editing it. A plain `source` of it is a no-op, and
-# so is brc: the file guards itself with GLOBAL_VARS_LOADED so that nested shells
-# do not re-append to PATH, and that variable is exported, so it is already set
-# here. Hence the unset first.
-alias gvr='unset GLOBAL_VARS_LOADED; source ~/.global_vars'
+# To re-read ~/.sh_env or ~/.global_vars after editing them, use source_env --
+# a function defined in .sh_env itself, so zsh has it too. Both files guard
+# themselves against a second read, and it clears both guards.
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
