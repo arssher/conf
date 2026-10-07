@@ -146,6 +146,39 @@ export CLICOLOR=1
 # only the soft one is 0.
 ulimit -c unlimited
 
+# Options for less. Here rather than in a shell's interactive half because
+# less is mostly reached through something else -- git, man, brew -- including
+# from scripts.
+# https://www.topbug.net/blog/2016/09/27/make-gnu-less-more-powerful/
+#
+# --quit-if-one-screen (-F)  exit outright if it all fits on one screen.
+# --ignore-case (-i)         case-insensitive search unless the pattern has a
+#                            capital in it.
+# --LONG-PROMPT (-M)         verbose prompt: line numbers and % through.
+# --RAW-CONTROL-CHARS (-R)   pass colour escapes through to the terminal
+#                            instead of showing them as ^[[31m, while still
+#                            counting line lengths properly -- which plain -r
+#                            does not.
+# --HILITE-UNREAD (-W)       mark the first new line after a page down.
+# --tabs=4                   postgres indents with 4.
+# --window=-4                scroll four lines less than a full screen, so a
+#                            page down keeps four lines of overlap.
+# --mouse --wheel-lines=3    wheel scrolling, three lines at a time.
+# --LINE-NUMBERS (-N)        line numbers down the left.
+#
+# All ten accepted by macOS's less, which is 668 and current; nothing here is
+# GNU-only. --no-init (-X) is deliberately absent: it leaves less's output on
+# the screen after quitting, and the warning that --quit-if-one-screen needs it
+# does not hold in practice.
+export LESS='--quit-if-one-screen --ignore-case --LONG-PROMPT --RAW-CONTROL-CHARS --HILITE-UNREAD --tabs=4 --window=-4 --mouse --wheel-lines=3 --LINE-NUMBERS'
+
+# Colours for gcc's warnings and errors. Inert on macOS: cc and even
+# /usr/bin/gcc there are clang, which has no GCC_COLORS equivalent -- it takes
+# -fcolor-diagnostics and colours to a tty by default. Checked: the string does
+# not appear in either Apple's clang or brew's llvm. Kept unconditionally for
+# the linux side, where gcc is what builds postgres.
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
 # ------------------------------------------------------------
 # Private half: secrets and machine-specific bits, not in this repo. It guards
 # itself with an exported GLOBAL_VARS_LOADED and is re-read with the `gvr`
