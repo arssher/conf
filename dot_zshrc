@@ -39,7 +39,80 @@ bindkey '\el' forward-char
 bindkey '\ei' up-line-or-history
 bindkey '\ek' down-line-or-history
 
-# Still missing, compared with what .bashrc does for bash: history settings,
-# the completion system (compinit), a prompt, the aliases from
-# .bash_scripts/aliases.sh, `stty -ixon` to free C-s, and the pg_* helper
-# functions.
+# ------------------------------------------------------------
+# History.
+#
+# Not a copy of .bashrc's: zsh does natively most of what that file works
+# around with PROMPT_COMMAND and shopt, so only the options that earn their
+# place are here. Its own file -- EXTENDED_HISTORY's format is not bash's, so
+# the two cannot share one. Nothing is exported: this is per-shell state, which
+# is why it lives here and not in .sh_env.
+HISTFILE=~/.zsh_history
+# In memory, and in the file. No unlimited form exists in zsh, so: a big
+# number. The file is rewritten to trim itself once it is 20% past SAVEHIST.
+HISTSIZE=1000000
+SAVEHIST=1000000
+
+# All shells share one history, live: this both imports other shells' lines and
+# appends ours as they are typed. Deliberately different from bash here, where
+# each terminal keeps its own. It supersedes INC_APPEND_HISTORY and
+# INC_APPEND_HISTORY_TIME -- the three are mutually exclusive -- and makes
+# .bashrc's `history -a` in PROMPT_COMMAND unnecessary.
+setopt SHARE_HISTORY
+
+# Timestamp and duration per entry, as `: <start>:<elapsed>;<command>'. Read
+# them back with `fc -l -d` or `-f`; plain `history` hides them, as bash's does
+# without HISTTIMEFORMAT. SHARE_HISTORY turns this on regardless, so saying it
+# explicitly only documents the file format.
+setopt EXTENDED_HISTORY
+
+# A leading space keeps a command out of history -- for anything with a secret
+# in the argv. The line still lingers in the current shell until the next
+# command, so it can be edited and reused first.
+setopt HIST_IGNORE_SPACE
+# Don't record a line identical to the one just before it.
+setopt HIST_IGNORE_DUPS
+# Strip superfluous whitespace before storing.
+setopt HIST_REDUCE_BLANKS
+# Don't record `history`/`fc -l` itself.
+setopt HIST_NO_STORE
+
+# Hide repeats while cycling or searching, and drop older duplicates when
+# writing the file -- but do NOT remove them from the history list itself.
+# That is the deliberate difference from .bashrc's HISTCONTROL=erasedups:
+# erasing duplicates loses when a command was last run, and with a million
+# entries there is no reason to pay that.
+setopt HIST_FIND_NO_DUPS
+setopt HIST_SAVE_NO_DUPS
+
+# Expand `!!` and `!$` into the buffer for inspection instead of running them
+# straight away.
+setopt HIST_VERIFY
+
+# fcntl locking on the history file. With one shared file and many terminals
+# writing to it after every command, this is what stops it being corrupted.
+setopt HIST_FCNTL_LOCK
+
+# No beep when a history movement hits either end.
+unsetopt HIST_BEEP
+
+# History with readable timestamps. zsh has no HISTTIMEFORMAT: `history' is
+# just `fc -l', and the format lives on the flag -- so the date has to be asked
+# for every time, hence the alias. [%F %T] is strftime, and matches the
+# HISTTIMEFORMAT .bashrc uses, so the two shells print alike.
+#
+# No range in the alias on purpose, so arguments still work: `h' alone gives
+# fc's default of the last 16, `h -50' the last 50, `h 1' everything, `h make'
+# from the last command starting with make.
+#
+# Not -D, which would add each command's duration: EXTENDED_HISTORY has a field
+# for it, but SHARE_HISTORY appends the line as soon as it is typed -- before
+# the command runs -- so the field is always 0:00. Tested with `sleep 2'. Only
+# INC_APPEND_HISTORY_TIME writes after the command finishes and records it, and
+# that one cannot be combined with sharing. Durations or shared history, not
+# both; sharing is worth more.
+alias h='fc -l -t "[%F %T]"'
+
+# Not here yet, compared with what .bashrc does for bash: the completion system
+# (compinit), a prompt, the aliases from .bash_scripts/aliases.sh, `stty -ixon`
+# to free C-s, and the pg_* helper functions.
