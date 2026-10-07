@@ -11,7 +11,7 @@ set editing-mode emacs
 "\ee": backward-kill-word
 "\er": kill-word
 "\eu": backward-word
-"\ei": previous-history
+"\ei": history-search-backward
 "\eo": forward-word
 
 # the home row
@@ -22,6 +22,17 @@ set editing-mode emacs
 "\eh": beginning-of-line
 "\eH": end-of-line
 "\ej": backward-char
-"\ek": next-history
+"\ek": history-search-forward
 "\el": forward-char
+
+# i and k search rather than merely step. readline takes everything between the
+# start of the line and the cursor and looks for history entries beginning with
+# it, so `git com' then M-i walks only the git com... commands. They were
+# previous-history/next-history, which ignore what is already typed.
+#
+# The zsh half is up-line-or-beginning-search in .zshrc: the same thing, plus a
+# move inside a multi-line buffer before it reaches for history. readline also
+# has history-substring-search-backward/-forward, which match anywhere in the
+# line rather than at its start -- not used, because zsh ships no equivalent and
+# readme.txt wants these two files to agree.
 

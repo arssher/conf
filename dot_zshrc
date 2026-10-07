@@ -41,12 +41,9 @@ bindkey '\eH' end-of-line
 bindkey '\ej' backward-char
 bindkey '\el' forward-char
 
-# i and k are previous-history/next-history in .inputrc. zsh has those under
-# the same names, but the -line-or- variants move inside a multi-line buffer
-# first and only reach for history at its edges, which is what the binding
-# means to do.
-bindkey '\ei' up-line-or-history
-bindkey '\ek' down-line-or-history
+# i and k are missing from this list on purpose: they move through history, so
+# they are bound at the end of the history section below, where the widget they
+# need can be loaded first.
 
 # ------------------------------------------------------------
 # History.
@@ -121,6 +118,29 @@ unsetopt HIST_BEEP
 # that one cannot be combined with sharing. Durations or shared history, not
 # both; sharing is worth more.
 alias h='fc -l -t "[%F %T]"'
+
+# i and k, the two ergoemacs bindings that belong with history rather than with
+# the motion keys above.
+#
+# up-line-or-beginning-search moves within a multi-line buffer first, and at
+# its edge searches history for entries beginning with everything left of the
+# cursor, leaving the cursor at the end of the line. So typing `git com' and
+# then M-i walks only the git com... commands, and consecutive presses keep
+# that same prefix. Compare up-line-or-history, which ignores what is typed,
+# and up-line-or-search, which matches on the first word only.
+#
+# .inputrc has the readline equivalent, history-search-backward/-forward, so
+# the two agree as readme.txt wants. readline has no up-line-or- compound, so
+# its version searches unconditionally rather than walking a multi-line buffer
+# first; for single-line commands they behave the same.
+#
+# Contributed widgets, so they need autoloading and registering with zle -N
+# before bindkey will accept the names.
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '\ei' up-line-or-beginning-search
+bindkey '\ek' down-line-or-beginning-search
 
 # ------------------------------------------------------------
 # Prompt.
