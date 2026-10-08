@@ -251,14 +251,23 @@ def main():
     p.add_argument("--from-common-log", action="store_true",
                    help="scatter: write ~/.bash_eternal_history "
                         "and ~/.zsh_history")
+    p.add_argument("--extra-log", action="append", metavar="PATH", default=[],
+                   help="another file in ~/.persistent_history's format to "
+                        "read into the merge; never written to. Repeatable. "
+                        "This is how a copy kept elsewhere -- a backup, "
+                        "another machine's -- gets folded in without either "
+                        "side replacing the other")
     p.add_argument("-n", "--dry-run", action="store_true",
                    help="report what would happen, write nothing")
     args = p.parse_args()
 
     log, bash, zsh = read_log(), read_bash(), read_zsh()
-    merged = merge(log, bash, zsh)
+    extras = [(p, read_log(p)) for p in args.extra_log]
+    merged = merge(log, *[e for _, e in extras], bash, zsh)
 
     print("read   %7d  %s" % (len(log), LOG))
+    for path, entries in extras:
+        print("read   %7d  %s" % (len(entries), path))
     print("read   %7d  %s" % (len(bash), BASH))
     print("read   %7d  %s" % (len(zsh), ZSH))
     print("merged %7d  entries" % len(merged))
