@@ -136,9 +136,40 @@ export EDITOR="$VISUAL"
 # disabled if the output is not directed to a terminal", so a pipe or a script
 # sees no escapes. CLICOLOR_FORCE would defeat that and is deliberately unset.
 #
-# Which colours is LSCOLORS, left unset so BSD's own defaults apply. It is a
-# positional string of letter pairs, nothing like GNU's named LS_COLORS.
 export CLICOLOR=1
+
+# Which colours is LSCOLORS: a positional string of foreground/background
+# letter pairs, nothing like GNU's named LS_COLORS, so changing one entry means
+# spelling out all twelve. This is BSD's own default with only the last pair
+# altered.
+#
+# That last pair is slot 12, "dataless file" -- a cloud placeholder whose name
+# is local but whose contents are not. Everything under ~/Dropbox is one until
+# first opened, since it is a symlink into ~/Library/CloudStorage and goes
+# through the File Provider framework. The default paints those `ah', black on
+# light grey, which is a block of white background across half of
+# `ls ~/Dropbox'.
+#
+# `hx' instead: light grey text, no background. Dimmer than a normal file,
+# which reads as the right thing for one that is not really here, while staying
+# perfectly legible. Measured against ghostty's defaults -- #282c34 background,
+# #ffffff text -- light grey is palette 7, #c5c8c6, giving 8.3:1 against the
+# background and 1.7:1 against normal text.
+#
+# Not `Ax', which was the first try: bold black is palette 8, #666666, only
+# 2.4:1 on that background and so near invisible. Nor `Hx', which is legible
+# but palette 15, #eaeaea, is 1.2:1 against #ffffff and so indistinguishable
+# from an ordinary file -- no marker at all. `gx', cyan, is the option if a
+# clearer distinction is ever wanted: 6.8:1 and 2.1:1, at the cost of a hue.
+#
+# Worth keeping some marker rather than turning it off with `xx'. A dataless
+# file reads at network speed rather than disk speed, and it is why git inside
+# Dropbox can report missing objects until the sync finishes -- `ls -G' on such
+# a directory is the quickest way to see whether it is really there yet.
+#
+# Ignored on linux, where GNU ls reads LS_COLORS and dataless files do not
+# exist.
+export LSCOLORS=exfxcxdxbxegedabagacadhx
 
 # always dump core, including from something started remotely. Not an
 # environment variable, but inherited by children the same way, so it belongs
