@@ -282,9 +282,11 @@ def main():
             print("wrote  %7d  %s" % (len(merged), path))
 
     if args.from_common_log and not args.dry_run:
-        print("\nAn interactive zsh already running holds its own copy of the "
-              "history\nand will write it back out, so restore with no zsh "
-              "open -- or run\n`fc -R' in the ones that are.", file=sys.stderr)
+        print("\nAlready-open shells keep their own in-memory history and will "
+              "append it\nlater, which cannot undo this: zsh appends rather "
+              "than replaces unless\nAPPEND_HISTORY is unset. With "
+              "SHARE_HISTORY they pick these entries up\non their next "
+              "command; `fc -R' forces it sooner.", file=sys.stderr)
     return 0
 
 
