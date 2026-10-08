@@ -211,8 +211,13 @@ PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 # ported either; they pipe to xclip, which is X11 only, so they do not work on
 # mac anyway.
 #
-# Kept running for now because the log is still the format-neutral store the
-# history backup merges through, and because it has years of commands in it.
+# Kept running, though, and for a sharper reason than inertia: HISTCONTROL
+# above has erasedups, which strips older duplicates from .bash_eternal_history
+# on every write, so that file cannot say when a repeated command ran the other
+# times -- only the last. This log can, and does, for ten years back. zsh needs
+# no equivalent hook because nothing there trims its history file, so
+# history-merge.py just reads it; see the note in .zshrc where such a hook
+# would have gone.
 log_bash_persistent_history()
 {
   [[

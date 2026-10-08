@@ -88,13 +88,18 @@ setopt HIST_REDUCE_BLANKS
 # Don't record `history`/`fc -l` itself.
 setopt HIST_NO_STORE
 
-# Hide repeats while cycling or searching, and drop older duplicates when
-# writing the file -- but do NOT remove them from the history list itself.
-# That is the deliberate difference from .bashrc's HISTCONTROL=erasedups:
-# erasing duplicates loses when a command was last run, and with a million
-# entries there is no reason to pay that.
+# Hide repeats while cycling or searching -- but only while showing them.
+# Nothing here removes a duplicate from the history list or from the file, and
+# that is the deliberate difference from .bashrc's HISTCONTROL=erasedups:
+# erasing duplicates loses when a command ran the other times, and with a
+# million entries there is no reason to pay that.
+#
+# Not HIST_SAVE_NO_DUPS either, which would omit older duplicates when the file
+# is written. It is the only thing that would make this file a lossy record,
+# and the file being complete is what lets history-merge.py read it instead of
+# a hook writing every command out twice -- see the note where that hook would
+# have gone.
 setopt HIST_FIND_NO_DUPS
-setopt HIST_SAVE_NO_DUPS
 
 # Expand `!!` and `!$` into the buffer for inspection instead of running them
 # straight away.
@@ -147,35 +152,18 @@ zle -N down-line-or-beginning-search
 bindkey '\ei' up-line-or-beginning-search
 bindkey '\ek' down-line-or-beginning-search
 
-# Log every command to ~/.persistent_history too, as .bashrc does from
-# PROMPT_COMMAND. Nothing reads that file interactively any more -- it existed
-# because bash gives each terminal its own history, which SHARE_HISTORY above
-# makes moot -- but it is the format-neutral store the history backup merges
-# through, so both shells have to feed it or half the history never reaches the
-# stash. See .bash_scripts/bin/history-merge.py.
+# There is deliberately no hook feeding ~/.persistent_history from here, the
+# way .bashrc does from PROMPT_COMMAND. history-merge.py reads this file
+# directly when the backup runs, so a hook would only duplicate the work -- and
+# worse, it would have to re-implement HIST_IGNORE_SPACE by hand to avoid
+# writing out the commands that very option exists to keep out. Reading the
+# file inherits that and HIST_IGNORE_DUPS, HIST_NO_STORE and
+# HIST_REDUCE_BLANKS for nothing.
 #
-# preexec hands the command line over as $1 before running it, which is both
-# simpler and more exact than bash's `history 1' regex.
-#
-# The leading-space test is the one that matters: HIST_IGNORE_SPACE keeps such
-# a command out of zsh's own history, and without this it would still land
-# here, leaking the very thing the space was typed for. $ARS_PH_LAST is quoted
-# because the right side of == is a pattern in zsh, and a command with a glob
-# character in it would otherwise match too much.
-#
-# strftime comes from zsh/datetime, so this costs no fork per command.
-# ARS_PH_LAST is deliberately not exported, unlike bash's
-# PERSISTENT_HISTORY_LAST: the duplicate check is about what this terminal just
-# typed.
-zmodload zsh/datetime
-autoload -Uz add-zsh-hook
-ars_log_persistent_history() {
-    [[ $1 == ' '* ]] && return
-    [[ $1 == "$ARS_PH_LAST" ]] && return
-    print -r -- "[$(strftime '%F %T' $EPOCHSECONDS)] | $1" >> ~/.persistent_history
-    ARS_PH_LAST=$1
-}
-add-zsh-hook preexec ars_log_persistent_history
+# bash still needs its hook, because HISTCONTROL=erasedups strips older
+# duplicates from its history file on every write, so the file alone cannot say
+# when a repeated command ran before. Nothing here does that to this file --
+# see the note on HIST_SAVE_NO_DUPS above -- so it is a complete record.
 
 # ------------------------------------------------------------
 # Completion.
