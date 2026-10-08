@@ -1,0 +1,20 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- /* Manage the footer only; keep all other Codex settings machine-local. */ -}}
+{{- $items := list
+    "hostname"
+    "model"
+    "context-window-size"
+    "git-branch"
+    "used-tokens"
+    "context-used"
+    "five-hour-limit"
+    "weekly-limit"
+    "current-dir"
+-}}
+{{- $config := fromToml .chezmoi.stdin -}}
+{{- $current := dig "tui" "status_line" (list) $config -}}
+{{- if eq (toJson $current) (toJson $items) -}}
+{{- .chezmoi.stdin -}}
+{{- else -}}
+{{- $config | setValueAtPath "tui.status_line" $items | toToml -}}
+{{- end -}}

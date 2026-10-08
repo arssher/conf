@@ -121,6 +121,25 @@ Shortcuts:
   - libedit's ~/.editrc
   - macos whenever possible through karabiner remaps:
 
+Codex status line:
+
+  private_dot_codex/modify_private_config.toml manages only tui.status_line in
+  ~/.codex/config.toml through chezmoi's modify-template support. Model, plugin,
+  MCP and project settings are read from the live file and retained, rather
+  than copied into this public repo. Auth files and session state stay local.
+
+  The footer shows hostname, model, context size, git branch, session tokens,
+  context usage, five-hour/weekly quota remaining, and directory. /statusline
+  changes the live selection; edit the list in the modify template to keep a
+  new selection here. Do not re-add the whole Codex config.
+
+  If the list already matches, the file is left byte for byte unchanged.
+  Changing the list re-serializes TOML, preserving other settings' values but
+  normalizing formatting and dropping comments. Apply just this target with:
+    chezmoi diff ~/.codex/config.toml
+    chezmoi apply ~/.codex/config.toml
+
+
 Content kept outside this repo:
 
   A separate private directory holds what does not belong in git here.
