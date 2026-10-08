@@ -200,6 +200,19 @@ PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 # history will be duplicated on each save, but need to check that
 
 # also log all commands to ~/.persistent_history and search it with phgrep.
+#
+# DEPRECATED. This log exists because of the limitation described just above:
+# bash gives every terminal its own history, so the only way to search what was
+# typed in another one was to keep a separate append-only log and grep it. zsh
+# does it natively -- SHARE_HISTORY puts every terminal's commands in one list
+# as they are typed, EXTENDED_HISTORY timestamps them, and C-r or M-i search
+# the lot -- so the zsh side has no equivalent of this and wants none. ph and
+# phgrep in .bash_scripts/utils.sh are the readers, and they are not being
+# ported either; they pipe to xclip, which is X11 only, so they do not work on
+# mac anyway.
+#
+# Kept running for now because the log is still the format-neutral store the
+# history backup merges through, and because it has years of commands in it.
 log_bash_persistent_history()
 {
   [[

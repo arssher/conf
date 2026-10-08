@@ -147,6 +147,36 @@ zle -N down-line-or-beginning-search
 bindkey '\ei' up-line-or-beginning-search
 bindkey '\ek' down-line-or-beginning-search
 
+# Log every command to ~/.persistent_history too, as .bashrc does from
+# PROMPT_COMMAND. Nothing reads that file interactively any more -- it existed
+# because bash gives each terminal its own history, which SHARE_HISTORY above
+# makes moot -- but it is the format-neutral store the history backup merges
+# through, so both shells have to feed it or half the history never reaches the
+# stash. See .bash_scripts/bin/history-merge.py.
+#
+# preexec hands the command line over as $1 before running it, which is both
+# simpler and more exact than bash's `history 1' regex.
+#
+# The leading-space test is the one that matters: HIST_IGNORE_SPACE keeps such
+# a command out of zsh's own history, and without this it would still land
+# here, leaking the very thing the space was typed for. $ARS_PH_LAST is quoted
+# because the right side of == is a pattern in zsh, and a command with a glob
+# character in it would otherwise match too much.
+#
+# strftime comes from zsh/datetime, so this costs no fork per command.
+# ARS_PH_LAST is deliberately not exported, unlike bash's
+# PERSISTENT_HISTORY_LAST: the duplicate check is about what this terminal just
+# typed.
+zmodload zsh/datetime
+autoload -Uz add-zsh-hook
+ars_log_persistent_history() {
+    [[ $1 == ' '* ]] && return
+    [[ $1 == "$ARS_PH_LAST" ]] && return
+    print -r -- "[$(strftime '%F %T' $EPOCHSECONDS)] | $1" >> ~/.persistent_history
+    ARS_PH_LAST=$1
+}
+add-zsh-hook preexec ars_log_persistent_history
+
 # ------------------------------------------------------------
 # Completion.
 #
