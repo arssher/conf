@@ -51,6 +51,20 @@ curl -fsSL https://claude.ai/install.sh | bash
 defaults -currentHost write -g com.apple.keyboard.modifiermapping.0-0-0 \
   '({HIDKeyboardModifierMappingSrc=30064771129;HIDKeyboardModifierMappingDst=30064771300;})'
 
+# Kill the big translucent letter that pops up mid-screen on switching input
+# source -- ABC and Russian, here. It arrived with Sonoma and System Settings
+# has no switch for it; this undocumented key is the only lever anyone has
+# found. Takes effect per process as each one re-reads preferences, so log out
+# and back in. Undo with `defaults delete`.
+#
+# UNVERIFIED past Sonoma: the write-ups for it are macOS 14 and this machine is
+# 26.6.2, so it may simply do nothing now -- in which case delete the key
+# rather than leave a dead pref behind. The other documented route is a feature
+# flag under /Library/Preferences/FeatureFlags/Domain turning off the
+# redesigned text cursor that the indicator belongs to, which is system-wide,
+# needs a reboot, and gets reset by updates. Not worth it for this.
+defaults write kCFPreferencesAnyApplication TSMLanguageIndicatorEnabled 0
+
 # Three finger drag: three fingers move a window or select text. The keys
 # System Settings -> Accessibility -> Pointer Control -> Trackpad Options
 # writes. Re-login required, and a half-applied state behaves erratically in
