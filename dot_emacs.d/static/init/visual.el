@@ -30,6 +30,15 @@
 ;; (setq scroll-step            1
       ;; scroll-conservatively  10000)
 
+;; Keep point on the same screen row through a screenful scroll, so that a page
+;; down followed by a page up puts it back where it started instead of leaving
+;; it drifted. Screenful scrolling is cua-scroll-up/down on the page keys,
+;; which on a mac keyboard means fn + down and fn + up.
+(setq scroll-preserve-screen-position t)
+;; At the edge of the buffer, scroll to the edge rather than refusing: a page
+;; down near the end moves point to the last line instead of ringing the bell.
+(setq scroll-error-top-bottom t)
+
 ;; always tail *Messages* buffer
 (tail-messages-enable)
 
