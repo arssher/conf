@@ -8,10 +8,12 @@ Three stores, three formats, none of which can be concatenated with another:
                               ls -la
     ~/.zsh_history            : 1791376094:0;ls -la
 
-~/.persistent_history is the neutral one and the only one that is backed up.
-bash appends to it from PROMPT_COMMAND and zsh from a preexec hook, so it is
-normally already current; this script is what moves history the other way, and
-what folds in whatever the two native files hold that the log does not.
+~/.persistent_history is the common one: the other two are each a single
+shell's, in that shell's own format, while this one is shared and so is the
+sensible thing to carry between machines. bash also appends to it from
+PROMPT_COMMAND, because HISTCONTROL=erasedups makes its own history file
+forget when a repeated command ran before; zsh needs no such hook, nothing
+trimming its file.
 
 There is really one operation: read all three, take the union, write out
 whichever ones were asked for. Both directions are therefore a merge rather
@@ -19,10 +21,10 @@ than a replace, which makes them idempotent and non-destructive -- running
 either twice changes nothing, and neither can lose an entry that only one store
 had.
 
-    --to-log      write the log only.      backup_private.sh calls this,
-                                           then copies the log to $CONFPATH.
-    --from-log    write bash and zsh only. restore_private.sh calls this,
-                                           after copying the log back.
+    --to-common-log     gather: write ~/.persistent_history, so it holds
+                        everything both shells have run.
+    --from-common-log   scatter: write the two per-shell files, so each shell
+                        can see the other's history.
 
 Entries are keyed on (timestamp, command) and sorted by timestamp. What that
 costs:
@@ -241,13 +243,14 @@ def write_zsh(entries, path=ZSH):
 def main():
     p = argparse.ArgumentParser(
         description="Merge bash and zsh history through ~/.persistent_history.",
-        epilog="With neither --to-log nor --from-log, nothing is written.",
+        epilog="Given neither direction, nothing is written: it reads the "
+               "three files and reports what a merge would hold.",
     )
-    p.add_argument("--to-log", action="store_true",
-                   help="write ~/.persistent_history (the backup direction)")
-    p.add_argument("--from-log", action="store_true",
-                   help="write ~/.bash_eternal_history and ~/.zsh_history "
-                        "(the restore direction)")
+    p.add_argument("--to-common-log", action="store_true",
+                   help="gather: write ~/.persistent_history")
+    p.add_argument("--from-common-log", action="store_true",
+                   help="scatter: write ~/.bash_eternal_history "
+                        "and ~/.zsh_history")
     p.add_argument("-n", "--dry-run", action="store_true",
                    help="report what would happen, write nothing")
     args = p.parse_args()
@@ -260,14 +263,15 @@ def main():
     print("read   %7d  %s" % (len(zsh), ZSH))
     print("merged %7d  entries" % len(merged))
 
-    if not (args.to_log or args.from_log):
-        print("nothing asked for; pass --to-log or --from-log", file=sys.stderr)
+    if not (args.to_common_log or args.from_common_log):
+        print("nothing asked for; pass --to-common-log or --from-common-log",
+              file=sys.stderr)
         return 0
 
     targets = []
-    if args.to_log:
+    if args.to_common_log:
         targets.append((LOG, write_log))
-    if args.from_log:
+    if args.from_common_log:
         targets += [(BASH, write_bash), (ZSH, write_zsh)]
 
     for path, writer in targets:
@@ -277,7 +281,7 @@ def main():
             writer(merged, path)
             print("wrote  %7d  %s" % (len(merged), path))
 
-    if args.from_log and not args.dry_run:
+    if args.from_common_log and not args.dry_run:
         print("\nAn interactive zsh already running holds its own copy of the "
               "history\nand will write it back out, so restore with no zsh "
               "open -- or run\n`fc -R' in the ones that are.", file=sys.stderr)
