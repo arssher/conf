@@ -225,6 +225,12 @@
 ;; The zxcv row:
 (global-set-key (kbd "C-z") 'undo-tree-undo)
 (global-set-key (kbd "C-S-z") 'undo-tree-redo)
+;; and on z as well, for the same reason as x/c/v below: macOS puts undo on
+;; cmd+z and redo on shift+cmd+z, never on ctrl+z, which in a terminal is
+;; suspend. This spends zap-to-char, the stock M-z, which nothing here binds
+;; and which is still reachable by name. M-Z was free.
+(global-set-key (kbd "M-z") 'undo-tree-undo)
+(global-set-key (kbd "M-Z") 'undo-tree-redo)
 ;; x, c and v cut, copy and paste, so that left cmd + x/c/v on mac -- where cmd
 ;; is Meta -- does what every other app does. cua already gives all three on
 ;; C-x, C-c and C-v and those keep working; these are the same commands reached
