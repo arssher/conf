@@ -2,12 +2,9 @@
 # reach is the point -- `ssh mac 'some command'` reads this file and nothing
 # else, so the environment has to arrive here rather than in a login file.
 #
-# There is deliberately no ~/.zprofile. zsh reads every applicable startup file
-# rather than the first that exists, so unlike bash's .profile -> .bashrc chain
-# nothing here needs to source anything else; and on macOS every terminal tab
-# is a login shell, so .zprofile would have had the same coverage as .zshrc,
-# one step earlier, for no gain. The only thing login-specific on this machine
-# is /etc/zprofile's path_helper, which .sh_env documents.
+# On macOS /etc/zprofile runs path_helper after this file. ~/.zprofile then
+# calls the Homebrew PATH function from .sh_env to restore its priority over
+# system tools. The rest of the environment still loads only here.
 #
 # Keep it silent: output from here corrupts scp and rsync.
 #

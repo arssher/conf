@@ -83,25 +83,26 @@ Shell startup files:
 
   .sh_env must therefore stay POSIX and silent -- dash reads it, and output
   from it corrupts scp and rsync. It guards itself with an exported
-  SH_ENV_LOADED so PATH is built once per session tree, not once per nested
-  shell. To re-read it after an edit, run source_env: a function it defines
-  itself, so both shells have it, which clears that guard and GLOBAL_VARS_LOADED
+  SH_ENV_LOADED so the environment loads once per session tree, not once per
+  nested shell. To re-read it after an edit, run source_env: a function defined
+  there, so both shells have it, which clears that guard and GLOBAL_VARS_LOADED
   -- covering the private ~/.global_vars it sources at its end.
 
-  There is deliberately no ~/.zprofile. zsh reads every applicable startup
-  file rather than the first that exists, so nothing needs to source anything
-  else the way .profile sources .bashrc; and on macOS every terminal tab is a
-  login shell, so .zprofile would have had .zshrc's coverage one step earlier
-  for no gain.
+  ~/.zprofile only calls sh_env_homebrew_path, defined in .sh_env's PATH
+  section above the guard so nested shells have it too. It restores Homebrew
+  priority after macOS's system login setup, without reloading toolchains or
+  the private environment. PATH configuration stays in .sh_env.
 
   The interactive halves stay per-shell: .bashrc below its `case $- in *i*)`
   guard, and .zshrc, which is bindings only so far.
 
   macOS gotcha: /etc/zprofile runs path_helper in every login shell, and it
-  moves anything already in PATH to the END. .zshenv runs before it, so in a
-  terminal the prepends land after the system directories. Nothing is dropped
-  and nothing currently needs to outrank /usr/bin, but it is why PATH order
-  differs between a terminal and `ssh mac 'command'`.
+  builds PATH from /etc/paths, then /etc/paths.d, then inherited entries.
+  /etc/paths.d/homebrew therefore puts Homebrew after /usr/bin. .zshenv runs
+  before this; .zprofile runs after it and restores Homebrew's bin and sbin
+  ahead of system tools. The function removes existing Homebrew entries first
+  so repeated calls do not duplicate them. bootstrap_mac.sh includes
+  `brew install python`; with this ordering, its python3 wins over Apple's.
 
   Installers write into these files: rustup appends to ~/.profile always and
   to ~/.zshenv whenever zsh is on PATH, and the claude installer has written

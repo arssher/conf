@@ -150,6 +150,9 @@ brew install --cask karabiner-elements
 brew install vim git rsync curl wget htop jq
 brew install ghostty
 
+# Modern python3; ~/.sh_env puts Homebrew ahead of Apple's system Python.
+brew install python
+
 # bash as a program, not as the login shell: there is deliberately no chsh
 # here, zsh stays the shell on mac. /etc/shells only makes brew's bash a
 # permitted one, for a later chsh or for tools that consult the list.

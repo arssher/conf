@@ -1,0 +1,6 @@
+# /etc/zprofile has already run macOS's path_helper, putting system paths
+# first. The shared PATH setup lives in ~/.sh_env, loaded by ~/.zshenv.
+# Reapply just Homebrew's ordering without reloading the whole environment.
+if command -v sh_env_homebrew_path >/dev/null 2>&1; then
+    sh_env_homebrew_path
+fi

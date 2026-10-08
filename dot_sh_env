@@ -51,13 +51,48 @@ source_env() {
     . "$HOME/.sh_env"
 }
 
+# ------------------------------------------------------------
+# PATH
+
+# macOS's path_helper reads /etc/paths.d/homebrew after the system paths, and
+# runs AFTER .zshenv in login zsh. Keep the ordering here; .zprofile calls this
+# function again after path_helper. Defined above the guard so nested shells
+# have it too, without reloading toolchains or the private environment.
+sh_env_homebrew_path() {
+    for sh_env_brew_prefix in /opt/homebrew /usr/local; do
+        [ -x "$sh_env_brew_prefix/bin/brew" ] || continue
+
+        # Remove existing entries before prepending, so repeated calls cannot
+        # duplicate them. Use builtins only: this runs during shell startup.
+        sh_env_brew_path=":${PATH-}:"
+        for sh_env_brew_dir in "$sh_env_brew_prefix/bin" "$sh_env_brew_prefix/sbin"; do
+            while :; do
+                case "$sh_env_brew_path" in
+                    *":$sh_env_brew_dir:"*)
+                        sh_env_brew_path="${sh_env_brew_path%%":$sh_env_brew_dir:"*}:${sh_env_brew_path#*":$sh_env_brew_dir:"}"
+                        ;;
+                    *) break ;;
+                esac
+            done
+        done
+        sh_env_brew_path=${sh_env_brew_path#:}
+        sh_env_brew_path=${sh_env_brew_path%:}
+        PATH="$sh_env_brew_prefix/bin:$sh_env_brew_prefix/sbin${sh_env_brew_path:+:$sh_env_brew_path}"
+        export PATH
+        break
+    done
+    unset sh_env_brew_prefix sh_env_brew_path sh_env_brew_dir
+}
+
 if [ -n "${SH_ENV_LOADED:-}" ]; then
     return 0
 fi
 export SH_ENV_LOADED=1
 
-# ------------------------------------------------------------
-# PATH
+# Needed here for bash and non-login zsh, which never read ~/.zprofile.
+# Login zsh also calls it from ~/.zprofile after /etc/zprofile's path_helper
+# has reordered PATH; that second call restores Homebrew's priority.
+sh_env_homebrew_path
 
 # Prepended, so these win over the system copies. Each is guarded against a
 # second entry anyway: the guard above normally makes that impossible, but the
@@ -103,14 +138,6 @@ fi
 if [ -f "$HOME/.deno/env" ]; then
     . "$HOME/.deno/env"
 fi
-
-# macOS note. /etc/zprofile runs `path_helper`, which rebuilds PATH from
-# /etc/paths and /etc/paths.d and moves anything already in PATH to the END.
-# .zshenv runs before it, and on mac every terminal tab is a login shell, so in
-# a terminal the prepends above come out *after* the system directories.
-# Nothing is dropped, and nothing above needs to outrank /usr/bin today, so
-# this is left as is. If something ever does, the fix is to clear the guard and
-# re-source from .zshrc, which runs after path_helper.
 
 # ------------------------------------------------------------
 # Plain environment
