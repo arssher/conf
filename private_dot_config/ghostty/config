@@ -10,21 +10,34 @@ font-family = Ubuntu Mono
 # there and write the number here -- cmd+0 goes back to whatever this says.
 font-size = 17
 
-# Left option becomes Alt, so it sends ESC+key, which is what zsh and readline
-# bind -- see .zshrc and .inputrc. Right option is left alone and still
-# composes (c) and --, which is why this is "left" and not "true".
+# Left option becomes Alt, so it sends ESC+key instead of composing a
+# character. Right option is left alone and still composes (c) and --, which
+# is why this is "left" and not "true".
 #
-# This is half of the ergoemacs story in the terminal. The other half is in
-# karabiner, which maps left cmd + letter to left option + letter for terminal
-# apps, so the thumb means Meta here as it does in gui apps. It has to be
-# karabiner and not keybinds in this file: ghostty's `super` is the cmd
-# modifier on either side, with no left/right form -- left_super, super_left,
-# physical:super and cmd_left are all rejected -- so keybinds here would take
-# right cmd too, and right cmd is meant to stay the system's.
+# Most of the ergoemacs scheme no longer rests on this. karabiner sends real
+# keys in terminals now -- arrows, Home, End, backspace, delete, ctrl+k -- so
+# that full-screen programs understand the gestures and not only readline-style
+# line editors; see its rules and .zshrc. What still rides ESC+letter is left
+# cmd + r and left cmd + G, and that is what this setting is for.
 #
-# Because only karabiner's fourteen letters move, and only on the left, every
-# ghostty shortcut survives on the right thumb: right cmd + d still splits,
-# + f still searches, + k still clears.
+# It also carries the tab keybinds below: option+m and option+comma compose a
+# mu and a less-than-or-equal, so without this they would arrive as those
+# characters rather than as alt+m and alt+comma.
+#
+# It does not carry option+arrow or option+backspace. Those compose nothing,
+# and per ghostty's own docs an option sequence with no printable character is
+# treated as Alt whatever this is set to. They are what karabiner posts for
+# left cmd + u/o and left cmd + e -- nothing here ever sees the cmd gesture
+# itself, only the option+key it was rewritten into -- so that part of the
+# scheme survives this setting changing.
+#
+# The remapping of left cmd has to live in karabiner rather than in keybinds
+# here: ghostty's `super` is the cmd modifier on either side, with no
+# left/right form -- left_super, super_left, physical:super and cmd_left are
+# all rejected -- so keybinds here would take right cmd too, and right cmd is
+# meant to stay the system's. Because only left cmd is remapped, every ghostty
+# shortcut survives on the right thumb: right cmd + d still splits, + f still
+# searches, + k still clears.
 macos-option-as-alt = left
 
 # Tabs on the thumb: left cmd + m goes left, left cmd + , goes right.
@@ -39,3 +52,39 @@ macos-option-as-alt = left
 # ctrl+tab and ctrl+shift+tab still switch tabs as they did.
 keybind = alt+m=previous_tab
 keybind = alt+comma=next_tab
+
+# Option+arrow, which is what left cmd + u/o emits now that the ergoemacs
+# scheme uses real keys in the terminal rather than ESC+letter.
+#
+# ghostty's own defaults here are alt+arrow_left=esc:b and
+# alt+arrow_right=esc:f, a reasonable guess since those are readline's
+# word motion keys. It collides with my ergoemacs setup, though:
+# .inputrc and .zshrc bind ESC f to delete-char, because M-f is
+# delete-forward-char in this scheme. So left cmd + o arrived as ESC f
+# and deleted the character ahead of the cursor instead of moving a
+# word.
+#
+# The CSI form is claimed by nothing, and both readers understand it: zsh
+# and .inputrc bind it to forward-word, and Claude Code takes it as
+# meta+right. ESC b and ESC f then keep meaning what they mean on linux,
+# where Alt is Meta and the keyboard sends them directly.
+#
+# Reading csi:1;3C -- the bytes are ESC [ 1 ; 3 C:
+#
+#   ESC [  CSI, which opens a control sequence. ECMA-48.
+#   C      which key. A/B/C/D are up/down/right/left, named after the
+#          cursor commands CUU/CUD/CUF/CUB they were borrowed from.
+#          ECMA-48 -- note it is Forward/Backward, by text flow, not
+#          Right/Left, which is why C and D look the wrong way round.
+#   3      which modifiers, as 1 + shift(1) + alt(2) + ctrl(4) +
+#          meta(8). So 3 is alt alone. xterm's ctlseqs, no standard.
+#   1      a placeholder. It is CUF's repeat count, kept only so the
+#          modifier parameter has a slot to sit in. ECMA-48.
+#
+# Offset by one because an omitted parameter takes its default, and that
+# default is 1 -- so "no modifiers" has to be 1, and a bare ESC [ C is the
+# unmodified key. That the arrow keys transmit any of this is DEC's doing,
+# from the VT100: ECMA-48 defines the framing and the letters as output
+# commands and says nothing about keyboards.
+keybind = alt+arrow_left=csi:1;3D
+keybind = alt+arrow_right=csi:1;3C

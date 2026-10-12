@@ -25,6 +25,17 @@ set editing-mode emacs
 "\ek": history-search-forward
 "\el": forward-char
 
+# Option+arrow, which is how left cmd + u/o reaches a terminal on mac now --
+# the ergoemacs scheme there uses real keys rather than ESC+letter, so that
+# full-screen programs understand it too and not just readline-style line
+# editors. ghostty is configured to send these CSI forms instead of its default
+# ESC b / ESC f, since ESC f is already spoken for above.
+#
+# Harmless on linux, where a terminal sends the same sequences for alt+arrow
+# and means the same thing by them.
+"\e[1;3D": backward-word
+"\e[1;3C": forward-word
+
 # i and k search rather than merely step. readline takes everything between the
 # start of the line and the cursor and looks for history entries beginning with
 # it, so `git com' then M-i walks only the git com... commands. They were

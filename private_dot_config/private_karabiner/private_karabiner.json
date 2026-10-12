@@ -4,17 +4,12 @@
             "complex_modifications": {
                 "rules": [
                     {
-                        "description": "ergoemacs motion: left cmd + i/k/j/l arrows, u/o by word. Bare arrows, so these are the ones that work in the most places. Not in emacs, which does the same split itself through ns-command-modifier, nor in terminals, where readline gets Meta from option instead.",
+                        "description": "ergoemacs motion: left cmd + i/k/j/l arrows, u/o by word. Everywhere but emacs, which does the same split itself through ns-command-modifier -- terminals included, which is the point. A real arrow is what a TUI reads; ESC+letter is what only a readline-style line editor reads. less, htop and fzf scroll on arrows and know nothing of ESC+i, and in Claude Code the prompt history and cursor motion are handled inside its text input as raw key events, with no bindable action behind them at all. Option+arrow survives the trip: Claude Code bundles node's readline keypress parser, which sets meta from either a leading ESC or a CSI modifier parameter, so \\e[1;3D and \\e\\e[D both arrive as meta+left and move by word. What does NOT survive is cmd+arrow -- node has no super modifier and a terminal does not encode cmd -- so line ends go through Home/End in the terminal rule below rather than through this one. The cost of all this is that ESC+i/k/j/l/u/o no longer exist in a terminal: left option + i is taken by the space-switch rule and ghostty's macos-option-as-alt=left rules out right option. .zshrc therefore binds the arrow sequences to the same widgets the ESC+letter bindings have, and keeps the latter for linux, where Alt is Meta directly.",
                         "manipulators": [
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": [
-                                            "^org\\.gnu\\.Emacs$",
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
+                                        "bundle_identifiers": ["^org\\.gnu\\.Emacs$"],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
@@ -28,12 +23,7 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": [
-                                            "^org\\.gnu\\.Emacs$",
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
+                                        "bundle_identifiers": ["^org\\.gnu\\.Emacs$"],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
@@ -47,12 +37,7 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": [
-                                            "^org\\.gnu\\.Emacs$",
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
+                                        "bundle_identifiers": ["^org\\.gnu\\.Emacs$"],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
@@ -66,12 +51,7 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": [
-                                            "^org\\.gnu\\.Emacs$",
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
+                                        "bundle_identifiers": ["^org\\.gnu\\.Emacs$"],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
@@ -85,12 +65,7 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": [
-                                            "^org\\.gnu\\.Emacs$",
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
+                                        "bundle_identifiers": ["^org\\.gnu\\.Emacs$"],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
@@ -109,12 +84,7 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": [
-                                            "^org\\.gnu\\.Emacs$",
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
+                                        "bundle_identifiers": ["^org\\.gnu\\.Emacs$"],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
@@ -287,17 +257,12 @@
                         ]
                     },
                     {
-                        "description": "ergoemacs deletion: left cmd + d/f delete a char back/forward, e/r a word back/forward.",
+                        "description": "ergoemacs deletion: left cmd + d/f delete a char back/forward, e/r a word back/forward. d, f and e reach terminals too, on the same reasoning as the motion rule: backspace, delete and option+backspace are real keys, and zsh, readline and Claude Code all already do the right thing with them -- \\x7f, \\e[3~ and \\e\\x7f respectively. Before this they went out as ESC+d/f/e, where Claude Code's hardcoded meta table reads ESC d as kill-word-FORWARD and ESC f as forward-word, so left cmd + d used to eat the word ahead of the cursor instead of the character behind it. r is the one left out: option+delete would be \\e[3;3~, which Claude Code reads as meta+delete and treats as kill-to-end-of-line rather than kill-word, so r keeps going through the terminal rule and does nothing there. The only sequence Claude Code would accept for kill-word is ESC d, and .zshrc binds that to backward-delete-char for the linux side.",
                         "manipulators": [
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": [
-                                            "^org\\.gnu\\.Emacs$",
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
+                                        "bundle_identifiers": ["^org\\.gnu\\.Emacs$"],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
@@ -311,12 +276,7 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": [
-                                            "^org\\.gnu\\.Emacs$",
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
+                                        "bundle_identifiers": ["^org\\.gnu\\.Emacs$"],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
@@ -330,12 +290,7 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": [
-                                            "^org\\.gnu\\.Emacs$",
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
+                                        "bundle_identifiers": ["^org\\.gnu\\.Emacs$"],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
@@ -378,7 +333,7 @@
                         ]
                     },
                     {
-                        "description": "ergoemacs kill line: left cmd + g kills to end of line, G to the start. G is cmd+delete, which is a real native combo; g is ctrl+k, which cocoa text fields understand.",
+                        "description": "ergoemacs kill line: left cmd + g kills to end of line, G to the start. G is cmd+delete, which is a real native combo; g is ctrl+k, which cocoa text fields understand. g reaches terminals as well, because ctrl+k is already kill-line in zsh and kill-to-end-of-line in Claude Code -- it is the one control key here that collides with nothing, unlike ctrl+a, which is the tmux prefix in .tmux.conf. G does not: cmd+delete is not something a terminal can send, and the alternative would be ctrl+u, which zsh binds to kill-whole-line rather than backward-kill-line. So G keeps going through the terminal rule and does nothing there.",
                         "manipulators": [
                             {
                                 "conditions": [
@@ -407,12 +362,7 @@
                             {
                                 "conditions": [
                                     {
-                                        "bundle_identifiers": [
-                                            "^org\\.gnu\\.Emacs$",
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
+                                        "bundle_identifiers": ["^org\\.gnu\\.Emacs$"],
                                         "type": "frontmost_application_unless"
                                     }
                                 ],
@@ -431,7 +381,7 @@
                         ]
                     },
                     {
-                        "description": "ergoemacs in terminals: left cmd + letter becomes left option + letter, which ghostty's macos-option-as-alt=left turns into ESC+letter, the sequence zsh and readline bind. Only left cmd and only these fourteen letters, so right cmd keeps every terminal shortcut. This has to live here rather than in ghostty keybinds, because ghostty's super modifier has no left/right form.",
+                        "description": "ergoemacs in terminals: what is left of it. This rule used to divert twelve letters to left option + letter, so ghostty's macos-option-as-alt=left would turn them into the ESC+letter sequences zsh and readline bind. The rest of the scheme now uses the real keys instead -- arrows, option+arrows, backspace, delete, option+backspace, ctrl+k -- because those are what a TUI reads, and zsh, readline and Claude Code already agree on all of them. Four cases remain. h and H become Home and End: the native line-end combo is cmd+arrow, which no terminal can send, while Home and End arrive as \\eOH and \\eOF, which zsh binds to beginning-of-line and end-of-line already and which Claude Code's input reads as home and end. G and r stay on ESC+letter, which works in zsh and does nothing in Claude Code; their own rules say why nothing better exists. Left cmd only, as everywhere here, so right cmd keeps every terminal shortcut. This has to live here rather than in ghostty keybinds, because ghostty's super modifier has no left/right form.",
                         "manipulators": [
                             {
                                 "conditions": [
@@ -445,153 +395,10 @@
                                     }
                                 ],
                                 "from": {
-                                    "key_code": "u",
-                                    "modifiers": { "mandatory": ["left_command"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "u",
-                                        "modifiers": ["left_option"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "bundle_identifiers": [
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
-                                        "type": "frontmost_application_if"
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "o",
-                                    "modifiers": { "mandatory": ["left_command"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "o",
-                                        "modifiers": ["left_option"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "bundle_identifiers": [
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
-                                        "type": "frontmost_application_if"
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "j",
-                                    "modifiers": { "mandatory": ["left_command"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "j",
-                                        "modifiers": ["left_option"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "bundle_identifiers": [
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
-                                        "type": "frontmost_application_if"
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "l",
-                                    "modifiers": { "mandatory": ["left_command"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "l",
-                                        "modifiers": ["left_option"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "bundle_identifiers": [
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
-                                        "type": "frontmost_application_if"
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "i",
-                                    "modifiers": { "mandatory": ["left_command"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "i",
-                                        "modifiers": ["left_option"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "bundle_identifiers": [
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
-                                        "type": "frontmost_application_if"
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "k",
-                                    "modifiers": { "mandatory": ["left_command"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "k",
-                                        "modifiers": ["left_option"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "bundle_identifiers": [
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
-                                        "type": "frontmost_application_if"
-                                    }
-                                ],
-                                "from": {
                                     "key_code": "h",
                                     "modifiers": { "mandatory": ["left_command", "shift"] }
                                 },
-                                "to": [
-                                    {
-                                        "key_code": "h",
-                                        "modifiers": ["left_option", "left_shift"]
-                                    }
-                                ],
+                                "to": [{ "key_code": "end" }],
                                 "type": "basic"
                             },
                             {
@@ -609,12 +416,7 @@
                                     "key_code": "h",
                                     "modifiers": { "mandatory": ["left_command"] }
                                 },
-                                "to": [
-                                    {
-                                        "key_code": "h",
-                                        "modifiers": ["left_option"]
-                                    }
-                                ],
+                                "to": [{ "key_code": "home" }],
                                 "type": "basic"
                             },
                             {
@@ -636,52 +438,6 @@
                                     {
                                         "key_code": "g",
                                         "modifiers": ["left_option", "left_shift"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "bundle_identifiers": [
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
-                                        "type": "frontmost_application_if"
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "g",
-                                    "modifiers": { "mandatory": ["left_command"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "g",
-                                        "modifiers": ["left_option"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "bundle_identifiers": [
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
-                                        "type": "frontmost_application_if"
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "e",
-                                    "modifiers": { "mandatory": ["left_command"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "e",
-                                        "modifiers": ["left_option"]
                                     }
                                 ],
                                 "type": "basic"
@@ -704,52 +460,6 @@
                                 "to": [
                                     {
                                         "key_code": "r",
-                                        "modifiers": ["left_option"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "bundle_identifiers": [
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
-                                        "type": "frontmost_application_if"
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "d",
-                                    "modifiers": { "mandatory": ["left_command"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "d",
-                                        "modifiers": ["left_option"]
-                                    }
-                                ],
-                                "type": "basic"
-                            },
-                            {
-                                "conditions": [
-                                    {
-                                        "bundle_identifiers": [
-                                            "^com\\.mitchellh\\.ghostty$",
-                                            "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
-                                        ],
-                                        "type": "frontmost_application_if"
-                                    }
-                                ],
-                                "from": {
-                                    "key_code": "f",
-                                    "modifiers": { "mandatory": ["left_command"] }
-                                },
-                                "to": [
-                                    {
-                                        "key_code": "f",
                                         "modifiers": ["left_option"]
                                     }
                                 ],

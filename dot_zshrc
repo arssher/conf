@@ -21,13 +21,17 @@ bindkey -e
 # since one serves bash and the other zsh and the fingers do not know which
 # shell they are in.
 #
-# The sequences are ESC+letter, because that is all a terminal can deliver --
-# cmd is never transmitted to the tty at all. Two things conspire to produce
-# them from the thumb, so it works here as it does in gui apps: karabiner maps
-# left cmd + letter to left option + letter in terminal apps, and ghostty's
-# macos-option-as-alt=left turns left option into ESC. It takes karabiner for
-# the first half because ghostty's cmd modifier has no left/right form, and
-# right cmd has to stay the system's.
+# The sequences are ESC+letter, which is how the gesture arrives on linux,
+# where Alt is Meta and the keyboard sends it directly. On mac it takes two
+# steps -- karabiner turns left cmd + letter into left option + letter, and
+# ghostty's macos-option-as-alt=left turns left option into ESC -- and karabiner
+# is needed for the first step because ghostty's cmd modifier has no left/right
+# form, while right cmd has to stay the system's.
+#
+# Most of the mac half no longer comes through here, though: karabiner now
+# sends the real keys instead, so that TUIs understand them too. See the
+# arrow-sequence block further down, and the karabiner rules for the reasoning.
+# These stay for linux, and are harmless on mac -- nothing emits them.
 bindkey '\ee' backward-kill-word
 bindkey '\er' kill-word
 bindkey '\eu' backward-word
@@ -40,6 +44,42 @@ bindkey '\eh' beginning-of-line
 bindkey '\eH' end-of-line
 bindkey '\ej' backward-char
 bindkey '\el' forward-char
+
+# Option+arrow, for the word motion that left cmd + u/o now emits on mac.
+# These are the only sequences in the whole scheme that zsh does not already
+# bind: plain arrows, Home, End, backspace, delete, option+backspace and ctrl+k
+# are all bound out of the box to exactly the widget the gesture wants, which is
+# what made moving to real keys worth it.
+#
+# The CSI form is what ghostty is configured to send -- see its config, which
+# has to override a default of alt+arrow_right=esc:f, a sequence this file
+# binds to delete-char a few lines up. That file also decodes the 1;3.
+bindkey '\e[1;3D' backward-word
+bindkey '\e[1;3C' forward-word
+
+# The same keystroke spelled the older way. There are two encodings for
+# alt+<key>, and which one arrives is a terminal setting:
+#
+#   prefix style, "Option as Meta"   \e\e[D     Terminal.app, iTerm
+#   parameter style, xterm's         \e[1;3D    most modern emulators
+#
+# The prefix style is only the Meta convention applied to a key that is
+# already an escape sequence: to send a key with Meta held, put ESC in front
+# of what it sends alone. An arrow alone is \e[D, so alt+arrow is ESC then
+# \e[D. There is nothing special about the doubling -- the first ESC is the
+# Meta flag, the second belongs to the arrow's own \e[ opener. The same rule
+# gives \e\e[3~ for alt+delete and \e\177 for alt+backspace, that last being
+# what left cmd + e rides, and the reason option+backspace kills a word where
+# a bare backspace kills a character.
+#
+# Bound alongside the CSI form so the gesture survives a terminal other than
+# ghostty. Keeping both is free: zle's keymap is a trie over byte sequences,
+# so \e[D and \e\e[D are just different paths through it and cannot collide.
+# The one cost is that ESC ESC becomes a prefix, so a bare double-Escape now
+# waits out KEYTIMEOUT -- 0.4s -- for a third byte. Nothing here binds \e\e,
+# so that pause is the whole of it.
+bindkey '\e\e[D' backward-word
+bindkey '\e\e[C' forward-word
 
 # i and k are missing from this list on purpose: they move through history, so
 # they are bound at the end of the history section below, where the widget they
@@ -151,6 +191,26 @@ zle -N up-line-or-beginning-search
 zle -N down-line-or-beginning-search
 bindkey '\ei' up-line-or-beginning-search
 bindkey '\ek' down-line-or-beginning-search
+
+# The bare arrows get the same widget. On mac, karabiner sends left cmd + i/k
+# as a real up/down arrow in a terminal rather than as ESC+i -- a TUI reads
+# arrows and knows nothing of ESC+i -- so without this the M-i gesture would
+# quietly downgrade to whatever the arrows do, and in a terminal the ESC
+# sequences above are no longer reachable at all. Harmless on linux, where it
+# just makes the arrows behave like M-i/M-k.
+#
+# \e[A and \e[B, the normal cursor-key sequences, are what actually arrives:
+# zle never emits smkx, so the terminal stays in normal rather than
+# application keypad mode. Checked by capturing an interactive zsh through a
+# pty -- it sends \e[?2004h for bracketed paste and no \e[?1h\e=. Worth
+# knowing, because /etc/zshrc binds ${key[Up]}, which is terminfo kcuu1 =
+# \eOA, the application-mode form; that binding never fires, and the arrows
+# are on zsh's built-in up-line-or-history until overridden here.
+bindkey '\e[A' up-line-or-beginning-search
+bindkey '\e[B' down-line-or-beginning-search
+# \eOA and \eOB too, in case some terminal does turn application mode on.
+bindkey '\eOA' up-line-or-beginning-search
+bindkey '\eOB' down-line-or-beginning-search
 
 # There is deliberately no hook feeding ~/.persistent_history from here, the
 # way .bashrc does from PROMPT_COMMAND. history-merge.py reads this file
