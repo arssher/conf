@@ -140,26 +140,33 @@ print(f"identical {e}, equivalent {q}, different {bad}")
 PY
 ```
 
-**Expected as of 2026-10-19: identical 26, equivalent 9, different 1.**
+**Expected as of 2026-10-19: identical 27, equivalent 9, different 0.**
 
-The one difference is the sleep rule, and it is permanent: goku knows nothing
-of `software_function`, so it compiles
-`{:software_function {:iokit_power_management_sleep_system {}}}` to `"to":
-[{}]`, an empty action.  Anything *else* reported as different is real drift --
-either the .edn was not updated with the .json, or a translation is wrong.
+Anything reported as different is real drift -- either the .edn was not updated
+alongside the .json, or a translation is wrong.
 
 ## Things goku does silently
 
-All three were found by compiling, never by reading, and none produced a
-warning:
+One rule explains nearly all of it: **goku's name for a thing is never
+karabiner's name for it**, and a key it does not recognise is dropped without a
+word.  So a wrong spelling does not fail, it produces a rule that quietly does
+nothing.  Each of these was found by compiling and diffing, never by reading:
 
-- `S` is `left_shift`.  There is no letter for karabiner's plain `shift`, which
-  matches either key -- so `:!CSh` narrows a binding without saying so.  The
-  shifted bindings therefore use the long form.
-- That long form is `{:key :h :modi {...}}`.  Given karabiner's own `:key_code`
-  and `:modifiers`, goku emits an empty `"from": {}` -- a rule matching
-  nothing.
-- `software_function` is dropped entirely, as above.
+- `{:key :h :modi {...}}`, not karabiner's `:key_code` and `:modifiers`.  Given
+  the karabiner spelling goku emits `"from": {}` -- a rule matching nothing.
+- `{:softf {:sleep {}}}`, not `{:software_function
+  {:iokit_power_management_sleep_system {}}}`.  goku renames `:sleep` on the
+  way out, as it renames `:dbc` to `cg_event_double_click`.  Given the long
+  form it emits `"to": [{}]`, an empty action.
+- `S` is `left_shift`, and there is no letter at all for karabiner's plain
+  `shift`, which matches *either* key.  So `:!CSh` narrows a binding rather
+  than translating it, and the shifted bindings use the long form instead.
+  This one is not a naming slip but a gap in the shorthand.
+
+`src/karabiner_configurator/tos.clj` upstream is the list of to-side keys goku
+accepts, and `froms.clj` the from-side.  Worth opening before inventing a
+spelling: its header comments map each short name to the karabiner JSON it
+produces.
 
 Treat a clean compile as evidence of very little.  The comparison is the test.
 

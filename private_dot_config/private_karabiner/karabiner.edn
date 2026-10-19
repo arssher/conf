@@ -142,15 +142,14 @@
   ;; is to-only, while generic_desktop system_sleep is the sleep KEY and is
   ;; from-only, so it cannot be used here.
   ;;
-  ;; GOKU CANNOT EXPRESS THIS ONE. 0.8.0 -- the latest, Feb 2025 -- knows
-  ;; nothing of software_function; it is in none of the docs, and compiling
-  ;; this rule yields "to": [{}], an empty action, without a word of
-  ;; complaint. The rule is kept here so the file still mirrors the json, but
-  ;; a real migration would have to hand-patch it back in afterwards. Third
-  ;; time goku has dropped something silently rather than erroring; see the
-  ;; header for the other two.
+  ;; :softf, and :sleep inside it, are goku's own names -- it renames :sleep
+  ;; to iokit_power_management_sleep_system on the way out, the way :dbc
+  ;; becomes cg_event_double_click. Spelled :software_function with the long
+  ;; inner key, which is what karabiner itself wants, goku drops the lot and
+  ;; emits "to": [{}], an empty action, saying nothing. Same failure as
+  ;; :key_code below; the rule is that goku's name is never karabiner's.
   {:des "right option + s sleeps the machine"
-   :rules [[:!Es {:software_function {:iokit_power_management_sleep_system {}}}]]}
+   :rules [[:!Es {:softf {:sleep {}}}]]}
 
   ;; For leaving something running rather than suspending it; s above is the
   ;; one that sleeps. Two to events in a vector, which karabiner fires in
