@@ -29,7 +29,7 @@
 ;; and :modi, not :key_code and :modifiers; goku takes the karabiner spelling
 ;; without complaint and emits an empty "from", matching nothing.
 
-{:profiles {:ergoemacs {:default true}}
+{:profiles {:ergoemacs {:default true :delay 500}}
 
  ;; Named once, used by keyword below. In the json these four bundle ids are
  ;; repeated inside each of the twenty-six manipulators that need them.
@@ -150,4 +150,23 @@
   ;; time goku has dropped something silently rather than erroring; see the
   ;; header for the other two.
   {:des "right option + s sleeps the machine"
-   :rules [[:!Es {:software_function {:iokit_power_management_sleep_system {}}}]]}]}
+   :rules [[:!Es {:software_function {:iokit_power_management_sleep_system {}}}]]}
+
+  ;; For leaving something running rather than suspending it; s above is the
+  ;; one that sleeps. Two to events in a vector, which karabiner fires in
+  ;; order on key down: ctrl+cmd+q locks, then pmset blanks the display.
+  ;; The lock is a real key rather than a consequence of the screen going
+  ;; dark, because dark only starts the idle path, which waits out the screen
+  ;; lock delay -- 300 seconds here -- while ctrl+cmd+q locks immediately.
+  ;; The delay is the point, not a precaution. Written the obvious way, both
+  ;; as plain to events in one array, the screen blanked and woke again at
+  ;; once: karabiner posts the sequence in microseconds, so the key-up for q
+  ;; lands after pmset has started, and a key-up wakes a sleeping display.
+  ;; to_if_invoked is cancelled if another key is pressed inside the window,
+  ;; which after locking the screen is not a problem.
+  ;;
+  ;; goku puts the 500ms on the profile as :delay, where the json has it per
+  ;; manipulator under parameters. Same number, wider blast radius: here it
+  ;; would become the default to_delayed_action delay for every rule.
+  {:des "right option + l locks and turns the screen off"
+   :rules [[:!El :!TCq nil {:delayed {:invoked "/usr/bin/pmset displaysleepnow"}}]]}]}
