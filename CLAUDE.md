@@ -35,4 +35,5 @@ not fold it into this file.
   usual, only when asked.
 
 Per-directory notes live beside the thing they describe:
-[dot_emacs.d/kbd-diagram/CLAUDE.md](dot_emacs.d/kbd-diagram/CLAUDE.md).
+[dot_emacs.d/kbd-diagram/CLAUDE.md](dot_emacs.d/kbd-diagram/CLAUDE.md),
+[private_dot_config/private_karabiner/AGENTS.md](private_dot_config/private_karabiner/AGENTS.md).
