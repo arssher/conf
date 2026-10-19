@@ -1,0 +1,134 @@
+;; ergoemacs, as goku would write it.
+;;
+;; NOT LIVE. karabiner.json beside this file is the config karabiner reads;
+;; nothing generates it from here, and .chezmoiignore keeps this out of $HOME.
+;; Kept for clarity, and so it has to be updated by hand when the json
+;; changes. readme.txt says why it is kept; the rest of this header is what
+;; to watch for if it is ever revived.
+;;
+;; Checked once against the json, by compiling it with goku: 26 manipulators
+;; identical, 8 differing only in how the app conditions are grouped -- goku
+;; emits one condition per :applications entry where the json merges the
+;; bundle ids into a single one. Karabiner ANDs conditions, so unless(A or B)
+;; is the same as unless(A) and unless(B), and the two are equivalent.
+;;
+;; Modifier letters, from goku's tutorial.md:
+;;   !  mandatory   #  optional
+;;   C  left_command   T  left_control   O  left_option   S  left_shift
+;;   Q  right_command  W  right_control  E  right_option  R  right_shift
+;; So :!Cj is left cmd + j and :!Oleft_arrow is left option + left arrow.
+;; The left/right split this scheme rests on is free here -- C is the left
+;; command key only, never both, which is exactly what the json spells out
+;; the long way with "left_command".
+;;
+;; The trap is the other side of that: S is left_shift, and there is no
+;; letter for karabiner's plain "shift", which matches either key. Left cmd
+;; is a left-thumb reach, so the shift actually pressed is usually the right
+;; one -- :!CSh would have quietly stopped matching how these are typed. The
+;; five shifted bindings therefore use the long form below. Note it is :key
+;; and :modi, not :key_code and :modifiers; goku takes the karabiner spelling
+;; without complaint and emits an empty "from", matching nothing.
+
+{:profiles {:ergoemacs {:default true}}
+
+ ;; Named once, used by keyword below. In the json these four bundle ids are
+ ;; repeated inside each of the twenty-six manipulators that need them.
+ :applications {:emacs     ["^org\\.gnu\\.Emacs$"]
+                :terminals ["^com\\.mitchellh\\.ghostty$"
+                            "^com\\.googlecode\\.iterm2$"
+                            "^com\\.apple\\.Terminal$"]
+                :firefox   ["^org\\.mozilla\\.firefox$"]}
+
+ :main
+ [;; Real keys, so a TUI understands them. Everywhere but emacs, which does
+  ;; the same split itself through ns-command-modifier -- terminals included,
+  ;; which is the point: less, htop and fzf scroll on arrows and know nothing
+  ;; of ESC+i, and Claude Code handles its prompt as raw key events.
+  {:des "ergoemacs motion: left cmd + i/k/j/l arrows, u/o by word"
+   :rules [[:!Ci :up_arrow         [:!emacs]]
+           [:!Ck :down_arrow       [:!emacs]]
+           [:!Cj :left_arrow       [:!emacs]]
+           [:!Cl :right_arrow      [:!emacs]]
+           [:!Cu :!Oleft_arrow     [:!emacs]]
+           [:!Co :!Oright_arrow    [:!emacs]]]}
+
+  ;; These four emit cmd+arrow, which cocoa and chromium honour and a tty
+  ;; cannot encode at all -- hence the terminal exclusion, and hence h/H
+  ;; reappearing as Home/End in the terminal rule below.
+  ;; Shift variants first: a mandatory modifier set has to match exactly.
+  {:des "ergoemacs line and buffer ends: left cmd + h/H, n/N"
+   :rules [[{:key :h :modi {:mandatory [:left_command :shift]}} :!Cright_arrow   [:!emacs :!terminals]]
+           [:!Ch  :!Cleft_arrow    [:!emacs :!terminals]]
+           [{:key :n :modi {:mandatory [:left_command :shift]}} :!Cdown_arrow    [:!emacs :!terminals]]
+           [:!Cn  :!Cup_arrow      [:!emacs :!terminals]]]}
+
+  ;; Left key down, right key up. They were on c and v, which cost cmd+c and
+  ;; cmd+v -- the strongest muscle memory on the machine -- and worse, made
+  ;; them scroll, since what they emit is option+arrow. Digits are left to
+  ;; applications on macOS; the one loss is a browser's cmd+1..9 tab jump.
+  {:des "ergoemacs paragraphs: left cmd + 8 down, 9 up"
+   :rules [[:!C9 :!Oup_arrow       [:!emacs :!terminals]]
+           [:!C8 :!Odown_arrow     [:!emacs :!terminals]]]}
+
+  ;; d, f and e reach terminals: backspace, delete and option+backspace are
+  ;; real keys that zsh, readline and Claude Code all handle already. r is
+  ;; left out -- option+delete reads as meta+delete, which Claude Code takes
+  ;; as kill-to-end-of-line rather than kill-word.
+  {:des "ergoemacs deletion: left cmd + d/f by char, e/r by word"
+   :rules [[:!Cd :delete_or_backspace    [:!emacs]]
+           [:!Cf :delete_forward         [:!emacs]]
+           [:!Ce :!Odelete_or_backspace  [:!emacs]]
+           [:!Cr :!Odelete_forward       [:!emacs :!terminals]]]}
+
+  ;; g is ctrl+k, the one control key here that collides with nothing --
+  ;; unlike ctrl+a, the tmux prefix. G is cmd+delete, which no tty can send.
+  {:des "ergoemacs kill line: left cmd + g to end, G to start"
+   :rules [[{:key :g :modi {:mandatory [:left_command :shift]}} :!Cdelete_or_backspace [:!emacs :!terminals]]
+           [:!Cg  :!Tk                   [:!emacs]]]}
+
+  ;; What is left of the old ESC+letter layer. It used to divert twelve
+  ;; letters; the rest of the scheme now travels as real keys. Home and End
+  ;; arrive as \eOH and \eOF, which zsh and Claude Code both already bind.
+  ;; G and r stay on ESC+letter: they work in zsh and do nothing in Claude
+  ;; Code, and their own rules above say why nothing better exists.
+  {:des "ergoemacs in terminals: what is left of it"
+   :rules [[{:key :h :modi {:mandatory [:left_command :shift]}} :end   :terminals]
+           [:!Ch  :home  :terminals]
+           [{:key :g :modi {:mandatory [:left_command :shift]}} :!OSg  :terminals]
+           [:!Cr  :!Or   :terminals]]}
+
+  ;; ghostty binds alt+m and alt+comma to previous_tab and next_tab. This has
+  ;; to live here rather than in ghostty keybinds, because ghostty's super
+  ;; modifier has no left/right form and right cmd must keep cmd+m minimise.
+  {:des "tab switching in terminals"
+   :rules [[:!Cm     :!Om     :terminals]
+           [:!Ccomma :!Ocomma :terminals]]}
+
+  ;; firefox's own previous/next tab on mac. Not ctrl+tab, which can be set
+  ;; to recently-used order rather than positional.
+  {:des "tab switching in firefox"
+   :rules [[:!Cm     :!COleft_arrow  :firefox]
+           [:!Ccomma :!COright_arrow :firefox]]}
+
+  ;; Not scoped to any app. The terminal tab rule above emits exactly this
+  ;; trigger and does not set it off: karabiner posts its output to the
+  ;; virtual keyboard without feeding it back through the rules.
+  {:des "left option + m switches apps"
+   :rules [[:!Om :!Ctab]]}
+
+  ;; Mission control's own shortcuts, which System Settings has enabled --
+  ;; turn those off there and this goes quiet with nothing to show why.
+  {:des "left option + u and i switch spaces"
+   :rules [[:!Ou :!Tleft_arrow]
+           [:!Oi :!Tright_arrow]]}
+
+  ;; A string in the to position is a shell command. One rule per app, so
+  ;; each costs only that letter's composed character -- emacs is on r
+  ;; rather than e to leave the dead keys alone. Absolute path because
+  ;; karabiner runs shell_command with a bare environment.
+  {:des "app launchers on right option"
+   :rules [[:!Ef "/usr/bin/open -b org.mozilla.firefox"]
+           [:!Ev "/usr/bin/open -b com.microsoft.VSCode"]
+           [:!Eg "/usr/bin/open -b com.mitchellh.ghostty"]
+           [:!Et "/usr/bin/open -b com.tdesktop.Telegram"]
+           [:!Er "/usr/bin/open -b org.gnu.Emacs"]]}]}

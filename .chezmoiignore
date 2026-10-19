@@ -30,6 +30,13 @@ vscode
 .emacs.d/kbd-diagram
 .emacs.d/kbd-diagram/**
 
+# The karabiner rules written out in goku's EDN, kept beside the json for
+# clarity. Repo-only: nothing compiles it, and karabiner never reads it --
+# goku would want it at ~/.config/karabiner.edn anyway, a level above the
+# directory it sits in here. Unconditional, because it is repo-only on both
+# platforms; the linux block at the bottom already takes the whole directory.
+.config/karabiner/karabiner.edn
+
 # elpa packages, should a stray copy ever appear in the source tree -- see the
 # .gitignore note on how loading the source init.el puts them there. Target
 # paths, so ".emacs.d/elpa": the source spelling would match nothing and the

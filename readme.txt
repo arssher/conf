@@ -122,6 +122,14 @@ Shortcuts:
   - libedit's ~/.editrc
   - macos whenever possible through karabiner remaps:
 
+  private_dot_config/private_karabiner/karabiner.edn is the same rules in
+  goku's EDN form. Kept for clarity: json has nowhere to put a comment, so
+  the rationale sits inside the "description" fields karabiner shows in its
+  UI, and the four bundle ids are repeated across twenty-six manipulators.
+  NOT migrated -- nothing generates the json from it and .chezmoiignore keeps
+  it out of $HOME, so it has to be updated by hand whenever the json changes
+  or it goes stale and misleads. Its own header covers the goku syntax.
+
 Codex status line:
 
   private_dot_codex/modify_private_config.toml manages only tui.status_line in
