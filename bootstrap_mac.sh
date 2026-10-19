@@ -197,6 +197,78 @@ brew install mu isync pass
 # media
 brew install ffmpeg yt-dlp
 
+# Images. Nothing to install for the simple half: sips is part of macOS, at
+# /usr/bin/sips, and does resize, crop, pad, rotate, flip, format conversion,
+# ICC profiles and reading or setting properties. It reads and writes HEIC
+# natively too, which is what iphone photos are.
+#
+# One trap, and it fails quietly: --out with a different extension does NOT
+# convert. It writes the original bytes under the new name and only warns
+# "Output file suffix should be jpg", so `file` reports JPEG for something
+# called .png and the next tool dies with "Not a PNG file". Spell it out:
+#
+#   sips -s format png -Z 300 in.jpg --out out.png
+#
+# imagemagick is for what sips has no concept of -- compositing, -trim,
+# -deskew, -distort Perspective, montage, -density when rasterising a PDF --
+# and for the formats sips does not know. In v7 the binary is magick. convert
+# is still shipped and still works, but it prints a deprecation warning on
+# every run, which is noise in a script. Brew's build links libheif, libtiff,
+# webp and little-cms2, so HEIC and TIFF work out of the box.
+brew install imagemagick
+
+# Scanned documents: ocrmypdf adds a searchable text layer to a scan without
+# touching the image, so the page still looks like a scan and the text is
+# selectable. Bottled, but it pulls in the whole pipeline -- tesseract for the
+# OCR itself, ghostscript and qpdf for the PDF side, unpaper for deskewing,
+# jbig2enc and pngquant for the compression -- so it is a few hundred MB.
+#
+# tesseract on its own carries English only. tesseract-lang is every other
+# language's trained data, and the reason it is here rather than one file
+# dropped into tessdata by hand: brew owns it, so it survives a tesseract
+# upgrade. Russian is the one actually wanted. Usage:
+#
+#   ocrmypdf -l rus+eng in.pdf out.pdf
+#
+# Give -l only the languages the document actually has. Adding rus to a page
+# that is pure Latin measurably lowers the accuracy -- tesseract starts
+# returning Cyrillic look-alikes, pe for ne and a for a.
+#
+# Deskewing and despeckling are worth the flags: --deskew --clean gained a
+# couple of points of word accuracy on a test page here. What --clean will not
+# do is cut the border away, because ocrmypdf hands unpaper --layout none,
+# which is exactly the switch that turns its mask and border detection off
+# (see _exec/unpaper.py). To get it back, override the defaults wholesale:
+#
+#   ocrmypdf --clean-final --unpaper-args '--layout single --mask-scan-size 100'
+#
+# scantailor is the usual recommendation for the step before, and it is the
+# right one for a flatbed: deskew, split a book spread, find the content box.
+# It has no perspective stage, though -- the pipeline is fix_orientation,
+# page_split, deskew, select_content, page_layout, output -- so it does
+# nothing for the one defect a photographed page actually has. It is also a
+# GUI out of a third-party tap. Skipped; see yb85/homebrew-tap if a flatbed
+# ever turns up.
+#
+# unpaper and qpdf come in as ocrmypdf dependencies regardless; naming them
+# keeps them installed-on-request, so brew autoremove leaves them behind if
+# ocrmypdf ever goes. qpdf is the page surgery and earns its place on its own:
+#
+#   qpdf in.pdf --pages . 2-4 -- out.pdf    # also 1,3,5 / z-1 / 1-6:even
+#   qpdf in.pdf --pages . 1-6,x3 -- out.pdf # x excludes, and must be comma
+#                                           # joined inside the one range
+#   qpdf --empty --pages a.pdf b.pdf -- merged.pdf
+#   qpdf --split-pages in.pdf out.pdf       # out-1.pdf, out-2.pdf, ...
+#   qpdf in.pdf --rotate=+90:1 out.pdf
+#
+# poppler is here for pdftotext, which answers the question that has to be
+# asked before OCR -- whether the file already carries a text layer, since the
+# default mode errors out when it does and the recovery is picking between
+# --skip-text, --redo-ocr and --force-ocr. It brings pdfinfo, pdfimages and
+# pdfseparate along. pdfgrep is the one thing none of them do: grep a whole
+# directory of PDFs and report the page the hit was on.
+brew install ocrmypdf tesseract-lang unpaper qpdf poppler pdfgrep
+
 # install rust. --no-modify-path because rustup otherwise appends
 # `. "$HOME/.cargo/env"` to every rc file it finds -- ~/.profile always, and
 # ~/.zshenv whenever zsh is on PATH, which on mac it always is. Both are
