@@ -131,4 +131,23 @@
            [:!Ev "/usr/bin/open -b com.microsoft.VSCode"]
            [:!Eg "/usr/bin/open -b com.mitchellh.ghostty"]
            [:!Et "/usr/bin/open -b com.tdesktop.Telegram"]
-           [:!Er "/usr/bin/open -b org.gnu.Emacs"]]}]}
+           [:!Er "/usr/bin/open -b org.gnu.Emacs"]]}
+
+  ;; macOS has no key for this any more -- every power-button combo Apple
+  ;; documents is scoped to built-in keyboards WITHOUT touch id, and on this
+  ;; one the power button is the touch id button, which locks instead. Right
+  ;; option, beside the launchers, at the same cost: option+s composed an
+  ;; eszett. karabiner makes the IOKit call itself, so no pmset and no shell.
+  ;; Asymmetric in karabiner's own list: iokit_power_management_sleep_system
+  ;; is to-only, while generic_desktop system_sleep is the sleep KEY and is
+  ;; from-only, so it cannot be used here.
+  ;;
+  ;; GOKU CANNOT EXPRESS THIS ONE. 0.8.0 -- the latest, Feb 2025 -- knows
+  ;; nothing of software_function; it is in none of the docs, and compiling
+  ;; this rule yields "to": [{}], an empty action, without a word of
+  ;; complaint. The rule is kept here so the file still mirrors the json, but
+  ;; a real migration would have to hand-patch it back in afterwards. Third
+  ;; time goku has dropped something silently rather than erroring; see the
+  ;; header for the other two.
+  {:des "right option + s sleeps the machine"
+   :rules [[:!Es {:software_function {:iokit_power_management_sleep_system {}}}]]}]}

@@ -658,6 +658,19 @@
                                 "type": "basic"
                             }
                         ]
+                    },
+                    {
+                        "description": "Right option + s sleeps the machine. macOS has no key for this any more: every power-button combo Apple documents -- option+command+power to sleep, control+power for the restart dialog, and the press-and-hold -- is scoped to built-in keyboards WITHOUT touch id, and on this one the power button is the touch id button, where a press locks the screen instead. That leaves the apple menu, which is not a shortcut. Sleep is the only one of those actually missed; lock already has control+command+q. Right option because that is where the system actions live, next to the launchers, and the cost is the same one they pay: option+s composed an eszett, and the dead keys -- option + e i u n and backtick -- stay clear. Tap rather than hold, so it behaves like every other binding here. software_function rather than a shell_command running pmset: karabiner does the IOKit call itself, which needs no PATH, no bare-environment workaround and no answer to whether pmset sleepnow wants root. Note the asymmetry in karabiner's own list -- iokit_power_management_sleep_system is to-only, while generic_desktop system_sleep is the sleep KEY and is from-only, so it cannot be used here.",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "s",
+                                    "modifiers": { "mandatory": ["right_option"] }
+                                },
+                                "to": [{ "software_function": { "iokit_power_management_sleep_system": {} } }],
+                                "type": "basic"
+                            }
+                        ]
                     }
                 ]
             },
