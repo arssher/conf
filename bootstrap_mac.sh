@@ -65,6 +65,31 @@ defaults -currentHost write -g com.apple.keyboard.modifiermapping.0-0-0 \
 # needs a reboot, and gets reset by updates. Not worth it for this.
 defaults write kCFPreferencesAnyApplication TSMLanguageIndicatorEnabled 0
 
+# Ask for the password the moment the screen locks, rather than after a grace
+# period. The default here was 300 seconds, which is longer than it sounds,
+# because the setting covers more than the screen saver: System Settings ->
+# Lock Screen words it "require password after screen saver begins or display
+# is turned off", and putting the machine to sleep turns the display off. So
+# with a delay, sleeping the laptop and waking it inside the window lands
+# straight on the desktop with nothing asked -- and the walk-away case is
+# worse, since the display's own idle timeout runs first and the two add up.
+#
+# FileVault does not cover this. It protects the disk at rest and asks at a
+# cold boot; with hibernatemode 3 the machine keeps RAM powered over sleep, so
+# a wake inside the window is just a wake.
+#
+# An explicit lock was always immediate regardless -- control+command+q, the
+# Lock Screen menu item, or a press of touch id, which is what the power
+# button does on a keyboard that has one. This only changes the paths that
+# lock by themselves.
+#
+# Not sudo: sysadminctl authenticates with the user's own password, and `-`
+# makes it prompt rather than taking it on the command line. So this one wants
+# a terminal and cannot be pasted into a script that runs unattended.
+#   sysadminctl -screenLock status      # to check
+#   sysadminctl -screenLock 300 -password -   # to put the delay back
+sysadminctl -screenLock immediate -password -
+
 # Three finger drag: three fingers move a window or select text. The keys
 # System Settings -> Accessibility -> Pointer Control -> Trackpad Options
 # writes. Re-login required, and a half-applied state behaves erratically in
