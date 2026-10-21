@@ -1,0 +1,42 @@
+#!/bin/bash
+#
+# Keep the tpm external's own directory at the mode chezmoi expects.
+#
+# ~/.tmux/plugins/tpm is a git-repo external (.chezmoiexternal.toml). chezmoi
+# records an expected entry state for that directory -- type dir, mode 0755,
+# derived from the umask pinned in .chezmoi.toml.tmpl -- and compares it on
+# every apply. The clone, though, is a `git clone` subprocess, and that pinned
+# umask is internal to chezmoi rather than the process umask, so on a host whose
+# real umask is 0002 (Debian with USERGROUPS_ENAB) git creates the directory
+# 0775. chezmoi then reads it as changed since it last wrote it and prompts --
+# on every apply, indefinitely, because answering "overwrite" for a git-repo
+# external re-records the expected state without touching the actual mode.
+#
+# One chmod settles it, and nothing inside the repo is touched: the group-write
+# bit on the containing directory is all that differs. On a 0022 host such as
+# macOS there was never anything to fix and this is a no-op.
+#
+# run_once_after_: _after_ so it lands once the external has been cloned, _once_
+# because the clone happens once per machine and the fix then sticks -- a refresh
+# `git pull` leaves the directory's own mode alone. A plain run_ would also catch
+# a later re-clone, but it shows up as pending in every `chezmoi status`, which
+# costs more than it buys: status is how drift gets noticed here. The tradeoff is
+# that a machine which has already run this and then loses and re-clones the
+# external gets the 0775 back, and wants a `chmod 755` by hand.
+#
+# destDir rather than $HOME, for the reason spelled out in
+# run_once_after_90-restore-private.sh.tmpl: under `chezmoi apply --destination
+# elsewhere` an $HOME-based path would reach past the rehearsal copy into the
+# real home.
+
+set -euo pipefail
+
+tpm="{{ .chezmoi.destDir }}/.tmux/plugins/tpm"
+
+if [ ! -d "${tpm}" ]; then
+    echo "tpm: ${tpm} not found, nothing to chmod"
+    echo "tpm: if the clone lands later, chmod 755 it or chezmoi will prompt"
+    exit 0
+fi
+
+chmod 755 "${tpm}"
