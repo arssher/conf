@@ -109,3 +109,5 @@ cargo install cork
 # fast app moving between monitors with move-to-next-monitor
 # don't use it currently
 # sudo apt-get -y install xdotool wmctrl
+
+# md-viewer is decent markdown viewer
