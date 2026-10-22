@@ -30,6 +30,7 @@
     swiper ; contains ivy, a completion frontend, and best search ever
     projectile ; for managing projects
     flycheck ; live syntax checking
+    lsp-mode ; language server client; lang.el hooks it into c/c++
     ace-window ; quick window switching from abo-abo
     undo-tree ; replace default undo/redo system
     magit ; git on steroids
