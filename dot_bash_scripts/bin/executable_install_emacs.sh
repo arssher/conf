@@ -77,5 +77,10 @@ sudo make install
     (unless (treesit-language-available-p lang)
       (treesit-install-language-grammar lang))))'
 
-# one-time start to install packages
-/usr/local/bin/emacs -batch --eval '(message "Hi!")'
+# One-time start, so packages.el installs the elpa packages it asks for.
+#
+# -l on the init file, because --batch implies -q: a plain `emacs -batch`
+# loads no init at all and so installed nothing. That is what this line did
+# for years -- the packages were really being installed by the first
+# interactive start instead.
+/usr/local/bin/emacs -batch -l "${HOME}/.emacs.d/init.el"

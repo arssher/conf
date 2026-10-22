@@ -201,8 +201,6 @@ browsers, probably related to
 https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/1562
 which can't be turned off, oh my.
 
-# building emacs (obsolete, in 13 stock is good enough)
-sudo apt-get install gnutls-dev checkinstall
 build and install emacs:
 install_emacs.sh
 
