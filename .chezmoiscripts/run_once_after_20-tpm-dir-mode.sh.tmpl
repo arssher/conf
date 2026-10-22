@@ -24,10 +24,10 @@
 # that a machine which has already run this and then loses and re-clones the
 # external gets the 0775 back, and wants a `chmod 755` by hand.
 #
-# destDir rather than $HOME, for the reason spelled out in
-# run_once_after_90-restore-private.sh.tmpl: under `chezmoi apply --destination
-# elsewhere` an $HOME-based path would reach past the rehearsal copy into the
-# real home.
+# destDir rather than $HOME: under `chezmoi apply --destination elsewhere` an
+# $HOME-based path would reach past the rehearsal copy and chmod the real home's
+# instead. Rehearsing against a temp destination is how this script was tested,
+# so that path is not hypothetical.
 
 set -euo pipefail
 

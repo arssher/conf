@@ -118,10 +118,9 @@ sysadminctl -screenLock immediate -password -
 # done
 
 # Secrets, history and work-specific scripts are not in the repo. Once whatever
-# syncs the private directory is up and CONFPATH points at it:
-#   restore_private.sh          $HOME bits
-#   restore_root.sh             root-owned config, needs sudo
-# restore_de.sh is linux desktop settings, nothing to restore here.
+# syncs the private directory is up and CONFPATH points at it, its own README
+# has the restore steps; the scripts are in $CONFPATH/bin. restore_de.sh there
+# is linux desktop settings, nothing to restore here.
 
 # visual.el asks for Ubuntu Mono, which macOS does not ship. Before emacs on
 # purpose: the config falls back to the stock font when it is missing and only

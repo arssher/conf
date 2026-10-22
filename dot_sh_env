@@ -142,11 +142,10 @@ fi
 # ------------------------------------------------------------
 # Plain environment
 
-# Where the private stash lives. Needed non-interactively, not just at a
-# prompt: the restore_*/backup_* names on PATH are symlinks to
-# private-dispatch.sh, which exits with an error when CONFPATH is unset -- and
-# chezmoi runs restore_private.sh from .chezmoiscripts, with no interactive
-# shell anywhere in sight. See restore_private.sh.
+# Where the private stash lives. The scripts in $CONFPATH/bin shuttle content
+# between it and this machine and locate it through this variable, so it is set
+# here rather than in an interactive block: nothing guarantees a shell running
+# one of them is a prompt. The stash documents itself; see its README.
 export CONFPATH="$HOME/Dropbox/configs"
 
 export LC_ALL="en_US.UTF-8"

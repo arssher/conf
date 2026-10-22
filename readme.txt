@@ -152,13 +152,6 @@ Codex status line:
 Content kept outside this repo:
 
   A separate private directory holds what does not belong in git here.
-  $CONFPATH in .bashrc points at it, and it documents itself.
-
-  The restore_* and backup_* names in .bash_scripts/bin are symlinks to
-  private-dispatch.sh, which execs the real script of the same name from
-  $CONFPATH/bin. They exit with a message if that directory is not on this
-  machine. chezmoi also runs restore_private.sh once on first apply, via
-  .chezmoiscripts.
 
 
 Things done on fresh Debian install:
@@ -182,9 +175,7 @@ Install chezmoi and lay down the dotfiles:
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin
 chezmoi init --ssh --apply arssher/conf
 
-Then set up whatever syncs the private directory, point CONFPATH at it, and
-run restore_private.sh. Look through and manually run things from
-bootstrap.sh for the packages.
+Look through and manually run things from bootstrap.sh for the packages.
 
 Optionally sync home from old machine:
 ssh-copy-id -f -i ~/.ssh/id_ed25519.pub ars@newmachine
@@ -210,7 +201,7 @@ sudo apt-get install gnutls-dev checkinstall
 build and install emacs:
 install_emacs.sh
 
-Important root configs (restore_root.sh handles the first two, see its notes):
+Important root configs:
 /etc/NetworkManager/system-connections/
 openvpn
 fstab (deliberately not restored -- the UUIDs are machine-specific)

@@ -14,10 +14,8 @@ source ~/.bashrc
 curl -fsSL https://claude.ai/install.sh | bash
 
 # Secrets, history and work-specific scripts are not in the repo. Once whatever
-# syncs the private directory is up and CONFPATH points at it:
-#   restore_private.sh          $HOME bits
-#   restore_root.sh             root-owned config, needs sudo
-#   restore_de.sh               desktop settings dump
+# syncs the private directory is up and CONFPATH points at it, its own README
+# has the restore steps; the scripts are in $CONFPATH/bin.
 
 sudo apt-get install emacs python3-pip python3-venv
 
