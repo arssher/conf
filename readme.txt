@@ -86,7 +86,12 @@ Shell startup files:
   SH_ENV_LOADED so the environment loads once per session tree, not once per
   nested shell. To re-read it after an edit, run source_env: a function defined
   there, so both shells have it, which clears that guard and GLOBAL_VARS_LOADED
-  -- covering the private ~/.global_vars it sources at its end.
+  and sources both files.
+
+  The private ~/.global_vars is NOT sourced from .sh_env. It holds API tokens,
+  and .sh_env is read by .profile, which the X11 session sources -- see
+  .profile's header. It is sourced from the interactive halves of .bashrc and
+  .zshrc instead, so a non-interactive shell does not get it.
 
   ~/.zprofile only calls sh_env_homebrew_path, defined in .sh_env's PATH
   section above the guard so nested shells have it too. It restores Homebrew
@@ -213,7 +218,7 @@ firefox/chrome
 The GNOME app launcher does not read .bashrc. To put a directory on the PATH
 of graphical sessions use ~/.config/environment.d/, which the systemd user
 session reads and which also works under wayland, where .profile is not
-sourced at all. See dot_config/environment.d/.
+sourced at all. See private_dot_config/environment.d/.
 
 
 How to play midi:

@@ -34,8 +34,8 @@
 # ===========================================================================
 
 # Everything bash shares with zsh -- PATH, CONFPATH, locale, editor, core
-# limit, nvm/cargo/deno, and ~/.global_vars -- lives in one POSIX file that
-# ~/.zshenv sources as well, so the two shells cannot drift apart. It guards
+# limit, nvm/cargo/deno -- lives in one POSIX file that ~/.zshenv sources as
+# well, so the two shells cannot drift apart. It guards
 # itself with an exported SH_ENV_LOADED, so a nested shell and a login bash
 # (where .profile has already sourced it) read it only once.
 if [ -f ~/.sh_env ]; then
@@ -59,6 +59,20 @@ esac
 # PART 2 -- interactive shells only. Everything below this point is skipped by
 # the return above, so a script or a remote command never sees any of it.
 # ===========================================================================
+
+# The private half of the environment: API tokens, work-specific PATH entries
+# and pyenv. Here rather than in .sh_env on purpose -- .sh_env is reached by
+# ~/.profile, which /etc/gdm3/Xsession sources, and gnome-session imports that
+# environment into `systemd --user`, so anything there ends up in gnome-shell
+# and in every GUI app. The `return` above is what keeps this file's second
+# half away from that route: the Xsession is a non-interactive /bin/sh.
+#
+# Guards itself with an exported GLOBAL_VARS_LOADED, so a nested interactive
+# shell reads it only once. Use source_env (defined in .sh_env, so zsh has it
+# too) to re-read it after editing.
+if [ -f ~/.global_vars ]; then
+    source ~/.global_vars
+fi
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -132,7 +146,9 @@ alias l='ls -CF'
 
 # To re-read ~/.sh_env or ~/.global_vars after editing them, use source_env --
 # a function defined in .sh_env itself, so zsh has it too. Both files guard
-# themselves against a second read, and it clears both guards.
+# themselves against a second read; it clears both guards and sources both,
+# which it has to do explicitly now that .sh_env no longer pulls in the
+# private half.
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert

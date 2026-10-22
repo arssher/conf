@@ -8,7 +8,12 @@
 #                guard. Covers interactive shells and `ssh host 'command'`,
 #                which bash reads .bashrc for because stdin is a socket.
 #   ~/.profile   a login `sh`/dash, and a login bash -- neither reads .zshenv,
-#                and dash does not read .bashrc either.
+#                and dash does not read .bashrc either. On X11 this also means
+#                the desktop session: /etc/gdm3/Xsession sources ~/.profile,
+#                and gnome-session imports the result into `systemd --user`, so
+#                everything in this file reaches gnome-shell and every GUI app.
+#                That is why the private half is not sourced from here. See
+#                ~/.profile's header for the route.
 #
 # Between the three, no shell that matters misses it. The one gap is
 # `bash script.sh`, which reads only $BASH_ENV; scripts get the environment by
@@ -25,8 +30,8 @@
 # corrupts their protocols.
 #
 # Public, and lives in the dotfiles repo. The private counterpart is
-# ~/.global_vars, sourced at the end: same job, but for what must not be in a
-# public repo.
+# ~/.global_vars: the same job for what must not be in a public repo. It is
+# deliberately NOT sourced from here -- see the note at the end of this file.
 
 # Guarded with an exported SH_ENV_LOADED, exactly the way .global_vars guards
 # itself. Exported on purpose: PATH then gets built once per session tree
@@ -35,8 +40,8 @@
 # .bashrc, mirroring `gvr`.
 # Re-read this file after editing it. A plain `. ~/.sh_env` is a no-op while
 # the guard below is set, and ~/.global_vars guards itself the same way with
-# GLOBAL_VARS_LOADED, so both have to be cleared -- which covers the private
-# half too, since this file sources it at the end.
+# GLOBAL_VARS_LOADED, so both have to be cleared. The two are sourced from
+# different places now, so this re-reads each of them by hand.
 #
 # A function here rather than an alias in .bashrc: zsh then gets it as well,
 # from the one definition, and it works in a non-interactive shell, where
@@ -49,6 +54,9 @@
 source_env() {
     unset SH_ENV_LOADED GLOBAL_VARS_LOADED
     . "$HOME/.sh_env"
+    if [ -f "$HOME/.global_vars" ]; then
+        . "$HOME/.global_vars"
+    fi
 }
 
 # ------------------------------------------------------------
@@ -237,10 +245,7 @@ export LESS='--quit-if-one-screen --ignore-case --LONG-PROMPT --RAW-CONTROL-CHAR
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 # ------------------------------------------------------------
-# Private half: secrets and machine-specific bits, not in this repo. It guards
-# itself with an exported GLOBAL_VARS_LOADED and is re-read with the `gvr`
-# alias. Note it now reaches zsh and a login dash too, which it did not when
-# only .bashrc sourced it -- so it has to be POSIX as well.
-if [ -f "$HOME/.global_vars" ]; then
-    . "$HOME/.global_vars"
-fi
+# ~/.global_vars, the private half, is deliberately not sourced here: this file
+# is read by ~/.profile, /etc/gdm3/Xsession sources that, and gnome-session
+# imports the result into `systemd --user` -- so everything set here ends up in
+# every GUI app. The interactive halves of .bashrc and .zshrc read it instead.

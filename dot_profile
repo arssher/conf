@@ -9,18 +9,27 @@
 #       this file completely and silently -- no error, the PATH additions below
 #       simply stop happening.
 #
-#   the X11 desktop session, but it does not get far
-#       /etc/gdm3/Xsession does source /etc/profile and then this file before
-#       starting the session. It does NOT follow that GUI programs see any of
-#       it: GNOME runs under systemd --user even on X11, and apps launched from
-#       the shell inherit the systemd user environment instead. Checked on this
-#       machine -- gnome-shell's PATH is byte-identical to
-#       `systemctl --user show-environment`, and neither it nor xbindkeys has
-#       CONFPATH, LC_ALL, EDITOR, LESS or GOPATH set. So do not put anything
-#       here expecting a GUI program to see it; use ~/.config/environment.d/.
-#       ~/.sh_env, sourced below, therefore reaches the Xsession shell and
-#       nothing the desktop actually runs -- harmless, but it is no substitute
-#       for environment.d.
+#   the X11 desktop session, and it reaches everything the desktop runs
+#       /etc/gdm3/Xsession is a #!/bin/sh script, and at its line 91 it does
+#       `test -f "$HOME/.profile" && . "$HOME/.profile"`. So ~/.sh_env below
+#       lands in the Xsession shell's environment.
+#       Xsession.d/99x11-common_start then execs gnome-session as a child of
+#       that shell, so gnome-shell inherits it by plain fork/exec; and
+#       gnome-session-binary calls UnsetAndSetEnvironment on
+#       org.freedesktop.systemd1.Manager, pushing the whole environment into
+#       `systemd --user`. Every user unit and every DBus-activated or
+#       .desktop-launched app inherits it from there.
+#
+#       So treat .sh_env as session-wide rather than shell-local. The private
+#       ~/.global_vars is deliberately NOT sourced from it for this reason: it
+#       holds API tokens, and is read from the interactive halves of .bashrc
+#       and .zshrc instead, which this route never reaches.
+#
+#       Under Wayland the route genuinely does not exist: GDM starts the
+#       session through systemd --user units and never runs Xsession, so this
+#       file is not read at all. That is the case environment.d was added for.
+#       This machine is X11 on purpose (WaylandEnable=false, see readme.txt),
+#       so here the route is live.
 #
 #   a login `sh` (dash on Debian)
 #       also reads it, which is why nothing here may use bashisms. Keep it
@@ -32,10 +41,13 @@
 #   `ssh host 'some command'`          ~/.bashrc only -- bash reads it there
 #                                      because stdin is a socket.
 #   `bash script.sh`, `bash -c ...`    only $BASH_ENV, if set.
-#   the systemd user session            GNOME, the app launcher and user services
-#                                      take their environment from
-#                                      ~/.config/environment.d/ instead -- on
-#                                      X11 as well as Wayland, see above.
+#   `systemd --user`                   started by pam_systemd at login, before
+#                                      this file runs, so it begins with a
+#                                      clean environment. It does not stay
+#                                      clean on X11 -- gnome-session imports
+#                                      the Xsession environment into it, see
+#                                      above. ~/.config/environment.d/ is the
+#                                      route that is meant to feed it.
 #
 # Note it sources ~/.bashrc itself, below, so a login bash ends up running both.
 #
