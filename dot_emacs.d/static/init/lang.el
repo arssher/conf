@@ -162,6 +162,14 @@
 ;; enable lsp-mode
 ;; ... you have to get compile_commands.json at the top dir and reload lang
 ;; server to make it work, which is kinda pain
+
+;; Take the project root from the VCS directory instead of asking. With the
+;; default nil, the first C file opened in each project gets a "Select action:
+;; import project root / blacklist" prompt, and answering it is the only thing
+;; that lets the rest of c-mode-hook run. Set before lsp-mode
+;; loads, which is fine: a defcustom leaves an already-set value alone.
+(setq lsp-auto-guess-root t)
+
 (add-hook 'c-mode-hook 'lsp)
 (add-hook 'c++-mode-hook 'lsp)
 
