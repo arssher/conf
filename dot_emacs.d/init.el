@@ -265,8 +265,17 @@
 ;; Space row
 (global-set-key (kbd "M-<SPC>") 'cua-set-mark) ; ergo
 ;; M-S-arrows move lines and words, it is set before loading drag-stuff
-;; enable switching windows with M-arrows
-(windmove-default-keybindings 'meta)
+;; Switch windows with C-M-arrows. The modifier is spelled out because the
+;; default is `shift', not control-meta -- and shift is cua's selection
+;; gesture here, so it was never an option.
+;;
+;; Was M-arrows. Moved so markdown-ts-mode can have them for promote/demote
+;; and moving a subtree; window switching is reachable enough by other means
+;; that a second gesture for it is not worth a mode's whole structural
+;; editing. The cost is the default C-M-arrow sexp motion -- backward-sexp,
+;; forward-sexp, backward-up-list, down-list -- which nothing here rebinds;
+;; C-M-f and C-M-b still do the first two.
+(windmove-default-keybindings '(control meta))
 ;; enlarge and shring active window with C-arrows
 (global-set-key (kbd "<C-up>") 'shrink-window)
 (global-set-key (kbd "<C-down>") 'enlarge-window)
@@ -395,18 +404,9 @@
 )
 
 ;; Markdown
-;; markdown-ts-mode, which lang.el points .md at. It takes the M-arrows for
-;; promote/demote and moving a subtree, and those are windmove here -- see
-;; (windmove-default-keybindings 'meta) above. Window switching wins: it is
-;; the same gesture in every buffer, and C-c C-n and friends already reach the
-;; outline commands. The subtree moves have no other binding and are left to
-;; M-x.
-(with-eval-after-load "markdown-ts-mode"
-  (define-key markdown-ts-mode-map (kbd "M-<left>") nil)
-  (define-key markdown-ts-mode-map (kbd "M-<right>") nil)
-  (define-key markdown-ts-mode-map (kbd "M-<up>") nil)
-  (define-key markdown-ts-mode-map (kbd "M-<down>") nil)
-  )
+;; markdown-ts-mode, which lang.el points .md at, keeps its own M-arrows for
+;; promote/demote and moving a subtree -- windmove moved off them, see above.
+;; Nothing to take away from it here.
 
 ;; markdown-mode, the elpa package, kept as the fallback while the ts mode is
 ;; experimental: M-x markdown-mode is the way out of a file it mishandles. It
