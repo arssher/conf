@@ -395,6 +395,23 @@
 )
 
 ;; Markdown
+;; markdown-ts-mode, which lang.el points .md at. It takes the M-arrows for
+;; promote/demote and moving a subtree, and those are windmove here -- see
+;; (windmove-default-keybindings 'meta) above. Window switching wins: it is
+;; the same gesture in every buffer, and C-c C-n and friends already reach the
+;; outline commands. The subtree moves have no other binding and are left to
+;; M-x.
+(with-eval-after-load "markdown-ts-mode"
+  (define-key markdown-ts-mode-map (kbd "M-<left>") nil)
+  (define-key markdown-ts-mode-map (kbd "M-<right>") nil)
+  (define-key markdown-ts-mode-map (kbd "M-<up>") nil)
+  (define-key markdown-ts-mode-map (kbd "M-<down>") nil)
+  )
+
+;; markdown-mode, the elpa package, kept as the fallback while the ts mode is
+;; experimental: M-x markdown-mode is the way out of a file it mishandles. It
+;; steals three of the ergo keys when it loads, and markdown-ts-mode binds
+;; none of those three, which is why the two blocks differ.
 (with-eval-after-load "markdown-mode"
   (define-key markdown-mode-map (kbd "M-h") nil)
   (define-key markdown-mode-map (kbd "M-n") nil)

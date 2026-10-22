@@ -166,6 +166,37 @@
 (add-hook 'c++-mode-hook 'lsp)
 
 
+;; Markdown
+;;
+;; markdown-ts-mode is built into emacs 31, but unlike the other ts modes it
+;; is neither autoloaded nor attached to any file extension: emacs ships it
+;; switched off because upstream still calls it experimental. Both the
+;; autoload and the auto-mode-alist entry below are therefore ours.
+;;
+;; Guarded on the two grammars actually being present. Debian packages
+;; neither, install_emacs.sh builds them, and markdown needs both -- the block
+;; grammar and the inline one. Without the guard a machine that had not run
+;; that step would open every .md in a mode that errors on arrival. Falling
+;; through instead leaves the entry markdown-mode's own autoloads install,
+;; which is the old behaviour, and M-x markdown-mode stays reachable either
+;; way if the new mode misbehaves on some file.
+;;
+;; The regexp is markdown-mode's own list of extensions. add-to-list pushes to
+;; the front, and packages.el has already run package-initialize by now, so
+;; this entry is found first.
+(when (and (fboundp 'treesit-available-p)
+           (treesit-available-p)
+           (require 'treesit nil t)
+           (locate-library "markdown-ts-mode")
+           (treesit-language-available-p 'markdown)
+           (treesit-language-available-p 'markdown-inline))
+  (autoload 'markdown-ts-mode "markdown-ts-mode"
+    "Major mode for Markdown, tree-sitter based." t)
+  (add-to-list 'auto-mode-alist
+               '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'"
+                 . markdown-ts-mode)))
+
+
 ;; turn on projectile
 ;; Right now I plan to use it only for two things: switching between header and
 ;; src, and, perhaps, quick project switching (basically, it just lets me avoid
