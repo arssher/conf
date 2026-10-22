@@ -404,7 +404,22 @@
 ;; Markdown
 ;; markdown-ts-mode, which lang.el points .md at, keeps its own M-arrows for
 ;; promote/demote and moving a subtree -- windmove moved off them, see above.
-;; Nothing to take away from it here.
+;;
+;; f6 and f7 were desktop+'s before it was dropped. In the mode maps rather
+;; than global, because neither command means anything outside a markdown
+;; buffer. Upstream also has C-c C-x C-m for the first; f6 is the short form.
+;;
+;; markdown-ts-view-mode is a major mode, not a minor one, so entering it is
+;; one-way as far as upstream is concerned -- it offers no exit command, and
+;; the q it inherits from special-mode-map buries the buffer rather than
+;; returning to editing. Binding f7 to markdown-ts-mode in the view map makes
+;; the pair a round trip.
+(with-eval-after-load "markdown-ts-mode"
+  (define-key markdown-ts-mode-map (kbd "<f6>") 'markdown-ts-toggle-hide-markup)
+  (define-key markdown-ts-mode-map (kbd "<f7>") 'markdown-ts-view-mode)
+  (define-key markdown-ts-view-mode-map (kbd "<f6>") 'markdown-ts-toggle-hide-markup)
+  (define-key markdown-ts-view-mode-map (kbd "<f7>") 'markdown-ts-mode)
+  )
 
 ;; markdown-mode, the elpa package, kept as the fallback while the ts mode is
 ;; experimental: M-x markdown-mode is the way out of a file it mishandles. It
