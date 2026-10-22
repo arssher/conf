@@ -125,8 +125,6 @@
 (global-set-key [f3] 'ivy-mode)
 (global-set-key [f4] 'toggle-remove-whitespace-on-save)
 (global-set-key [f5] 'revert-buffer-no-confirm)
-(global-set-key [f6] 'desktop+-create) ; save desktop
-(global-set-key [f7] 'desktop+-load) ; load saved desktop
 (global-set-key [f8] 'neotree-toggle) ; show and hide neotree
 (global-set-key [f9] 'whitespace-mode) ; toggle show whitespace
 (global-set-key [f10] 'ars-toggle-theme) ; toggle theme
@@ -441,8 +439,6 @@
 ;; Winner mode?
 ;; icicles?
 ;; fix highlight matching ()
-;; save tree in desktop+?
-;; save remote files in desktop+?
 ;; tail messages toggle instead of enable/disable; or better disable when active,
 ;;   enable when leaving
 ;; check kbd escaping

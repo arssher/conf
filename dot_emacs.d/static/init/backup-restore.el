@@ -11,14 +11,6 @@
 (setq auto-save-file-name-transforms
       `((".*" ,"~/.emacs_saves")))
 
-;; Desktop saving stuff
-;; Finally I decided to use desktop+ extension:
-;; https://github.com/ffevotte/desktop-plus
-;; It just works.
-;; TODO: add bash command
-(setq desktop-load-locked-desktop "ask"
-      desktop-restore-frames      t) ; save windows layout; works only since 24.4
-
 ;; autoreload all files from disk, by default every 5 seconds
 (global-auto-revert-mode 1)
 
