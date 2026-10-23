@@ -125,6 +125,14 @@ bindkey '\e[1;3C' forward-word
 bindkey '\e\e[D' backward-word
 bindkey '\e\e[C' forward-word
 
+# Ctrl+arrow, which is what left alt + u/o emits on linux: xremap sends the
+# GTK word-motion keys there, ctrl rather than option, as Claude Code ignores
+# alt+arrows. bash has these from /etc/inputrc; zsh reads no inputrc and binds
+# nothing to them, so without these lines u/o did nothing at all. Modified
+# keys keep the CSI form even with the keypad in application mode.
+bindkey '\e[1;5D' backward-word
+bindkey '\e[1;5C' forward-word
+
 # i and k are missing from this list on purpose: they move through history, so
 # they are bound at the end of the history section below, where the widget they
 # need can be loaded first.
@@ -240,19 +248,26 @@ bindkey '\ek' down-line-or-beginning-search
 # as a real up/down arrow in a terminal rather than as ESC+i -- a TUI reads
 # arrows and knows nothing of ESC+i -- so without this the M-i gesture would
 # quietly downgrade to whatever the arrows do, and in a terminal the ESC
-# sequences above are no longer reachable at all. Harmless on linux, where it
-# just makes the arrows behave like M-i/M-k.
+# sequences above are no longer reachable at all. The same on linux, where
+# xremap sends left alt + i/k as the arrows.
 #
-# \e[A and \e[B, the normal cursor-key sequences, are what actually arrives:
-# zle never emits smkx, so the terminal stays in normal rather than
-# application keypad mode. Checked by capturing an interactive zsh through a
-# pty -- it sends \e[?2004h for bracketed paste and no \e[?1h\e=. Worth
-# knowing, because /etc/zshrc binds ${key[Up]}, which is terminfo kcuu1 =
-# \eOA, the application-mode form; that binding never fires, and the arrows
-# are on zsh's built-in up-line-or-history until overridden here.
+# Which form arrives depends on the system zshrc, so both are bound. An arrow
+# sends \e[A in the terminal's normal mode and \eOA in application mode, which
+# a program turns on by printing terminfo's smkx; terminfo's key table, kcuu1 =
+# \eOA, describes application mode.
+#
+#   mac: zle never emits smkx -- checked by capturing an interactive zsh
+#   through a pty, which sends \e[?2004h for bracketed paste and no
+#   \e[?1h\e= -- so \e[A arrives. /etc/zshrc's ${key[Up]} binding is the \eOA
+#   form and never fires, and the arrows stay on zsh's built-in
+#   up-line-or-history until overridden here.
+#
+#   debian: /etc/zsh/zshrc defines zle-line-init to print smkx, and
+#   zle-line-finish rmkx, "only then are the values from $terminfo valid".
+#   So while a line is being edited \eOA arrives, and \e[A is the one that
+#   never does.
 bindkey '\e[A' up-line-or-beginning-search
 bindkey '\e[B' down-line-or-beginning-search
-# \eOA and \eOB too, in case some terminal does turn application mode on.
 bindkey '\eOA' up-line-or-beginning-search
 bindkey '\eOB' down-line-or-beginning-search
 
@@ -262,9 +277,11 @@ bindkey '\eOB' down-line-or-beginning-search
 #
 # /etc/zshrc binds ${key[Home]} and ${key[End]}, which are terminfo khome and
 # kend -- \eOH and \eOF for xterm-ghostty. Those are the application-mode
-# forms, so by the same smkx argument as the arrows they never arrive; what
-# does arrive is \e[H and \e[F, and `bindkey '^[[H'` answered undefined-key.
-# Hence left cmd + h in ghostty moving the cursor nowhere.
+# forms, so on mac, by the same smkx argument as the arrows, they never arrive;
+# what does arrive is \e[H and \e[F, and `bindkey '^[[H'` answered
+# undefined-key. Hence left cmd + h in ghostty moving the cursor nowhere. On
+# debian it is the other way round again, \eOH and \eOF arriving, so all four
+# are bound.
 #
 # readline has no such gap -- it ships all four, which is why .inputrc needs
 # nothing and the breakage looked zsh-specific:
