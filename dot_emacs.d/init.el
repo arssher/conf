@@ -435,6 +435,21 @@
   ;; "Jump to a heading via completion", ivy supplies the completion, and
   ;; ars-markdown.el has put the headings at the top of the index.
   (define-key markdown-ts-view-mode-map (kbd "t") 'imenu)
+  ;; The same set in the editable mode, where the letters are taken, under C-c.
+  ;; Nothing of emacs' own is shadowed: C-c <letter> is the range the
+  ;; conventions reserve for users, so modes may not bind it -- markdown-ts
+  ;; keeps to C-c C-n, C-c C-v n and the like. The three collisions are with my
+  ;; own globals, and all three are idle in markdown: flycheck runs here but
+  ;; finds no checker, none of markdownlint-cli, mdl or pymarkdown being
+  ;; installed, and C-c l downcases for shouting sql. Install markdownlint and
+  ;; C-c i/C-c k are worth handing back.
+  (define-key markdown-ts-mode-map (kbd "C-c i") 'scroll-down-command) ; was flycheck-previous-error
+  (define-key markdown-ts-mode-map (kbd "C-c k") 'scroll-up-command) ; was flycheck-next-error
+  (define-key markdown-ts-mode-map (kbd "C-c j") 'outline-previous-heading)
+  (define-key markdown-ts-mode-map (kbd "C-c l") 'outline-next-heading) ; was downcase-word
+  (define-key markdown-ts-mode-map (kbd "C-c u") 'outline-backward-same-level)
+  (define-key markdown-ts-mode-map (kbd "C-c o") 'outline-forward-same-level)
+  (define-key markdown-ts-mode-map (kbd "C-c t") 'imenu)
   )
 
 ;; markdown-mode, the elpa package, kept as the fallback while the ts mode is
