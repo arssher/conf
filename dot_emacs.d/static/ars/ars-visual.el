@@ -64,11 +64,10 @@ the frame will be maximized after disabling fullscreen state."
 
 (defvar ars-current-theme "dark" "light or dark")
 
-;; Font height for the dark theme, in 1/10 pt. Bigger on macOS: the same number
-;; renders smaller there than under X. Linux keeps the 140 it had.
-;; system-type rather than window-system, which is nil until a graphical frame
-;; exists and so would read as linux inside a daemon.
-(defvar ars-dark-font-height (if (eq system-type 'darwin) 160 140)
+;; Font height for the dark theme, in 1/10 pt. Was 160 on macOS and 140 here,
+;; the same number rendering smaller there than under X; linux has since come
+;; up to 160 as well, by preference rather than to match.
+(defvar ars-dark-font-height 160
   "Default face :height for the dark theme, in 1/10 pt")
 
 (defun ars-toggle-theme (&optional theme)
