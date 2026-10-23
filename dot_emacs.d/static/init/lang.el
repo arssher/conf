@@ -202,7 +202,11 @@
     "Major mode for Markdown, tree-sitter based." t)
   (add-to-list 'auto-mode-alist
                '("\\.\\(?:md\\|markdown\\|mkd\\|mdown\\|mkdn\\|mdwn\\)\\'"
-                 . markdown-ts-mode)))
+                 . markdown-ts-mode))
+  ;; The view mode (f7) is for reading, so lay the tables out. See
+  ;; ars-markdown.el for why this is not something the mode does itself.
+  (require 'ars-markdown)
+  (add-hook 'markdown-ts-view-mode-hook #'ars-markdown-ts-align-all-tables))
 
 
 ;; turn on projectile
