@@ -1,3 +1,19 @@
+{{/*
+    vscode's settings.json, the one source for both platforms. Rendered into
+    two targets by one-line templates that includeTemplate this file:
+
+      linux  private_dot_config/Code/User/settings.json.tmpl
+      macos  "private_Library/private_Application Support/private_Code/User/"
+
+    .chezmoitemplates is chezmoi's shared-template directory: never applied
+    anywhere itself, so it needs no .chezmoiignore line. Keybindings are NOT
+    organised this way -- the two platforms genuinely differ there, see
+    vscode/readme.txt -- but settings are the same bar two keys, so a single
+    file with an os check beats two copies drifting apart.
+
+    Comments survive: vscode parses settings.json as JSONC. The {{ "{{" }}/*...*\/
+    form here is a template comment and does not reach the output.
+*/ -}}
 {
     "security.workspace.trust.untrustedFiles": "open",
     "tlaplus.tlc.modelChecker.options": "-workers 3",
@@ -45,12 +61,24 @@
     "redhat.telemetry.enabled": true,
     "git.openRepositoryInParentFolders": "never",
     "editor.minimap.enabled": false,
+{{- if eq .chezmoi.os "linux" }}
+    // vscode's own key is platform-suffixed, so this one is inert on macOS
+    // anyway. Gated regardless, so the applied file on each machine holds only
+    // keys that mean something there.
     "terminal.integrated.defaultProfile.linux": "bash",
+{{- end }}
     "remote.extensionKind": {
         "pub.name": [
             "ui"
         ]
     },
     "github.copilot.selectedCompletionModel": "",
+{{- if eq .chezmoi.os "darwin" }}
+    // macOS has no /bin/python3 at all -- Apple's is /usr/bin/python3 -- and
+    // .sh_env puts homebrew ahead of it, so this follows the python3 that a
+    // shell here actually resolves.
+    "python.defaultInterpreterPath": "/opt/homebrew/bin/python3"
+{{- else }}
     "python.defaultInterpreterPath": "/bin/python3"
+{{- end }}
 }

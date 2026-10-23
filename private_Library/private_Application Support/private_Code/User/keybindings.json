@@ -76,7 +76,15 @@
     // ---------------------------------------------------------------
     // Not part of the ergoemacs scheme and not touched by karabiner: ctrl and
     // option combinations that arrive as typed on either platform. Copied from
-    // the linux file, and they have to stay in step with it by hand.
+    // the linux file, and they have to stay in step with it by hand. These are
+    // pressed as option+letter here, not through the left cmd layer -- no
+    // karabiner rule feeds them, and asking for one would cost the letter's
+    // real cmd shortcut.
+    //
+    // The linux file's two unbinds are not copied, and cannot be: it removes
+    // the defaults on ctrl+b and ctrl+q, which exist only there. Both commands
+    // are declared CtrlCmd|Key, so macOS gets them as cmd+b (toggleSidebar) and
+    // cmd+q (quit), and a removal keyed to ctrl would match nothing.
     {
         "key": "ctrl+y",
         "command": "editor.action.deleteLines",
@@ -99,6 +107,10 @@
     {
         "key": "ctrl+'",
         "command": "workbench.action.toggleSidebarVisibility"
+    },
+    {
+        "key": "alt+a",
+        "command": "workbench.action.focusActiveEditorGroup"
     },
     {
         "key": "alt+b",
