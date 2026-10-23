@@ -419,6 +419,17 @@
   (define-key markdown-ts-mode-map (kbd "<f7>") 'markdown-ts-view-mode)
   (define-key markdown-ts-view-mode-map (kbd "<f6>") 'markdown-ts-toggle-hide-markup)
   (define-key markdown-ts-view-mode-map (kbd "<f7>") 'ars-markdown-ts-edit)
+  ;; Ergo motion, bare: the view is read-only, so the letters are free and no
+  ;; modifier is needed. Same hands and same directions as the global M-
+  ;; versions above -- i/k the vertical pair, j/l back and forward, u/o the
+  ;; coarser jump of the two, as M-u/M-o are to M-j/M-l. Upstream's own n/p
+  ;; (heading) and f/b (same level) are left alone underneath.
+  (define-key markdown-ts-view-mode-map (kbd "i") 'scroll-down-command) ; page up
+  (define-key markdown-ts-view-mode-map (kbd "k") 'scroll-up-command) ; page down
+  (define-key markdown-ts-view-mode-map (kbd "j") 'outline-previous-heading)
+  (define-key markdown-ts-view-mode-map (kbd "l") 'outline-next-heading)
+  (define-key markdown-ts-view-mode-map (kbd "u") 'outline-backward-same-level)
+  (define-key markdown-ts-view-mode-map (kbd "o") 'outline-forward-same-level)
   )
 
 ;; markdown-mode, the elpa package, kept as the fallback while the ts mode is
