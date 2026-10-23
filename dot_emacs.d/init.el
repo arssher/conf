@@ -431,6 +431,10 @@
   (define-key markdown-ts-view-mode-map (kbd "l") 'outline-next-heading)
   (define-key markdown-ts-view-mode-map (kbd "u") 'outline-backward-same-level)
   (define-key markdown-ts-view-mode-map (kbd "o") 'outline-forward-same-level)
+  ;; t for the table of contents. Plain imenu: upstream's own menu offers it as
+  ;; "Jump to a heading via completion", ivy supplies the completion, and
+  ;; ars-markdown.el has put the headings at the top of the index.
+  (define-key markdown-ts-view-mode-map (kbd "t") 'imenu)
   )
 
 ;; markdown-mode, the elpa package, kept as the fallback while the ts mode is
