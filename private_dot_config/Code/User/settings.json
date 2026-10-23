@@ -14,6 +14,9 @@
         "editor.formatOnSave": false,
         "editor.formatOnType": true
     },
+    "[json]": {
+        "editor.formatOnSave": false
+    },
     "[yaml]": {
         // use redhat.vscode-yaml extension for formatting
         "editor.defaultFormatter": "redhat.vscode-yaml",
@@ -36,10 +39,18 @@
         "**/test_output/**",
         "**/target/**"
     ],
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "go.toolsManagement.autoUpdate": true,
     "explorer.confirmDelete": false,
     "redhat.telemetry.enabled": true,
     "git.openRepositoryInParentFolders": "never",
-    "editor.minimap.enabled": false
+    "editor.minimap.enabled": false,
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "remote.extensionKind": {
+        "pub.name": [
+            "ui"
+        ]
+    },
+    "github.copilot.selectedCompletionModel": "",
+    "python.defaultInterpreterPath": "/bin/python3"
 }

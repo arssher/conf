@@ -19,8 +19,8 @@ sudo apt-get install emacs python3-pip python3-venv
 
 # install manually chrome, vscode, slack (from deb package)
 
-# vscode's own Settings Sync, off: chezmoi applies the keybindings now and sync
-# writes the same file, so with both on they overwrite each other. Sync
+# vscode's own Settings Sync, off: chezmoi applies the keybindings and settings
+# now and sync writes the same files, so with both on they overwrite each other. Sync
 # enablement is machine state rather than config, so there is no settings.json
 # key for it and this has to be run once per machine. See vscode/readme.txt.
 code --sync off
