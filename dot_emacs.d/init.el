@@ -77,10 +77,10 @@
 ;; Make the keys work with russian layout
 (reverse-input-method "russian-computer")
 
-;; Now, the keys. As you know I use default ctrl as C and alt as M.
+;; Now, the keys/shortcuts. As you know I use default ctrl as C and alt as M.
 ;; I bind caps lock and right alt to be also ctrl to be more ergonomic
 ;; though.
-;; About prefixes:
+;; About modifiers:
 ;; * Alt is the best
 ;; * Ctrl is the second priority (right Alt)
 ;; * Shift Alt is ok, if the key is for right hand, but pinky is getting nervious
@@ -90,6 +90,15 @@
 
 ;; Try to write C-letter keys first, then M-letter, then M-big_letter,
 ;; then C-M-letter
+
+;; Prefixes:
+;; C-c is the major mode specific keymap. C-c <letter> is reserved for
+;; user mappings, so packages don't use it.
+;; C-x is kinda used for 'extending emacs' - files, buffers, windows,
+;; registers etc.
+;; Plus ESC keymap, which is the whole M- layer: M-x is literally ESC x,
+;; so every M-letter binding below lives in it.
+;; C-h or F1 is help.
 
 ;; See kbd-diagram for a picture of result.
 
