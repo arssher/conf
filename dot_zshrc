@@ -58,6 +58,35 @@ bindkey '\eH' end-of-line
 bindkey '\ej' backward-char
 bindkey '\el' forward-char
 
+# What counts as a word, for every widget above that takes one. zsh's default
+# is $WORDCHARS = *?_-.[]~=/&;!#$%^(){}<>, and a slash being in there makes a
+# whole path one word: on `cd /usr/local/share/foo' with the cursor at the end,
+# M-e killed back to `cd ' and M-u jumped the entire path in one go. readline
+# has never behaved that way -- its backward-word is "letters and digits",
+# full stop -- and .inputrc serves the same gestures in bash, so the two have
+# to agree.
+#
+# select-word-style rather than assigning WORDCHARS by hand: it sets a zstyle
+# and swaps the standard widgets for the contributed *-match versions, so one
+# setting covers every word widget and the per-widget overrides below become
+# possible. `bash' is its name for alphanumerics-only. Measured on the line
+# above, cursor at the end:
+#   default:  backward-kill-word -> [cd ]
+#   bash:     backward-kill-word -> [cd /usr/local/share/]
+autoload -Uz select-word-style
+select-word-style bash
+
+# ^W kept on whitespace, which is what it was doing before this and what it
+# does in bash -- readline has it on unix-word-rubout, not backward-kill-word,
+# so it takes the whole path and ignores the alnum rule. zsh binds ^W to plain
+# backward-kill-word, which the line above would otherwise narrow along with
+# everything else. A separate widget because the word style is read from the
+# zstyle context `:zle:$WIDGET', so a binding needs its own name to carry its
+# own style; `-match' is the contributed widget select-word-style autoloads.
+zle -N ws-backward-kill-word backward-kill-word-match
+zstyle ':zle:ws-backward-kill-word' word-style whitespace
+bindkey '^W' ws-backward-kill-word
+
 # Option+arrow, for the word motion that left cmd + u/o now emits on mac.
 # Backspace, delete, option+backspace and ctrl+k are bound out of the box to
 # exactly the widget the gesture wants, which is what made moving to real keys
