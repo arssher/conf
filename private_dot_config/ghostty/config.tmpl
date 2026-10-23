@@ -74,6 +74,14 @@ keybind = alt+comma=next_tab
 # Not on mac, where the gesture is cmd+t and ctrl+t belongs to the shell. It
 # costs fzf's ^T file picker here, which Terminator's ctrl+t already did.
 keybind = ctrl+t=new_tab
+
+# Meant to open windows maximized, as Terminator's launcher has it with
+# --maximize. It does not take effect yet: on GNOME under X11 the 1.3.1 snap
+# opens a window at its default size with or without it, and --maximize=true on
+# the command line does no better. Kept so that a fixed release picks it up,
+# since the snap updates itself; until then Super+Up maximizes. Linux only so
+# far; the mac's windows are left as they were.
+maximize = true
 {{- end }}
 
 # Option+arrow, which is what left cmd + u/o emits now that the ergoemacs
