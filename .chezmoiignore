@@ -5,8 +5,9 @@
 # get applied into ~/.bash_scripts/archive.
 
 # Repo-only content: the notes about this repo, the bootstrap scripts, and the
-# vscode settings backup (kept in git for paranoia; vscode normally syncs via
-# the GH account).
+# vscode settings backup (kept in git for paranoia; vscode normally syncs
+# settings via the GH account). Keybindings are no longer in there -- they are
+# applied per platform now, see the two blocks at the bottom of this file.
 #
 # "CLAUDE.md" here is the one at the root, these notes about the source dir.
 # The pattern is anchored: unlike gitignore, a bare name matches only the top
@@ -73,6 +74,8 @@ etc/**
 .config/environment.d
 .config/xremap
 .config/systemd
+.config/Code
+.config/Code/**
 {{ end }}
 
 # The other direction: macOS-only targets, skipped on linux. Karabiner is a mac
@@ -81,4 +84,25 @@ etc/**
 {{ if ne .chezmoi.os "darwin" }}
 .config/karabiner
 .config/karabiner/**
+Library
+Library/**
 {{ end }}
+
+# vscode's keybindings, one file per platform rather than one shared file: the
+# user keybindings.json schema takes only key/command/when/args, with no
+# "mac"/"linux" override of the kind the default keybindings use. `when` does
+# carry isMac and isLinux context keys, so a single file was possible, but the
+# two platforms share under half their contents -- karabiner turns the
+# ergoemacs gestures into standard macOS keys before vscode sees them, which
+# makes the whole per-widget half of the linux file unnecessary there.
+#
+# The paths differ, so each is excluded from the other platform above:
+#   linux  ~/.config/Code/User/            <- private_dot_config/Code/User/
+#   mac    ~/Library/Application Support/  <- "Library/Application Support/..."
+# The mac source path carries spaces, which chezmoi passes through untouched;
+# verify with `chezmoi managed` after the first apply.
+#
+# Both platforms also need vscode's Settings Sync to leave keybindings alone,
+# or sync and chezmoi take turns overwriting the file. The
+# settingsSync.keybindingsPerPlatform setting defaults to true, which keeps the
+# two platforms apart but does not stop sync writing this file.

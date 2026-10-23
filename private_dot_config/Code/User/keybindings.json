@@ -381,11 +381,8 @@
     },
     {
         "key": "alt+shift+n",
-        "command": "cursorBottom ",
-    },
-    {
-        "key": "alt+shift+n",
-        "command": "cursorBottom ",
+        "command": "cursorBottom",
+        "when": "textInputFocus"
     },
     // alt+cv scrolling page down/up
     {

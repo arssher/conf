@@ -68,7 +68,8 @@ Things that are easy to get wrong:
     git mv dot_bash_scripts/archive/foo.sh dot_bash_scripts/bin/executable_foo.sh
   A few of them lack +x, so chmod when promoting.
 
-  docs/, bootstrap/ and vscode/ are likewise tracked but not applied.
+  docs/, bootstrap/ and vscode/ are likewise tracked but not applied. vscode/
+  holds settings only -- its keybindings are applied, see Shortcuts below.
 
 
 Shell startup files:
@@ -122,7 +123,16 @@ Shortcuts:
   mostly kept in sync in the following places:
   - emacs
   - readline's ~/.inputrc
-  - vscode
+  - vscode, one keybindings.json per platform:
+      linux  private_dot_config/Code/User/
+      macos  "Library/Application Support/Code/User/"
+    Each is .chezmoiignore'd on the other platform. vscode/ keeps the settings
+    backup only. The mac file is the shorter by far, because karabiner turns
+    the gestures into standard macOS keys before vscode sees them: a real arrow
+    serves the suggest widget, lists and notebooks at once, where linux needs
+    an alt+i binding for each. Its header lists what karabiner covers, so what
+    is missing from it is missing on purpose. Settings Sync must be kept off
+    keybindings, or it and chezmoi overwrite each other.
   - ~/.zshrc
   - libedit's ~/.editrc
   - linux outside emacs through xremap, see below
