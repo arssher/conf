@@ -43,7 +43,9 @@ costs:
 Reading is deliberately forgiving. History files collect junk -- half-written
 lines, stray bytes from a crashed terminal -- which is why ph used `grep
 --text`. Everything is read and written with surrogateescape, so bytes that are
-not UTF-8 survive a round trip untouched.
+not UTF-8 survive a round trip untouched. The two exceptions are NUL bytes,
+dropped on reading, and ~/.zsh_history's own byte encoding; see _open_read and
+_metafy.
 """
 
 import argparse
@@ -69,12 +71,43 @@ ZSH_RE = re.compile(r"^: (\d+):(\d+);(.*)$")
 UNKNOWN = 0
 
 
-def _open_read(path):
-    """Return the file's lines, or [] if it is not there."""
+# zsh metafies its history file: each byte from 0x83 to 0xa2 is written as 0x83
+# followed by the byte XOR 0x20. The range is measured rather than taken from
+# zsh's source -- zsh 5.9 was made to write every byte value from 1 to 255, and
+# exactly these thirty-two came out escaped. UTF-8 is full of them: Cyrillic `у'
+# is 0xd1 0x83. So a raw write is misread, zsh taking that 0x83 for an escape
+# and garbling the byte after it, and a raw read hands back zsh's escapes as
+# text, which is how commands typed in zsh used to reach the log.
+META = b"\x83"
+_METAFY_RE = re.compile(rb"[\x83-\xa2]")
+_UNMETAFY_RE = re.compile(rb"\x83(.)", re.DOTALL)
+
+
+def _metafy(data):
+    return _METAFY_RE.sub(lambda m: META + bytes([m.group(0)[0] ^ 0x20]), data)
+
+
+def _unmetafy(data):
+    return _UNMETAFY_RE.sub(lambda m: bytes([m.group(1)[0] ^ 0x20]), data)
+
+
+def _open_read(path, unmetafy=False):
+    """Return the file's lines, or [] if it is not there.
+
+    NUL bytes are dropped. No shell command can hold one, so in a history file
+    they are only ever junk: a write cut short and zero-filled, as a crash
+    leaves it. ~/.persistent_history has two such runs, each just ahead of an
+    intact entry, and dropping them lets that entry parse as its own line
+    again rather than as a continuation of the one above. Kept, they went out
+    into ~/.zsh_history, and zsh stops reading its file at the first NUL.
+    """
     if not os.path.exists(path):
         return []
-    with open(path, "r", encoding="utf-8", errors="surrogateescape") as f:
-        return f.read().splitlines()
+    with open(path, "rb") as f:
+        data = f.read().replace(b"\0", b"")
+    if unmetafy:
+        data = _unmetafy(data)
+    return data.decode("utf-8", "surrogateescape").splitlines()
 
 
 def _norm(cmd):
@@ -116,19 +149,55 @@ def read_log(path=LOG):
 
 
 def read_bash(path=BASH):
-    """[(epoch, command)] from the #epoch / command pair format."""
+    """[(epoch, command)] from the #epoch / command pair format.
+
+    An entry is everything from one timestamp to the next, which is how bash
+    reads its own file once HISTTIMEFORMAT is set. Most are one line, but a
+    heredoc is kept with its body, lines and all, under a single timestamp --
+    read a line at a time, each line of the body became a timestampless
+    "command" of its own. The line right after a timestamp belongs to that
+    entry even when blank: that is an empty command, as the log has them.
+
+    Lines before the first timestamp are separate entries without one. That is
+    the shape of a file written before HISTTIMEFORMAT was set, and of what
+    write_bash puts at the front, where timestampless entries sort.
+    """
     out = []
     pending = None
+    timestamped = False
     for line in _open_read(path):
         m = BASH_TS_RE.match(line)
         if m:
             pending = int(m.group(1))
+            timestamped = True
             continue
-        if line == "":
-            continue
-        out.append((pending if pending is not None else UNKNOWN, _norm(line)))
-        pending = None
-    return out
+        if pending is not None:
+            out.append([pending, line])
+            pending = None
+        elif timestamped and out:
+            out[-1][1] += "\n" + line
+        elif line != "":
+            out.append([UNKNOWN, line])
+    return [(e, _norm(c)) for e, c in out]
+
+
+# A command that really ends in a backslash -- `ls man/man7\', a stray one
+# before Enter -- would read back as continued on the next line. zsh avoids
+# that by writing one space after it and dropping one space from any line that
+# ends in a backslash and spaces when it reads: `a\  ' comes back as `a\ ',
+# while `plain ' keeps its space. Checked against zsh 5.9 both ways. Doing the
+# same here keeps such entries from swallowing the one after them, a new
+# glued-together twin on every run.
+_PADDED_RE = re.compile(r"\\ +$")
+_NEEDS_PAD_RE = re.compile(r"\\ *$")
+
+
+def _unpad(cmd):
+    return cmd[:-1] if _PADDED_RE.search(cmd) else cmd
+
+
+def _pad(cmd):
+    return cmd + " " if _NEEDS_PAD_RE.search(cmd) else cmd
 
 
 def read_zsh(path=ZSH):
@@ -140,12 +209,12 @@ def read_zsh(path=ZSH):
     out = []
     pending_epoch = None
     pending_cmd = None
-    for line in _open_read(path):
+    for line in _open_read(path, unmetafy=True):
         if pending_cmd is not None:
             # Continuation of a multi-line command.
             pending_cmd = pending_cmd[:-1] + "\n" + line
             if not line.endswith("\\"):
-                out.append((pending_epoch, _norm(pending_cmd)))
+                out.append((pending_epoch, _norm(_unpad(pending_cmd))))
                 pending_epoch = pending_cmd = None
             continue
         m = ZSH_RE.match(line)
@@ -154,7 +223,7 @@ def read_zsh(path=ZSH):
             if cmd.endswith("\\"):
                 pending_epoch, pending_cmd = int(epoch), cmd
             else:
-                out.append((int(epoch), _norm(cmd)))
+                out.append((int(epoch), _norm(_unpad(cmd))))
         elif line != "":
             # A line with no ": epoch:elapsed;" prefix. zsh writes these when
             # EXTENDED_HISTORY is off, so take the command and give up on when.
@@ -182,17 +251,20 @@ def merge(*groups):
     return out
 
 
-def _write_atomic(path, text, mode=0o600):
+def _write_atomic(path, text, mode=0o600, metafy=False):
     """Write via a temporary file in the same directory, then rename.
 
     History files are worth not truncating halfway: the rename is atomic, so an
     interrupted run leaves the old file intact.
     """
+    data = text.encode("utf-8", "surrogateescape")
+    if metafy:
+        data = _metafy(data)
     d = os.path.dirname(path) or "."
     fd, tmp = tempfile.mkstemp(dir=d, prefix=".history-merge.")
     try:
-        with os.fdopen(fd, "w", encoding="utf-8", errors="surrogateescape") as f:
-            f.write(text)
+        with os.fdopen(fd, "wb") as f:
+            f.write(data)
         os.chmod(tmp, mode)
         os.replace(tmp, path)
     except BaseException:
@@ -232,12 +304,21 @@ def write_bash(entries, path=BASH):
 
 
 def write_zsh(entries, path=ZSH):
+    """: epoch:0;command lines, metafied as zsh writes them.
+
+    Entries without a timestamp are left out. zsh has no way to say so: it
+    reads an epoch of 0 as missing, stamps the entry with the time it was
+    loaded, and saves it back that way -- so it would come round on the next
+    gather as a fresh entry dated today. The log and bash's file keep them.
+    """
     lines = []
     for epoch, cmd in entries:
+        if epoch == UNKNOWN:
+            continue
         # zsh's own continuation: backslash at the end of every line but the
         # last, which is how it wrote the entry in the first place.
-        lines.append(": %d:0;%s" % (epoch, cmd.replace("\n", "\\\n")))
-    _write_atomic(path, "".join(l + "\n" for l in lines))
+        lines.append(": %d:0;%s" % (epoch, _pad(cmd).replace("\n", "\\\n")))
+    _write_atomic(path, "".join(l + "\n" for l in lines), metafy=True)
 
 
 def main():
