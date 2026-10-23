@@ -92,6 +92,35 @@ sh_env_homebrew_path() {
     unset sh_env_brew_prefix sh_env_brew_path sh_env_brew_dir
 }
 
+# ------------------------------------------------------------
+# The ghostty snap's leaks
+
+# The linux ghostty is a snap, and the snap's launcher points ghostty at its
+# bundled libraries through the environment -- which ghostty then hands down to
+# the shell it starts, and the shell to everything run from it:
+#
+#   LC_ALL=C.UTF-8   the bundled libc cannot load the host's locale data, so
+#                    ghostty falls back to C and passes that on: ls and sort
+#                    order, dates and numbers all differ from any other
+#                    terminal's.
+#   GDK_PIXBUF_MODULE_FILE   the snap's list of GTK image loaders, built
+#                    against its own libraries. A GTK program started from
+#                    the shell -- emacs &, eog -- would load them.
+#   LD_LIBRARY_PATH, __EGL_VENDOR_LIBRARY_DIRS   empty and the host's own
+#                    paths respectively, harmless; unset for a clean slate.
+#
+# Above the guard because SH_ENV_LOADED is exported through the whole desktop
+# session, so in ghostty's shells the rest of this file never runs and never
+# sets the locale back. GHOSTTY_BIN_DIR under /snap is what marks such a shell;
+# the mac's brew ghostty and every other terminal are left alone. The locale is
+# the one set under "Plain environment" below -- keep the two in step.
+case "${GHOSTTY_BIN_DIR:-}" in
+    /snap/*)
+        unset GDK_PIXBUF_MODULE_FILE LD_LIBRARY_PATH __EGL_VENDOR_LIBRARY_DIRS
+        export LC_ALL="en_US.UTF-8"
+        ;;
+esac
+
 if [ -n "${SH_ENV_LOADED:-}" ]; then
     return 0
 fi
@@ -156,6 +185,7 @@ fi
 # one of them is a prompt. The stash documents itself; see its README.
 export CONFPATH="$HOME/Dropbox/configs"
 
+# Also restored above the guard for the ghostty snap; keep the two in step.
 export LC_ALL="en_US.UTF-8"
 
 # use emacs as an editor everywhere
