@@ -32,6 +32,10 @@ sudo apt-get -y install vim git checkinstall locate \
 # in the rest of a command from history, syntax-highlighting reddens one that
 # does not resolve. Debian puts both under /usr/share, the last path .zshrc tries.
 sudo apt-get -y install zsh zsh-autosuggestions zsh-syntax-highlighting
+# And the login shell, as on mac. Asks for the password; terminals opened
+# afterwards start zsh, while $SHELL itself changes at the next login. bash
+# stays installed and in step through .sh_env, for scripts and `bash' by hand.
+chsh -s /bin/zsh
 # fzf, for the zsh widgets .zshrc sets up from it: ^R over history, ^T over
 # file paths, M-c over directories. Bookworm's 0.38 has no `fzf --zsh', so
 # .zshrc falls back to the scripts the package leaves in
