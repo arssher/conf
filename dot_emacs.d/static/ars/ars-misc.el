@@ -120,6 +120,16 @@ paste-back-into-emacs."
     (kill-new path)
     (message "%s" path)))
 
+;; Emacs inserts a date nowhere: time-stamp, the one thing in the tree that
+;; comes close, rewrites a stamp a file already carries in its first lines
+;; rather than writing one at point. The format is the local one -- day first,
+;; dots, four-digit year -- not ISO, since this goes into prose for people to
+;; read.
+(defun ars-insert-date ()
+  "Insert today's date at point, as dd.mm.yyyy."
+  (interactive)
+  (insert (format-time-string "%d.%m.%Y")))
+
 ;; The two rungs embark does not have a command for. embark-bindings covers
 ;; the middle of the ladder -- the local map plus the minor mode ones -- and
 ;; embark-bindings-in-keymap the far end, any keymap you can name; these are

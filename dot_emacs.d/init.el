@@ -310,6 +310,9 @@
 (global-set-key (kbd "C-c i") 'flycheck-previous-error)
 ;; sql SHOUTING killer
 (global-set-key (kbd "C-c l") 'downcase-word)
+;; Global rather than markdown-only: dating a line is just as useful in a .txt
+;; note or a commit message. Nothing had C-c d, in any map or globally.
+(global-set-key (kbd "C-c d") 'ars-insert-date)
 
 
 ;; Now mode-specific bindings
