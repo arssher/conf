@@ -28,6 +28,7 @@
     xcscope ; frontend for cscope
     ggtags ; frontend for gnu global
     swiper ; contains ivy, a completion frontend, and best search ever
+    embark ; offers a prefix's bindings through completing-read; see navigation-and-completion.el
     projectile ; for managing projects
     flycheck ; live syntax checking
     lsp-mode ; language server client; lang.el hooks it into c/c++

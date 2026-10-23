@@ -120,5 +120,22 @@ paste-back-into-emacs."
     (kill-new path)
     (message "%s" path)))
 
+;; The two rungs embark does not have a command for. embark-bindings covers
+;; the middle of the ladder -- the local map plus the minor mode ones -- and
+;; embark-bindings-in-keymap the far end, any keymap you can name; these are
+;; the narrower and the wider view either side of it. Bound under C-h l.
+(defun ars-embark-bindings-in-mode-map ()
+  "Explore this major mode's own key bindings with completion."
+  (interactive)
+  (unless (current-local-map)
+    (user-error "This buffer has no local map"))
+  (embark-bindings-in-keymap (current-local-map)))
+
+(defun ars-embark-bindings-global ()
+  "Explore the current key bindings, the global ones included, with completion.
+`embark-bindings' leaves those out unless given a prefix argument."
+  (interactive)
+  (embark-bindings t))
+
 (message "ars-misc loaded")
 (provide 'ars-misc)

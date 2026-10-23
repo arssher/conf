@@ -124,6 +124,21 @@
 
 ;; The F keys row
 (global-set-key [f1] help-map) ; help prefix
+;; C-h l lists bindings through embark, so ivy narrows them as you type, same
+;; as C-h after a prefix does. A ladder outwards: m is this major mode's own
+;; map, f that plus the minor modes, t those plus the global map, k any keymap
+;; by name. Off the ladder, p is whatever a text property or overlay binds at
+;; point -- eww links, gnus attachments, the vc-dir stash line -- which nothing
+;; else lists. Costs view-lossage, which had C-h l; M-x still reaches it.
+;; define-prefix-command both names the group, so C-h l C-h describes it, and
+;; makes l a prefix -- define-key on a sequence through a command would error.
+(define-prefix-command 'ars-bindings-map)
+(define-key help-map "l" 'ars-bindings-map)
+(define-key ars-bindings-map "m" 'ars-embark-bindings-in-mode-map)
+(define-key ars-bindings-map "f" 'embark-bindings)
+(define-key ars-bindings-map "t" 'ars-embark-bindings-global)
+(define-key ars-bindings-map "k" 'embark-bindings-in-keymap)
+(define-key ars-bindings-map "p" 'embark-bindings-at-point)
 (define-key 'help-command (kbd "C-l") 'find-library)
 (define-key 'help-command (kbd "C-f") 'find-function)
 (define-key 'help-command (kbd "C-k") 'find-function-on-key)
