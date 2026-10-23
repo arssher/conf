@@ -26,6 +26,12 @@ sudo apt-get -y install vim git checkinstall locate \
      openssh-server \
      rsync fio sysstat hdparm hwinfo lshw hping3 \
      xsel curl
+# zsh, as on mac: .zshenv and .zshrc are managed here, and .sh_env gives it and
+# bash the same environment, so either can be the one in use. With the two
+# plugins .zshrc looks for, as bootstrap_mac.sh has them: autosuggestions greys
+# in the rest of a command from history, syntax-highlighting reddens one that
+# does not resolve. Debian puts both under /usr/share, the last path .zshrc tries.
+sudo apt-get -y install zsh zsh-autosuggestions zsh-syntax-highlighting
 # fzf, for the zsh widgets .zshrc sets up from it: ^R over history, ^T over
 # file paths, M-c over directories. Bookworm's 0.38 has no `fzf --zsh', so
 # .zshrc falls back to the scripts the package leaves in
