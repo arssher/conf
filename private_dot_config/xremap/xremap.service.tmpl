@@ -1,0 +1,52 @@
+# The xremap daemon, as a system unit. Not read from here: install_xremap.sh
+# copies it to /etc/systemd/system/, and config.yml beside it to /etc/xremap/.
+# chezmoi applies both into ~/.config/xremap so they are reviewable and
+# diffable in the repo, but a daemon holding the keyboards must not read files
+# its user's processes can write -- hence the copy, made by hand under sudo.
+#
+# The split, upstream's own design: this runs as a dedicated `xremap` system
+# user in the input group, so the right to read every keyboard belongs to a
+# user nobody logs in as. Which window has focus comes from the bridge, a user
+# unit running as {{ .chezmoi.username }} (xremap-bridge.service), over a socket in a directory
+# only the two of them can enter: /run/xremap/{{ .chezmoi.uid }}, 2770 xremap:xremap-{{ .chezmoi.username }}. The
+# daemon finds the bridge through logind's active session.
+#
+# --allow-launch=false: the daemon defaults to true, and with the socket
+# directory missing it would fork a config's `launch` itself, as xremap. Off,
+# a config can only remap keys. --no-window-logging keeps window titles out
+# of the system journal.
+#
+# ExecStartPre runs as xremap too; it may hand the directory to the
+# xremap-{{ .chezmoi.username }} group because SupplementaryGroups makes it a member.
+# RuntimeDirectoryPreserve keeps the directory across restarts, so a running
+# bridge's socket survives one.
+#
+# Hardening that a keyboard daemon costs nothing: no new privileges, a
+# read-only filesystem apart from /run/xremap, no home directories, and unix
+# sockets only -- logind is on the system bus, the bridge on a unix socket,
+# and --watch=device uses inotify.
+
+[Unit]
+Description=xremap ergoemacs key remapping
+After=systemd-udevd.service systemd-logind.service
+
+[Service]
+ExecStartPre=/usr/bin/install --directory --mode 2770 --owner xremap --group xremap-{{ .chezmoi.username }} /run/xremap/{{ .chezmoi.uid }}
+ExecStart=/usr/local/bin/xremap --desktop=socket --allow-launch=false --no-window-logging --watch=device /etc/xremap/config.yml
+User=xremap
+Group=xremap
+SupplementaryGroups=input xremap-{{ .chezmoi.username }}
+RuntimeDirectory=xremap
+RuntimeDirectoryMode=0755
+RuntimeDirectoryPreserve=yes
+Restart=always
+RestartSec=2
+Environment=RUST_LOG=warn
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+RestrictAddressFamilies=AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,28 @@
+# The user-side half of xremap: answers the system daemon's "which window has
+# focus?" over /run/xremap/<uid>/xremap.sock. The daemon has the keyboards but
+# no X access; this has X access but no keyboards. See
+# ~/.config/xremap/xremap.service for the daemon, and install_xremap.sh for
+# the group that lets this process reach the socket directory.
+#
+# --allow-launch=false, also the bridge's default, written out because this is
+# the half that would run a config's `launch` as you. --no-window-logging
+# keeps every window title out of the journal.
+#
+# Restart=always rather than on-failure: the accept loop ends the process on
+# the first malformed request, and while the bridge is down the daemon falls
+# back to remapping everywhere, emacs included. If it starts before the
+# daemon has made the socket directory, it exits and the restart covers that
+# too.
+
+[Unit]
+Description=xremap bridge: tells the xremap daemon which window has focus
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=/usr/local/bin/xremap --bridge --desktop=x11 --allow-launch=false --no-window-logging
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=graphical-session.target

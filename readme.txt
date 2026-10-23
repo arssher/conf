@@ -125,6 +125,7 @@ Shortcuts:
   - vscode
   - ~/.zshrc
   - libedit's ~/.editrc
+  - linux outside emacs through xremap, see below
   - macos whenever possible through karabiner remaps:
 
   private_dot_config/private_karabiner/karabiner.edn is the same rules in
@@ -134,6 +135,22 @@ Shortcuts:
   NOT migrated -- nothing generates the json from it and .chezmoiignore keeps
   it out of $HOME, so it has to be updated by hand whenever the json changes
   or it goes stale and misleads. Its own header covers the goku syntax.
+
+  xremap is karabiner's counterpart on linux, left alt in place of left cmd.
+  Both send real keys -- arrows, Home, End, ctrl+arrows, BackSpace, Delete --
+  rather than ESC+letter, so full-screen terminal programs such as Claude Code
+  understand the gestures, not only readline. That is also why .inputrc and
+  .zshrc bind the bare arrows to the same history search as M-i/M-k.
+
+  It runs in two halves. A system service, as its own `xremap` user in the
+  input group, holds the keyboards; a user unit, xremap-bridge, tells it over
+  a socket which window has focus, so that emacs can be left alone. Nothing
+  you run gets the input group. The daemon reads root-owned copies in /etc,
+  never the ones chezmoi applies, so an edit to private_dot_config/xremap/
+  takes two steps:
+    chezmoi apply          prints "/etc is behind" -- it never runs sudo
+    install_xremap.sh      copies into /etc under sudo, restarts the daemon
+  The unit's header has the reasoning; install_xremap.sh pins the version.
 
 Codex status line:
 
@@ -204,10 +221,16 @@ which can't be turned off, oh my.
 build and install emacs:
 install_emacs.sh
 
+ergoemacs keys outside emacs, after chezmoi apply (also in bootstrap.sh):
+install_xremap.sh
+then relogin, so the session joins xremap-<user> and the bridge can start
+
 Important root configs:
 /etc/NetworkManager/system-connections/
 openvpn
 fstab (deliberately not restored -- the UUIDs are machine-specific)
+(/etc/xremap, its unit and the uinput udev rule need no backup:
+install_xremap.sh recreates them from ~/.config/xremap)
 
 Important home configs not saved anywhere:
 the sync client's own config

@@ -1,0 +1,101 @@
+# xremap: the ergoemacs gestures outside emacs. The linux half of what
+# karabiner does on mac -- see karabiner.edn, which this follows rule for rule
+# with left alt in place of left cmd. Same thumb position on a pc keyboard,
+# and the same modifier emacs uses, so one habit across all three.
+#
+# Nothing reads this copy. The daemon reads /etc/xremap/config.yml, which
+# install_xremap.sh puts there -- see xremap.service beside this for why. After
+# editing: chezmoi apply, which reminds, then install_xremap.sh, which asks
+# for sudo.
+#
+# What goes out is real keys -- arrows, Home, End, BackSpace, Delete, ctrl+k --
+# never ESC+letter, so full-screen terminal programs understand the gestures
+# too and not only readline. Claude Code was the reason: its keybindings.json
+# has no cursor-motion actions at all, so the only way in is to arrive as keys
+# it already reads. Up/Down then miss .inputrc's \ei/\ek, which is why .inputrc
+# and .zshrc point the bare arrows at the same history search.
+#
+# Left alt only, on every rule: xkb's ctrl:ralt_rctrl makes right alt a ctrl,
+# but xremap reads evdev underneath xkb, where it is still KEY_RIGHTALT. A bare
+# Alt- would catch it, and right alt + i, meant as ctrl+i, would come out Up.
+#
+# Matching is by WM_CLASS, the part after the dot in `xremap --list-windows`.
+# Nothing sees the program running inside a terminal. A title rule could stand
+# in -- xremap matches titles on X11 too, and Claude Code sets its terminal's
+# title -- but that title is a status line with a spinner and the task in it,
+# not a name. Real keys make the question moot: everything reads them.
+# emacs -nw would be a terminal window and so get rewritten; only the GUI one
+# is excluded.
+#
+# Physical keys, so it works the same in the russian layout.
+
+keymap:
+  # Motion. Not exact_match, so extra modifiers pass through: alt+shift+l
+  # becomes shift+Right and selects, as shift-motion does everywhere. That same
+  # rule would turn M-H into shift+Home, though, so the one shifted gesture with
+  # a meaning of its own comes first -- xremap takes the first match.
+  #
+  # u/o go to ctrl+arrows rather than karabiner's option+arrows: that is the
+  # word-motion convention here, as option is on mac, and it is what Claude
+  # Code reads -- alt+left/right do nothing there. readline has the ctrl forms
+  # through /etc/inputrc.
+  #
+  # h/H need no terminal split, unlike on mac: there cmd+arrow has no tty
+  # encoding, but Home and End are both the GTK binding and a terminal key.
+  - name: ergoemacs motion
+    application:
+      not: Emacs
+    remap:
+      Alt_L-Shift-h: End
+      Alt_L-i: Up
+      Alt_L-k: Down
+      Alt_L-j: Left
+      Alt_L-l: Right
+      Alt_L-u: C-Left
+      Alt_L-o: C-Right
+      Alt_L-h: Home
+
+  # Deletion, exact so that alt+shift+f cannot pass shift through and become
+  # shift+Delete, which is cut in GTK.
+  - name: ergoemacs deletion
+    exact_match: true
+    application:
+      not: Emacs
+    remap:
+      Alt_L-d: Backspace
+      Alt_L-f: Delete
+
+  # Kills everywhere else. Words: ctrl+BackSpace and ctrl+Delete, the GTK and
+  # Chromium forms, as option+backspace and option+delete are on mac. Not in
+  # terminals, which have the block below and ESC r -- a terminal sends ^H for
+  # ctrl+BackSpace. Left unmapped, alt+e reached chrome, which opens its menu
+  # on it.
+  #
+  # Lines have no single GUI key, so select and delete. The edge cases pick the
+  # second key: at the end of a line Shift-End selects nothing and Delete joins
+  # the next line, as kill-line does there; at the start, Shift-Home selects
+  # nothing and BackSpace joins the previous one, as cmd+backspace does on mac
+  # -- Delete would eat the line's first character instead.
+  - name: ergoemacs kills outside terminals
+    exact_match: true
+    application:
+      not: [Emacs, Terminator, Gnome-terminal, XTerm]
+    remap:
+      Alt_L-e: C-Backspace
+      Alt_L-r: C-Delete
+      Alt_L-g: [Shift-End, Delete]
+      Alt_L-Shift-g: [Shift-Home, Backspace]
+
+  # Kills, terminals only: in a browser ctrl+w closes the tab, ctrl+k focuses
+  # search and ctrl+u shows the source. These are the readline and Claude Code
+  # defaults for kill-line, backward-kill-line and kill-word-back. ctrl+w
+  # stops at whitespace (unix-word-rubout) where M-e in emacs stops at a word
+  # boundary. alt+r is not here: it stays ESC r, kill-word in readline and zsh.
+  - name: ergoemacs kills in terminals
+    exact_match: true
+    application:
+      only: [Terminator, Gnome-terminal, XTerm]
+    remap:
+      Alt_L-e: C-w
+      Alt_L-g: C-k
+      Alt_L-Shift-g: C-u

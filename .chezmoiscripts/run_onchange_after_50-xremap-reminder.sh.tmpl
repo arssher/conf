@@ -1,0 +1,27 @@
+{{ if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+#
+# Say so when the xremap daemon is running an older config than chezmoi just
+# applied. Only says: the daemon reads root-owned copies in /etc, and putting
+# them there needs sudo, which a chezmoi script must not ask for -- the same
+# reason restore_root.sh is run by hand. install_xremap.sh does the copying.
+#
+# The hashes are what make chezmoi re-run this, as in the xbindkeys hook.
+# Rendered to nothing on macOS, where chezmoi then skips it.
+#
+# config.yml hash: {{ include "private_dot_config/xremap/config.yml" | sha256sum }}
+# xremap.service hash: {{ include "private_dot_config/xremap/xremap.service.tmpl" | sha256sum }}
+
+set -euo pipefail
+
+src="{{ .chezmoi.destDir }}/.config/xremap"
+
+# Not installed on this machine: nothing is running stale, and bootstrap.sh is
+# where installing is done.
+[ -x /usr/local/bin/xremap ] || exit 0
+
+if ! cmp -s "${src}/config.yml" /etc/xremap/config.yml ||
+   ! cmp -s "${src}/xremap.service" /etc/systemd/system/xremap.service; then
+    echo "xremap: /etc is behind ~/.config/xremap -- run install_xremap.sh"
+fi
+{{ end -}}

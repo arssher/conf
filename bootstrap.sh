@@ -110,6 +110,14 @@ sudo sysctl -p
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 cargo install cork
 
+# xremap, the ergoemacs gestures outside emacs: a system service as its own
+# user, plus a bridge as you for window matching. The script builds it (x11
+# needs libx11-dev), creates the users and groups, and installs the root-owned
+# copies of ~/.config/xremap; see the unit there. Needs chezmoi applied first,
+# and a relogin before the bridge can reach the daemon.
+sudo apt-get -y install libx11-dev
+~/.bash_scripts/bin/install_xremap.sh
+
 # fast app moving between monitors with move-to-next-monitor
 # don't use it currently
 # sudo apt-get -y install xdotool wmctrl
