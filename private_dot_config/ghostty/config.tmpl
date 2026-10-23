@@ -1,4 +1,6 @@
-# Ghostty. Mac-only, see .chezmoiignore.
+# Ghostty, on mac from brew and on linux from the snap. A template for the one
+# line that differs, the font size; everything else either means the same on
+# both or, like macos-option-as-alt, is ignored where it does not apply.
 
 # Safe to name unconditionally: where it is not installed ghostty falls
 # back to the JetBrains Mono it bundles.
@@ -8,7 +10,13 @@ font-family = Ubuntu Mono
 # at the same size, so this may want another point or two. cmd+plus and
 # cmd+minus adjust by one at runtime, so the way to retune is to find the size
 # there and write the number here -- cmd+0 goes back to whatever this says.
+# ctrl+plus, ctrl+minus and ctrl+0 on linux. Linux starts at emacs's 16; the
+# same number renders larger there than on mac.
+{{ if eq .chezmoi.os "darwin" -}}
 font-size = 17
+{{- else -}}
+font-size = 16
+{{- end }}
 
 # Left option becomes Alt, so it sends ESC+key instead of composing a
 # character. Right option still composes (c) and --, which is why this is
@@ -58,6 +66,15 @@ macos-option-as-alt = left
 # ctrl+tab and ctrl+shift+tab still switch tabs as they did.
 keybind = alt+m=previous_tab
 keybind = alt+comma=next_tab
+{{- if ne .chezmoi.os "darwin" }}
+
+# On linux the same thumb is left alt itself, no karabiner in between, and the
+# two lines above are already what Terminator has for prev_tab and next_tab.
+# New tab follows Terminator too: ctrl+t rather than ghostty's ctrl+shift+t.
+# Not on mac, where the gesture is cmd+t and ctrl+t belongs to the shell. It
+# costs fzf's ^T file picker here, which Terminator's ctrl+t already did.
+keybind = ctrl+t=new_tab
+{{- end }}
 
 # Option+arrow, which is what left cmd + u/o emits now that the ergoemacs
 # scheme uses real keys in the terminal rather than ESC+letter.

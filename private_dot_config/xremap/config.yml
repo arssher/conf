@@ -79,7 +79,7 @@ keymap:
   - name: ergoemacs kills outside terminals
     exact_match: true
     application:
-      not: [Emacs, Terminator, Gnome-terminal, XTerm]
+      not: [Emacs, Terminator, Gnome-terminal, XTerm, ghostty]
     remap:
       Alt_L-e: C-Backspace
       Alt_L-r: C-Delete
@@ -94,7 +94,7 @@ keymap:
   - name: ergoemacs kills in terminals
     exact_match: true
     application:
-      only: [Terminator, Gnome-terminal, XTerm]
+      only: [Terminator, Gnome-terminal, XTerm, ghostty]
     remap:
       Alt_L-e: C-w
       Alt_L-g: C-k

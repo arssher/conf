@@ -84,6 +84,12 @@ sudo apt-get -y install chromium  \
 
 sudo apt-get install snapd flatpak
 
+# ghostty. Debian has no package and upstream no official linux build; the
+# snap is built with ghostty's own scripts and is classic -- unconfined, so it
+# reads ~/.config/ghostty and starts the real shell, as a terminal must.
+# Updates itself; `snap refresh --hold ghostty' pins it if one breaks.
+sudo snap install ghostty --classic
+
 flatpak install flathub org.telegram.desktop
 
 flatpak install --user flathub org.keepassxc.KeePassXC
