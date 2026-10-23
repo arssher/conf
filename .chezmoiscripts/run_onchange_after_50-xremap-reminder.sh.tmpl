@@ -6,7 +6,9 @@
 # them there needs sudo, which a chezmoi script must not ask for -- the same
 # reason restore_root.sh is run by hand. install_xremap.sh does the copying.
 #
-# The hashes are what make chezmoi re-run this, as in the xbindkeys hook.
+# The hashes are what make chezmoi re-run this: a run_onchange_ script runs
+# whenever its own rendered content changes, and these lines change with the
+# files.
 # Rendered to nothing on macOS, where chezmoi then skips it.
 #
 # config.yml hash: {{ include "private_dot_config/xremap/config.yml" | sha256sum }}

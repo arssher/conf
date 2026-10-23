@@ -3,8 +3,6 @@
 set -e
 
 sudo apt-get update
-# the xbindkeys reload hook needs it
-sudo apt-get install xbindkeys
 
 # lay down the dotfiles
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin

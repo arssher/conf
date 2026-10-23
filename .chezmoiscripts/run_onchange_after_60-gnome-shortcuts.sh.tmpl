@@ -1,0 +1,93 @@
+{{ if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+#
+# The launcher shortcuts, as GNOME custom shortcuts. The table below is the
+# whole set: this owns the custom-keybindings list, so one added by hand in
+# GNOME Settings is dropped the next time the table changes -- add it here.
+#
+# GNOME's own mechanism rather than xbindkeys, which held some of these until
+# it was dropped: xbindkeys grabs keys through X and so ends with X, where
+# these work unchanged under wayland. It had also been losing to them -- both
+# claimed Super+f/e/c/t, gnome-shell grabbed first, and xbindkeys's lines for
+# those four were dead.
+#
+# Written with dconf rather than gsettings. Without a desktop session gsettings
+# falls back to a memory backend and "succeeds" into nothing, where dconf fails
+# outright -- and failing is what makes chezmoi run this again on the next
+# apply instead of recording it done. On a fresh machine that means once
+# logged in.
+#
+# Commands are run without a shell, so no ~ or $HOME; plain names are looked
+# up on the session's PATH, which has ~/.bash_scripts/bin through
+# environment.d. Fields are tab-separated; a single quote anywhere is refused,
+# as it would need escaping into a GVariant string.
+#
+# The stash's restore_de.sh loads a whole dconf dump, this list with it, and
+# an older dump would undo the table. Run it before chezmoi apply, or force
+# this to run again afterwards with:
+#   chezmoi state delete-bucket --bucket=scriptState
+
+set -euo pipefail
+
+schema=org.gnome.settings-daemon.plugins.media-keys
+dir=/org/gnome/settings-daemon/plugins/media-keys/
+
+if ! gsettings list-schemas | grep -qx "${schema}"; then
+    echo "gnome-shortcuts: no ${schema} here, not a GNOME desktop -- skipped"
+    exit 0
+fi
+
+keyfile=""
+paths=()
+i=0
+while IFS=$'\t' read -r key cmd; do
+    [ -n "${key}" ] || continue
+    case "${key}${cmd}" in
+        *"'"*)
+            echo "gnome-shortcuts: no single quotes in the table: ${key} ${cmd}" >&2
+            exit 1
+            ;;
+    esac
+    paths+=("'${dir}custom-keybindings/custom${i}/'")
+    keyfile+="[custom-keybindings/custom${i}]"$'\n'
+    keyfile+="binding='${key}'"$'\n'"command='${cmd}'"$'\n'"name='${cmd}'"$'\n\n'
+    i=$((i + 1))
+done <<'EOF'
+<Super>f	firefox
+<Super>e	emacs
+<Super>c	claude-desktop
+<Super>h	google-chrome
+<Super>n	nautilus
+<Super>t	terminator --maximize
+<Super>g	ghostty
+<Super>v	code
+<Super>b	switch_background.sh
+<Super>s	systemctl suspend
+Print	flameshot gui
+EOF
+
+list=$(IFS=,; echo "${paths[*]}")
+if ! printf '[/]\ncustom-keybindings=[%s]\n\n%s' "${list}" "${keyfile}" |
+        dconf load "${dir}" 2>/dev/null; then
+    echo "gnome-shortcuts: cannot write to dconf -- no desktop session?" >&2
+    echo "gnome-shortcuts: chezmoi will try again on the next apply" >&2
+    exit 1
+fi
+
+# Keys the table takes from GNOME's own bindings, which would otherwise win
+# them. Super+h was the window manager's minimize; it stays on the title bar
+# and the window menu.
+dconf write /org/gnome/desktop/wm/keybindings/minimize "@as []"
+
+# Entries left over from a longer list, by hand or from an older table.
+for sub in $(dconf list "${dir}custom-keybindings/"); do
+    n=${sub#custom}
+    n=${n%/}
+    case "${n}" in
+        ''|*[!0-9]*) dconf reset -f "${dir}custom-keybindings/${sub}" ;;
+        *) [ "${n}" -lt "${i}" ] || dconf reset -f "${dir}custom-keybindings/${sub}" ;;
+    esac
+done
+
+echo "gnome-shortcuts: ${i} launchers set"
+{{ end -}}
