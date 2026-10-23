@@ -140,7 +140,22 @@ print(f"identical {e}, equivalent {q}, different {bad}")
 PY
 ```
 
-**Expected as of 2026-10-19: identical 27, equivalent 9, different 0.**
+**Expected as of 2026-10-19: identical 27, equivalent 9, different 0** -- for the
+13 rules and 36 manipulators of that date.
+
+**Stale since 2026-10-23.** Two vscode rules were added by hand (14 rules, 38
+manipulators now): the tab-switching rule gained vscode's bundle id through a
+new `:tabapps` application set, and "move lines in vscode" is new. Nobody has
+compiled the edn since, so the numbers above no longer describe it and a run
+will report more of everything. Re-run the comparison and replace this note
+with the counts it gives.
+
+One thing to look at first if that run reports a difference: `:tabapps` exists
+because an `if` condition cannot be split. goku emits one
+`frontmost_application_if` per `:applications` keyword and karabiner ANDs
+conditions, so `[:terminals :vscode]` would compile to a rule that can never
+fire. The `:!emacs :!terminals` vectors elsewhere are safe only because
+`unless(A) and unless(B)` is exactly `unless(A or B)`.
 
 Anything reported as different is real drift -- either the .edn was not updated
 alongside the .json, or a translation is wrong.

@@ -468,7 +468,7 @@
                         ]
                     },
                     {
-                        "description": "tab switching in terminals: left cmd + m and left cmd + , become left option + m and , which ghostty binds to previous_tab and next_tab. Left cmd only, so right cmd keeps cmd+m minimise and cmd+, open_config. m and comma are bound in neither .inputrc nor .zshrc, so nothing in the shell loses out. The left option + m this emits is also the app-switch rule's trigger and does not set it off; that rule says why.",
+                        "description": "tab switching in terminals and vscode: left cmd + m and left cmd + , become left option + m and , which ghostty binds to previous_tab and next_tab and vscode's keybindings.json binds to previousEditor and nextEditor. Left cmd only, so right cmd keeps cmd+m minimise, and cmd+, ghostty's open_config and vscode's settings. m and comma are bound in neither .inputrc nor .zshrc, so nothing in the shell loses out. The left option + m this emits is also the app-switch rule's trigger and does not set it off; that rule says why. The option detour is the whole point in vscode too: vscode cannot tell left cmd from right, so a native cmd+m binding there would take minimise away from both keys.",
                         "manipulators": [
                             {
                                 "conditions": [
@@ -476,7 +476,8 @@
                                         "bundle_identifiers": [
                                             "^com\\.mitchellh\\.ghostty$",
                                             "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
+                                            "^com\\.apple\\.Terminal$",
+                                            "^com\\.microsoft\\.VSCode$"
                                         ],
                                         "type": "frontmost_application_if"
                                     }
@@ -499,7 +500,8 @@
                                         "bundle_identifiers": [
                                             "^com\\.mitchellh\\.ghostty$",
                                             "^com\\.googlecode\\.iterm2$",
-                                            "^com\\.apple\\.Terminal$"
+                                            "^com\\.apple\\.Terminal$",
+                                            "^com\\.microsoft\\.VSCode$"
                                         ],
                                         "type": "frontmost_application_if"
                                     }
@@ -512,6 +514,53 @@
                                     {
                                         "key_code": "comma",
                                         "modifiers": ["left_option"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "move lines in vscode: left cmd + shift + i and k become left option + shift + i and k, which vscode's keybindings.json binds to moveLinesUp and moveLinesDown. Letters rather than arrows on purpose. vscode's own gesture for this is option+arrow, but the paragraph rule above already emits that -- so in vscode left cmd + 9/8 would move code lines instead of moving the cursor, and keybindings.json takes option+arrow for scrollPageUp/Down to stop it. That leaves moveLines homeless, and this brings it back on the key it has on linux, shift+alt+i/k. option+shift+arrow is left alone, so vscode keeps duplicate-line where it put it.",
+                        "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "bundle_identifiers": [
+                                            "^com\\.microsoft\\.VSCode$"
+                                        ],
+                                        "type": "frontmost_application_if"
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "i",
+                                    "modifiers": { "mandatory": ["left_command", "shift"] }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "i",
+                                        "modifiers": ["left_option", "left_shift"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "conditions": [
+                                    {
+                                        "bundle_identifiers": [
+                                            "^com\\.microsoft\\.VSCode$"
+                                        ],
+                                        "type": "frontmost_application_if"
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "k",
+                                    "modifiers": { "mandatory": ["left_command", "shift"] }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "k",
+                                        "modifiers": ["left_option", "left_shift"]
                                     }
                                 ],
                                 "type": "basic"

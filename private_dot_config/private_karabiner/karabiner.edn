@@ -12,6 +12,11 @@
 ;; bundle ids into a single one. Karabiner ANDs conditions, so unless(A or B)
 ;; is the same as unless(A) and unless(B), and the two are equivalent.
 ;;
+;; NOT re-checked since the two vscode rules were added -- the tab rule's new
+;; :tabapps set and "move lines in vscode". Those are hand-written here, so
+;; this file and the json may differ in a way nothing has caught yet. AGENTS.md
+;; has the procedure for re-running the comparison.
+;;
 ;; Modifier letters, from goku's tutorial.md:
 ;;   !  mandatory   #  optional
 ;;   C  left_command   T  left_control   O  left_option   S  left_shift
@@ -37,6 +42,18 @@
                 :terminals ["^com\\.mitchellh\\.ghostty$"
                             "^com\\.googlecode\\.iterm2$"
                             "^com\\.apple\\.Terminal$"]
+                :vscode    ["^com\\.microsoft\\.VSCode$"]
+                ;; The terminals plus vscode, as one set rather than
+                ;; [:terminals :vscode] in the rule below. goku emits one
+                ;; condition per keyword and karabiner ANDs conditions, so two
+                ;; frontmost_application_if conditions could never both hold
+                ;; and the rule would never fire. The :!emacs :!terminals
+                ;; vectors elsewhere get away with it only because
+                ;; unless(A) and unless(B) is what unless(A or B) means.
+                :tabapps   ["^com\\.mitchellh\\.ghostty$"
+                            "^com\\.googlecode\\.iterm2$"
+                            "^com\\.apple\\.Terminal$"
+                            "^com\\.microsoft\\.VSCode$"]
                 :firefox   ["^org\\.mozilla\\.firefox$"]}
 
  :main
@@ -100,9 +117,20 @@
   ;; ghostty binds alt+m and alt+comma to previous_tab and next_tab. This has
   ;; to live here rather than in ghostty keybinds, because ghostty's super
   ;; modifier has no left/right form and right cmd must keep cmd+m minimise.
-  {:des "tab switching in terminals"
-   :rules [[:!Cm     :!Om     :terminals]
-           [:!Ccomma :!Ocomma :terminals]]}
+  {:des "tab switching in terminals and vscode"
+   :rules [[:!Cm     :!Om     :tabapps]
+           [:!Ccomma :!Ocomma :tabapps]]}
+
+  ;; vscode's own gesture for moving a line is option+arrow, but the paragraph
+  ;; rule above already emits that -- so left cmd + 9/8 moved code lines there,
+  ;; and keybindings.json takes option+arrow for scrollPageUp/Down to stop it.
+  ;; That leaves moveLines homeless, and this puts it back on the key it has on
+  ;; linux. Letters, so option+shift+arrow and vscode's duplicate-line are left
+  ;; alone. :!OSi is left_option + left_shift + i, matching the json; the from
+  ;; side needs the long form because its shift is karabiner's plain "shift".
+  {:des "move lines in vscode"
+   :rules [[{:key :i :modi {:mandatory [:left_command :shift]}} :!OSi :vscode]
+           [{:key :k :modi {:mandatory [:left_command :shift]}} :!OSk :vscode]]}
 
   ;; firefox's own previous/next tab on mac. Not ctrl+tab, which can be set
   ;; to recently-used order rather than positional.
