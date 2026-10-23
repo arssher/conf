@@ -2,7 +2,7 @@
   "attribution": {
     "commit": "Assisted-By: Claude Opus 5 <noreply@anthropic.com>"
   },
-  "model": "claude-opus-5",
+  "model": "opus",
   "statusLine": {
     "type": "command",
     "command": "bash ~/.claude/statusline-command.sh"
