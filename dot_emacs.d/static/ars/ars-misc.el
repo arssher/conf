@@ -96,5 +96,29 @@ user."
                    (overlays-at (point))))))
 
 
+;; Emacs has no such command for a file buffer: the one kill-new of a file name
+;; in the whole 31.1 tree is image-mode's, on W and only there. Dired is the
+;; other half-exception, with dired-copy-filename-as-kill on w -- C-u 0 w for
+;; the absolute name, C-u 1 w for one relative to the project -- which is why
+;; this answers in dired too rather than refusing.
+;;
+;; kill-new alone reaches the X clipboard, select-enable-clipboard defaulting
+;; to t and nothing here setting it otherwise.
+(defun ars-copy-file-path (&optional local)
+  "Put this buffer's absolute file name on the kill ring.
+In dired, use the directory being listed. With a prefix argument LOCAL,
+drop the tramp prefix from a remote name, leaving the path as that host's
+own shell would write it -- paste-into-a-terminal rather than
+paste-back-into-emacs."
+  (interactive "P")
+  (let ((path (or buffer-file-name
+                  (and (derived-mode-p 'dired-mode) default-directory))))
+    (unless path
+      (user-error "This buffer is not visiting a file"))
+    (when local
+      (setq path (file-local-name path)))
+    (kill-new path)
+    (message "%s" path)))
+
 (message "ars-misc loaded")
 (provide 'ars-misc)

@@ -157,6 +157,7 @@
 
 ;; The qwerty row:
 (global-set-key (kbd "M-w") 'select-line) ; ergo
+(global-set-key (kbd "M-W") 'ars-copy-file-path) ; C-u for the path without the tramp prefix
 (global-set-key (kbd "C-w") 'kill-current-buffer) ; ergo
 (global-set-key (kbd "C-M-w") 'just-one-space) ; ergo
 (global-set-key (kbd "M-e") 'backward-kill-word) ; ergo
