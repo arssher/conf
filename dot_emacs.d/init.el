@@ -418,7 +418,7 @@
   (define-key markdown-ts-mode-map (kbd "<f6>") 'markdown-ts-toggle-hide-markup)
   (define-key markdown-ts-mode-map (kbd "<f7>") 'markdown-ts-view-mode)
   (define-key markdown-ts-view-mode-map (kbd "<f6>") 'markdown-ts-toggle-hide-markup)
-  (define-key markdown-ts-view-mode-map (kbd "<f7>") 'markdown-ts-mode)
+  (define-key markdown-ts-view-mode-map (kbd "<f7>") 'ars-markdown-ts-edit)
   )
 
 ;; markdown-mode, the elpa package, kept as the fallback while the ts mode is

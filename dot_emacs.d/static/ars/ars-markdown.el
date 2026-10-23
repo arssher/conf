@@ -1,5 +1,6 @@
 ;;; -*- lexical-binding: t -*-
-;; Markdown extras. Currently just table alignment for the read-only view.
+;; Markdown extras: table alignment for the read-only view, and the way back
+;; out of it.
 
 ;; markdown-ts-mode aligns a pipe table only on demand, with C-c C-c, and
 ;; markdown-ts-view-mode switches that off entirely: it sets
@@ -21,11 +22,14 @@
 ;; markdown-ts-view-mode-hook, which runs once everything is up.
 (defun ars-markdown-ts-align-all-tables ()
   "Align every pipe table in the buffer, leaving the modified flag as it was.
-Meant for `markdown-ts-view-mode-hook'.  Viewing then leaves no trace:
-the text really is rewritten, but a buffer that was clean on arrival
-stays clean, so reading a file does not offer to save it afterwards.  A
-buffer that was already dirty keeps its flag -- clearing it there would
-hide somebody's unsaved edits."
+Meant for `markdown-ts-view-mode-hook'.  The text really is rewritten;
+`ars-markdown-ts-edit' puts it back by re-reading the file on the way
+out, so the alignment lasts as long as the view does.
+
+A buffer clean on arrival is left clean, so reading a file does not offer
+to save it afterwards.  One already dirty keeps its flag, since clearing
+it would hide somebody's unsaved edits -- and that same flag is what
+tells `ars-markdown-ts-edit' whether re-reading is safe."
   (let ((inhibit-read-only t)
         (was-modified (buffer-modified-p))
         (starts (mapcar #'treesit-node-start
@@ -56,6 +60,32 @@ hide somebody's unsaved edits."
         (markdown-ts-in-table-mode -1)))
     (unless was-modified
       (set-buffer-modified-p nil))))
+
+;; markdown-ts-view-mode is a major mode with no way back: its only exit is the
+;; q it inherits from special-mode-map, which buries the buffer rather than
+;; returning you to editing.  Calling markdown-ts-mode by hand gets the mode
+;; line right and nothing else -- it would leave the buffer holding the view's
+;; aligned text, and still read-only, buffer-read-only being a permanent local
+;; that starting another major mode does not kill.
+(defun ars-markdown-ts-edit ()
+  "Leave `markdown-ts-view-mode' for `markdown-ts-mode' and allow editing."
+  (interactive)
+  (if (and buffer-file-name
+           (file-exists-p buffer-file-name)
+           ;; Edits that predate the view, which re-reading would throw away.
+           (not (buffer-modified-p)))
+      ;; Re-reading the file is the whole job, and undoes the whole visit:
+      ;; the alignment goes, normal-mode picks markdown-ts-mode back out of
+      ;; auto-mode-alist, and after-find-file restores buffer-read-only from
+      ;; the file's own permissions, so a write-protected file stays protected
+      ;; rather than being quietly unlocked by a trip through the view.
+      (revert-buffer t t)
+    ;; Nothing safe to re-read.  Switch by hand and keep the text, including
+    ;; the alignment; recompute read-only the way after-find-file would.
+    (markdown-ts-mode)
+    (read-only-mode (if (and buffer-file-name
+                             (not (file-writable-p buffer-file-name)))
+                        1 -1))))
 
 (message "ars-markdown loaded")
 (provide 'ars-markdown)
