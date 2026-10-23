@@ -471,11 +471,14 @@ fi
 # be picked and come back newline-joined. Next to `h' further up: fc prints a
 # list to read, this hands back a line to edit.
 #
-# ^T inserts the picked paths at the cursor, shell-quoted, displacing
-# transpose-chars. M-c cd's into a picked directory and is the one that does
-# not wait -- it calls accept-line itself, so the cd happens on selection.
-# Neither key is claimed above: the ESC+letter set in this file stops at
-# e r u o d f g G h H i j k l, and ^T was never bound. To drop one, set
+# ^P inserts the picked paths at the cursor, shell-quoted. fzf binds this one
+# to ^T, moved below: ghostty and Terminator both take ctrl+t for a new tab on
+# linux, so ^T never reached the shell there, and one key on both platforms
+# beats two. ^P costs zsh's up-line-or-history, which Up and M-i do better,
+# and ^T goes back to its stock transpose-chars. M-c cd's into a picked
+# directory and is the one that does not wait -- it calls accept-line itself,
+# so the cd happens on selection. Neither key is claimed above: the ESC+letter
+# set in this file stops at e r u o d f g G h H i j k l. To drop one, set
 # FZF_CTRL_T_COMMAND= or FZF_ALT_C_COMMAND= to empty ON the eval line below --
 # the scripts read them as they load, so assigning afterwards does nothing.
 #
@@ -520,6 +523,10 @@ if (( $+commands[fzf] )); then
         done
     fi
     unset _f
+    if (( $+widgets[fzf-file-widget] )); then
+        bindkey '^P' fzf-file-widget
+        bindkey '^T' transpose-chars
+    fi
 fi
 
 # ------------------------------------------------------------
