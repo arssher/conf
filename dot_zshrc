@@ -411,6 +411,72 @@ else
 fi
 
 # ------------------------------------------------------------
+# fzf: an interactive filter. On its own it reads lines on stdin, narrows them
+# as a query is typed and prints the one picked -- `ls | fzf', `git branch |
+# fzf'. What earns it a place in this file is the shell integration: three ZLE
+# widgets, each replacing a search that could only ever show one candidate at
+# a time.
+#
+# ^R displaces history-incremental-search-backward. It feeds the whole history
+# through fzf, deduplicated, takes whatever is already on the line as the
+# initial query, and puts the chosen entry in the buffer WITHOUT running it --
+# the same contract HIST_VERIFY above asks for. ^R again inside fzf toggles
+# sort between relevance and recency, and it runs --multi, so several lines can
+# be picked and come back newline-joined. Next to `h' further up: fc prints a
+# list to read, this hands back a line to edit.
+#
+# ^T inserts the picked paths at the cursor, shell-quoted, displacing
+# transpose-chars. M-c cd's into a picked directory and is the one that does
+# not wait -- it calls accept-line itself, so the cd happens on selection.
+# Neither key is claimed above: the ESC+letter set in this file stops at
+# e r u o d f g G h H i j k l, and ^T was never bound. To drop one, set
+# FZF_CTRL_T_COMMAND= or FZF_ALT_C_COMMAND= to empty ON the eval line below --
+# the scripts read them as they load, so assigning afterwards does nothing.
+#
+# Fuzzy completion arrives in the same breath and rebinds ^I. Harmless:
+# fzf-completion only acts when the word ends in `**' (FZF_COMPLETION_TRIGGER)
+# and otherwise calls the widget it displaced, which it reads out of
+# `bindkey "^I"' as it loads -- so compinit and the menuselect keymap bound
+# further up keep behaving as before. The gesture is `vim **<TAB>'.
+#
+# Sourced before the two plugins below rather than after, because
+# zsh-syntax-highlighting asks to be the last thing in the file.
+#
+# One cost to know, and it is the HISTSIZE one again. ^R builds its list by
+# printing the in-memory $history array and deduplicating it through perl, on
+# every press. Measured here with unique entries: 7ms at ten thousand, 67ms at
+# a hundred thousand, 772ms at a million. At the eighty-odd thousand this
+# history holds today that is about 60ms and unnoticeable; at the million
+# HISTSIZE allows, ^R would sit for the better part of a second before fzf drew
+# anything. The answer then is to narrow what the widget is fed, not to shrink
+# the history -- the same trade as the autosuggestions note below.
+#
+# `fzf --zsh' prints both scripts out of the binary, which is the supported
+# route and cannot drift from the version installed. It wants fzf 0.48 (Feb
+# 2024): brew's is 0.74 and trixie's 0.60.3, but bookworm ships 0.38.0, which
+# has no such flag -- hence the fallback to the files the debian package leaves
+# under /usr/share/doc. stdin is closed on the probe so that a version which
+# did not recognise the flag could not sit waiting for input at startup.
+#
+# One cosmetic wart. The scripts save the whole option set as they start and
+# restore it as they finish, and restoring `zle' fails where there is no
+# terminal -- so `zsh -ic ...' from a script now prints "can't change option:
+# zle" twice on stderr. Under a real terminal it is silent, and `[[ -o zle ]]'
+# is no help: that reads on in both. Wrapping the block in `[[ -t 0 ]]' would
+# stop it, at the price of skipping fzf wherever zsh is talked to over a pipe.
+if (( $+commands[fzf] )); then
+    if _f=$(fzf --zsh 2>/dev/null </dev/null); then
+        eval "$_f"
+    else
+        for _f in /usr/share/doc/fzf/examples/key-bindings.zsh \
+                  /usr/share/doc/fzf/examples/completion.zsh; do
+            [[ -r $_f ]] && source $_f
+        done
+    fi
+    unset _f
+fi
+
+# ------------------------------------------------------------
 # zsh-autosuggestions: while typing, the rest of a matching history line is
 # shown in grey ahead of the cursor. From zsh-users, and nothing to do with
 # oh-my-zsh, which is only where most people meet it.

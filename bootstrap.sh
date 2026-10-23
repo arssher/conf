@@ -26,6 +26,12 @@ sudo apt-get -y install vim git checkinstall locate \
      openssh-server \
      rsync fio sysstat hdparm hwinfo lshw hping3 \
      xsel curl
+# fzf, for the zsh widgets .zshrc sets up from it: ^R over history, ^T over
+# file paths, M-c over directories. Bookworm's 0.38 has no `fzf --zsh', so
+# .zshrc falls back to the scripts the package leaves in
+# /usr/share/doc/fzf/examples; trixie's 0.60 has the flag.
+sudo apt-get -y install fzf
+
 sudo apt-get -y install build-essential gdb clang mold
 # lang server stuff
 sudo apt-get -y install clangd bear

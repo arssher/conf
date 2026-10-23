@@ -209,6 +209,12 @@ brew install readline zlib icu4c openssl@3 gettext libxml2 libxslt \
 # of a few paths exists, so nothing needs editing after installing them.
 brew install zsh-autosuggestions zsh-syntax-highlighting
 
+# fzf, an interactive filter, and with it the three zsh widgets .zshrc sets up
+# from it: ^R over history, ^T over file paths, M-c over directories. .zshrc
+# takes the integration out of the binary with `fzf --zsh', so there is nothing
+# to source by hand and nothing to keep in step with the version.
+brew install fzf
+
 brew install tmux
 
 # various desktop stuff
