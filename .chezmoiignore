@@ -5,9 +5,8 @@
 # get applied into ~/.bash_scripts/archive.
 
 # Repo-only content: the notes about this repo, the bootstrap scripts, and the
-# vscode notes. Only notes are left in vscode/ -- the keybindings, and on linux
-# the settings, are applied from private_dot_config/Code/User/ now, see the two
-# blocks at the bottom of this file.
+# vscode notes. Only notes are left in vscode/ -- the keybindings and settings
+# are applied per platform now, see the two blocks at the bottom of this file.
 #
 # "CLAUDE.md" here is the one at the root, these notes about the source dir.
 # The pattern is anchored: unlike gitignore, a bare name matches only the top
@@ -106,4 +105,5 @@ Library/**
 # or sync and chezmoi take turns overwriting the file -- and settings.json,
 # applied on linux. The
 # settingsSync.keybindingsPerPlatform setting defaults to true, which keeps the
-# two platforms apart but does not stop sync writing this file.
+# two platforms apart but does not stop sync writing this file. Sync's own
+# Configure dialog takes the two out; vscode/readme.txt has how.

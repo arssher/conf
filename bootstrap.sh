@@ -19,11 +19,13 @@ sudo apt-get install emacs python3-pip python3-venv
 
 # install manually chrome, vscode, slack (from deb package)
 
-# vscode's own Settings Sync, off: chezmoi applies the keybindings and settings
-# now and sync writes the same files, so with both on they overwrite each other. Sync
-# enablement is machine state rather than config, so there is no settings.json
-# key for it and this has to be run once per machine. See vscode/readme.txt.
-code --sync off
+# vscode's Settings Sync, if signed in, must leave out settings and keybindings:
+# chezmoi applies both now and sync writes the same files, so with both on they
+# overwrite each other. Extensions and the rest keep syncing. It is machine
+# state with no settings.json key and no command-line form -- `code --sync off`
+# lasts only the launch it is given to -- so by hand, once per machine:
+#   palette > "Settings Sync: Configure..." > untick Settings and Keyboard Shortcuts
+# See vscode/readme.txt, which also has how to check.
 
 # first do things enough for the minimal remote box
 sudo apt-get -y install vim git checkinstall locate \

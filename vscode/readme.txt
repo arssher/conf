@@ -58,29 +58,37 @@ right-trimming {{ if -}} form eats the indentation of the line that follows the
 block, and the result is valid JSON that looks mangled.
 
 
-Settings Sync is OFF, deliberately, on every machine.
+Settings Sync stays ON, with Settings and Keyboard Shortcuts taken out of it.
 
-It used to be how all of this travelled. It cannot stay on now: sync writes
-keybindings.json and settings.json and so does chezmoi, and with both running
-each file is whichever wrote last. settingsSync.keybindingsPerPlatform
-(default true) keeps the platforms' keybindings apart but does not stop sync
-owning the file.
+Those two files are chezmoi's now: sync writes keybindings.json and
+settings.json and so does chezmoi, and with both on each file is whichever
+wrote last. settingsSync.keybindingsPerPlatform (default true) keeps the
+platforms' keybindings apart but does not stop sync owning the file. The rest
+-- extensions above all, and snippets, tasks, ui state, profiles, prompts --
+has no home here and keeps travelling by sync.
 
-Turning it off is per machine and is not something the dotfiles can carry: the
-enablement is machine state in globalStorage, not a settings.json key. Both
-bootstrap scripts have the line:
+What sync covers is per machine and the dotfiles cannot carry it: it is
+machine state in globalStorage, not a settings.json key, and there is no
+command-line form of it either. So on every machine where sync is on, once:
 
-  code --sync off
+  palette > "Settings Sync: Configure..." > untick Settings and Keyboard
+  Shortcuts
 
-That is the non-interactive form, and it only works with vscode not running:
-handed to a running instance it just opens a window there, and sync carries
-on. Seen on linux -- quit vscode first, or use the palette. The palette's "Settings Sync: Turn Off" also
-offers to turn it off on all devices and delete the copy held in the cloud,
-which the flag does not do -- worth using that one once if the cloud copy
-should go too.
+The ticks are what IS synced -- untick to exclude, not the other way round.
 
-To check a machine: `select key from ItemTable where key like 'sync.%'` in
-globalStorage/state.vscdb shows only store metadata (storeUrl, productQuality,
-previous.store) and no sync.enable or account keys. A `sync` directory under
-the User directory is left behind by a machine that once synced, so its
-presence alone does not mean sync is on.
+Not `code --sync off`. It is no way to turn sync off for good: it overrides
+sync for the vscode it launches and stores nothing -- that session logs
+"[AutoSync] Disabled." while sync.enable stays true in state.vscdb, and the
+next ordinary launch syncs again. Handed to an already running vscode it does
+not even that, only opening a window there. Both seen on linux.
+
+To check a machine, in globalStorage/state.vscdb:
+
+  select key, value from ItemTable where key like 'sync.enable%'
+
+sync.enable.settings and sync.enable.keybindings should both be 'false'. A
+resource with no row there is synced: absent means the default, which is on.
+A machine with sync.enable absent or false does not sync at all, which is
+equally safe. userDataSync.log, in the newest session directory under
+~/.config/Code/logs (mac: ~/Library/Application Support/Code/logs), shows which
+resources each sync touched.

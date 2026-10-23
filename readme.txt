@@ -69,8 +69,8 @@ Things that are easy to get wrong:
   A few of them lack +x, so chmod when promoting.
 
   docs/, bootstrap/ and vscode/ are likewise tracked but not applied. vscode/
-  holds only notes now: its keybindings and, on linux, its settings.json are
-  applied from private_dot_config/Code/User/, see Shortcuts below.
+  holds only notes now: its keybindings and settings.json are applied per
+  platform, see Shortcuts below.
 
 
 Shell startup files:
@@ -128,13 +128,13 @@ Shortcuts:
       linux  private_dot_config/Code/User/
       macos  "Library/Application Support/Code/User/"
     Each is .chezmoiignore'd on the other platform. settings.json is applied
-    beside the linux one, the mac's not managed yet; vscode/readme.txt has the
+    beside each, both from one shared template; vscode/readme.txt has the
     notes. The mac file is the shorter by far, because karabiner turns
     the gestures into standard macOS keys before vscode sees them: a real arrow
     serves the suggest widget, lists and notebooks at once, where linux needs
     an alt+i binding for each. Its header lists what karabiner covers, so what
-    is missing from it is missing on purpose. Settings Sync must be kept off,
-    or it and chezmoi overwrite each other.
+    is missing from it is missing on purpose. Settings Sync must leave settings
+    and keybindings out, or it and chezmoi overwrite each other.
   - ~/.zshrc
   - libedit's ~/.editrc
   - linux outside emacs through xremap, see below
