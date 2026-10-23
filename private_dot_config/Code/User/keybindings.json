@@ -686,6 +686,10 @@
         "when": "codeActionMenuVisible"
     },
     {
+        "key": "alt+a",
+        "command": "workbench.action.focusActiveEditorGroup"
+    },
+    {
         "key": "shift+alt+[",
         "command": "editor.action.smartSelect.expand",
         "when": "editorTextFocus"
@@ -694,5 +698,13 @@
         "key": "shift+alt+]",
         "command": "editor.action.smartSelect.shrink",
         "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+b",
+        "command": "-workbench.action.toggleSidebarVisibility"
+    },
+    {
+        "key": "ctrl+q",
+        "command": "-workbench.action.quit"
     },
 ]
