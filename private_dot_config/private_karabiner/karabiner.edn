@@ -6,16 +6,13 @@
 ;; changes. readme.txt says why it is kept; the rest of this header is what
 ;; to watch for if it is ever revived.
 ;;
-;; Checked once against the json, by compiling it with goku: 26 manipulators
-;; identical, 8 differing only in how the app conditions are grouped -- goku
-;; emits one condition per :applications entry where the json merges the
-;; bundle ids into a single one. Karabiner ANDs conditions, so unless(A or B)
-;; is the same as unless(A) and unless(B), and the two are equivalent.
-;;
-;; NOT re-checked since the two vscode rules were added -- the tab rule's new
-;; :tabapps set and "move lines in vscode". Those are hand-written here, so
-;; this file and the json may differ in a way nothing has caught yet. AGENTS.md
-;; has the procedure for re-running the comparison.
+;; Checked against the json by compiling it with goku, most recently on
+;; 2026-10-23 with the two vscode rules in place: 14 rules and 38 manipulators
+;; on both sides, 29 identical and 9 differing only in how the app conditions
+;; are grouped -- goku emits one condition per :applications entry where the
+;; json merges the bundle ids into a single one. Karabiner ANDs conditions, so
+;; unless(A or B) is the same as unless(A) and unless(B), and the two are
+;; equivalent. Nothing differed. AGENTS.md has the procedure.
 ;;
 ;; Modifier letters, from goku's tutorial.md:
 ;;   !  mandatory   #  optional

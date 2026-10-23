@@ -89,7 +89,17 @@ mkdir -p jail/home/.config/karabiner
 cp /path/to/chezmoi/private_dot_config/private_karabiner/karabiner.edn \
    jail/home/.config/karabiner.edn          # note: NOT inside karabiner/
 cp ~/.config/karabiner/karabiner.json now.json
+cp now.json jail/home/.config/karabiner/karabiner.json   # goku READS this
+```
 
+That last copy is not optional, and the dry run is why it is easy to miss. Even
+with `-d`, goku's `update-to-karabiner-json` opens
+`$HOME/.config/karabiner/karabiner.json` before printing anything, so without a
+copy inside the jail it dies with a java `FileNotFoundException` and an empty
+stdout. The two copies are the same bytes; `now.json` is the one the comparison
+reads, this one only feeds goku.
+
+```sh
 env -i HOME="$PWD/jail/home" PATH=/opt/homebrew/bin:/usr/bin:/bin \
        TERM=dumb SHELL=/bin/zsh \
   sandbox-exec -f jail.sb "$PWD/goku_bin/goku/goku" -d > out.json 2> out.err
@@ -100,6 +110,9 @@ Without it goku rewrites `$HOME/.config/karabiner/karabiner.json`, which inside
 the jail is the throwaway copy -- the sandbox is the guarantee, the `HOME`
 redirection only the convenience.  `goku -h` reports the paths it resolved, so
 run that first if anything looks wrong.
+
+**It exits 1 even when it worked.** Judge the run by `out.err` being empty and
+`out.json` holding a complete config, not by the status.
 
 Note goku's input path is `~/.config/karabiner.edn`, a level **above** the
 `karabiner/` directory the file lives in here.
@@ -140,18 +153,13 @@ print(f"identical {e}, equivalent {q}, different {bad}")
 PY
 ```
 
-**Expected as of 2026-10-19: identical 27, equivalent 9, different 0** -- for the
-13 rules and 36 manipulators of that date.
+**Expected as of 2026-10-23: identical 29, equivalent 9, different 0**, over 14
+rules and 38 manipulators -- the counts both sides reported in that run. The
+previous record was 27/9/0 over 13 rules and 36 manipulators, before the two
+vscode rules.
 
-**Stale since 2026-10-23.** Two vscode rules were added by hand (14 rules, 38
-manipulators now): the tab-switching rule gained vscode's bundle id through a
-new `:tabapps` application set, and "move lines in vscode" is new. Nobody has
-compiled the edn since, so the numbers above no longer describe it and a run
-will report more of everything. Re-run the comparison and replace this note
-with the counts it gives.
-
-One thing to look at first if that run reports a difference: `:tabapps` exists
-because an `if` condition cannot be split. goku emits one
+If a run reports a difference in the tab-switching rule, look at `:tabapps`
+first. It exists because an `if` condition cannot be split: goku emits one
 `frontmost_application_if` per `:applications` keyword and karabiner ANDs
 conditions, so `[:terminals :vscode]` would compile to a rule that can never
 fire. The `:!emacs :!terminals` vectors elsewhere are safe only because
