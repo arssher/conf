@@ -243,6 +243,16 @@ brew install tmux
 brew install --cask google-chrome visual-studio-code slack iterm2 \
      telegram keepassxc
 
+# vscode's own Settings Sync, off. chezmoi applies the keybindings now -- see
+# vscode/readme.txt for the two per-platform paths -- and sync writes the same
+# file, so with both on they overwrite each other in whichever order they run.
+# There is no settings.json key for this: sync enablement is machine state, not
+# config, so it is a command on every new machine rather than something the
+# dotfiles carry. `code --sync off` is the non-interactive form of the palette's
+# "Settings Sync: Turn Off"; the palette additionally offers to turn it off on
+# all devices and delete the copy in the cloud, which the flag does not.
+code --sync off
+
 # mu/mu4e, and pass for secrets
 brew install mu isync pass
 
