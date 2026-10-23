@@ -46,4 +46,14 @@ set editing-mode emacs
 # has history-substring-search-backward/-forward, which match anywhere in the
 # line rather than at its start -- not used, because zsh ships no equivalent and
 # the two files have to agree.
+#
+# The bare arrows get the same two, as they do in .zshrc. xremap on linux and
+# karabiner on mac send alt/cmd + i/k into a terminal as real up/down arrows,
+# so that full-screen programs understand them, and \ei/\ek above then never
+# arrive. Without these the gesture would drop back to previous-history.
+# \e[A is what a terminal sends outside application mode, which readline does
+# not turn on; /etc/inputrc and readline's defaults cover every other key the
+# remap emits -- Home, End, ctrl+arrows, Delete, ctrl+k/u/w -- already.
+"\e[A": history-search-backward
+"\e[B": history-search-forward
 
