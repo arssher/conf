@@ -87,5 +87,38 @@ tells `ars-markdown-ts-edit' whether re-reading is safe."
                              (not (file-writable-p buffer-file-name)))
                         1 -1))))
 
+;; Two imenu irritations, both imenu's own defaults rather than anything
+;; markdown-ts does, and both settled here buffer-locally so that C, go and the
+;; rest keep the behaviour they have.
+;;
+;; markdown-ts files its index under two categories, Headings and Code Blocks,
+;; so imenu asks which category before it asks which heading. It goes on asking
+;; in a file with no code blocks at all: an empty category is dropped, but a
+;; lone surviving one is still nested, nesting being structural. Giving
+;; headings the nil category hoists them to the top level, where a document's
+;; table of contents belongs, and leaves Code Blocks a submenu underneath.
+;;
+;; The *Rescan* entry is the other half. imenu adds it precisely when
+;; imenu-auto-rescan is nil -- the last form of imenu--make-index-alist is that
+;; cons -- and picking it rebuilds the index and asks again, which reads as
+;; doing nothing. Rebuilding every time is not worth avoiding on documents this
+;; size, so take that and lose the entry.
+(defun ars-markdown-ts-setup-imenu ()
+  "Put headings at the top level of imenu, and drop its *Rescan* entry.
+For both `markdown-ts-mode-hook' and `markdown-ts-view-mode-hook': the
+view mode is a parent of the other only by `derived-mode-add-parents',
+which `derived-mode-p' honours but `run-mode-hooks' does not, so neither
+hook fires the other.  Running twice is harmless -- the hoist no longer
+matches once it has been done."
+  (setq-local imenu-auto-rescan t)
+  ;; Matched by name, so an upstream rename costs us the hoist and nothing
+  ;; else: the mapcar stops matching and imenu goes back to its nested menu.
+  (setq-local treesit-simple-imenu-settings
+              (mapcar (lambda (setting)
+                        (if (equal (car setting) "Headings")
+                            (cons nil (cdr setting))
+                          setting))
+                      treesit-simple-imenu-settings)))
+
 (message "ars-markdown loaded")
 (provide 'ars-markdown)

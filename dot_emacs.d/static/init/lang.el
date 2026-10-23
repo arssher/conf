@@ -206,7 +206,10 @@
   ;; The view mode (f7) is for reading, so lay the tables out. See
   ;; ars-markdown.el for why this is not something the mode does itself.
   (require 'ars-markdown)
-  (add-hook 'markdown-ts-view-mode-hook #'ars-markdown-ts-align-all-tables))
+  (add-hook 'markdown-ts-view-mode-hook #'ars-markdown-ts-align-all-tables)
+  ;; Both hooks on purpose, see the function.
+  (dolist (hook '(markdown-ts-mode-hook markdown-ts-view-mode-hook))
+    (add-hook hook #'ars-markdown-ts-setup-imenu)))
 
 
 ;; turn on projectile
