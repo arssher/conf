@@ -165,6 +165,28 @@ brew install --cask emacs-plus-app
 
 # start emacs, ensure it loads
 
+# Tree-sitter grammars, the same step install_emacs.sh does on linux. The cask
+# already builds with tree-sitter -- check with
+#   emacs -Q --batch --eval '(message "%S" (treesit-available-p))'
+# -- but emacs bundles no grammar, only the recipes, so the compiling happens
+# here, with the command line tools' cc and git. Markdown needs two, the block
+# grammar and the inline one, which live in separate directories of a single
+# repo. They land in ~/.emacs.d/tree-sitter/ as .dylib, a path that is not
+# version-specific, so this survives the next emacs. About ten seconds.
+#
+# Not optional if you edit markdown: lang.el checks for both grammars before
+# it points .md at markdown-ts-mode, so without them every .md quietly opens
+# in markdown-mode instead, with none of the f6/f7 bindings.
+#
+# -Q because this must not depend on the init files loading cleanly, and the
+# explicit path for the reason the lines above give -- a stale bin/emacs from
+# the formula would otherwise answer here.
+"$BREW/bin/emacs" -Q -batch --eval '(progn
+  (require (quote markdown-ts-mode))
+  (dolist (lang (quote (markdown markdown-inline)))
+    (unless (treesit-language-available-p lang)
+      (treesit-install-language-grammar lang))))'
+
 # Keyboard. Karabiner does the left/right cmd split; goku turns compact EDN
 # into its verbose json, optional.
 brew install --cask karabiner-elements
