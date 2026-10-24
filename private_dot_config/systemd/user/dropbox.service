@@ -1,0 +1,35 @@
+# Dropbox, started with the desktop session instead of by hand with
+# `dropbox.py start` after every boot. $CONFPATH lives in ~/Dropbox, so most
+# of the stash depends on this running.
+#
+# Not `dropbox.py autostart y`, which only copies the .deb's
+# /usr/share/applications/dropbox.desktop into ~/.config/autostart and quietly
+# does nothing for the standalone ~/.dropbox-dist install used here.
+#
+# dropboxd stays in the foreground, so plain Type=simple; `dropbox.py start`
+# is only a wrapper that forks the same binary off. dropbox.py's status,
+# filestatus and the rest still work, over dropboxd's own socket.
+#
+# Enabled by chezmoi, not systemctl: the symlink in
+# graphical-session.target.wants beside this is managed too. Skipped where
+# Dropbox is not installed. The first link of a machine to the account is
+# still `dropbox.py start` by hand, which prints the URL to open.
+#
+# Restart=always, so `dropbox.py stop` is undone after RestartSec -- stop it
+# with `systemctl --user stop dropbox` instead. Always rather than on-failure
+# because Dropbox updates itself in ~/.dropbox-dist and how the old process
+# exits then is not documented; a restart picks up the new version either way.
+
+[Unit]
+Description=Dropbox
+PartOf=graphical-session.target
+After=graphical-session.target
+ConditionPathExists=%h/.dropbox-dist/dropboxd
+
+[Service]
+ExecStart=%h/.dropbox-dist/dropboxd
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=graphical-session.target
