@@ -15,9 +15,9 @@
 # it already reads. Up/Down then miss .inputrc's \ei/\ek, which is why .inputrc
 # and .zshrc point the bare arrows at the same history search.
 #
-# Left alt only, on every rule: xkb's ctrl:ralt_rctrl makes right alt a ctrl,
-# but xremap reads evdev underneath xkb, where it is still KEY_RIGHTALT. A bare
-# Alt- would catch it, and right alt + i, meant as ctrl+i, would come out Up.
+# Left alt only, on every rule. Right alt is a ctrl -- the modmap below makes
+# it one -- and modmap runs before keymap, so the rules never see it as alt
+# anyway. Alt_L- still says outright which thumb the gestures are on.
 #
 # Matching is by WM_CLASS, the part after the dot in `xremap --list-windows`.
 # Nothing sees the program running inside a terminal. A title rule could stand
@@ -28,6 +28,18 @@
 # is excluded.
 #
 # Physical keys, so it works the same in the russian layout.
+
+# Right alt is a second ctrl, under the right thumb -- the ctrl emacs reaches
+# for second, after caps lock (see init.el). Everywhere, emacs included, so no
+# application filter. It used to be xkb's ctrl:ralt_rctrl, set by setxkbmap
+# from .bashrc: X11 only, and only once some interactive bash had started,
+# which stopped being a given when zsh became the login shell. Here it holds
+# from boot and under wayland alike. Caps lock stays in GNOME's xkb-options,
+# from the stash's dconf dump.
+modmap:
+  - name: right alt is ctrl
+    remap:
+      Alt_R: Control_R
 
 keymap:
   # Motion. Not exact_match, so extra modifiers pass through: alt+shift+l

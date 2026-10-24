@@ -222,8 +222,8 @@ uncomment WaylandEnable=false in
 In bookworm as of 05.2023 there was also this issue, but it somehow seems to
 got resolved after reboot or something. Nope, it is still there:
 https://discourse.ubuntu.com/t/keyboard-layout-switching-shortcut-periodically-stops-working/7617
-Also, setxkbmap doesn't work in wayland, and there is no map right alt to ctrl
-in gnome tweaks.
+Right alt as ctrl is no obstacle any more: it is an xremap modmap now, see
+~/.config/xremap/config.yml, and works under wayland as under X11.
 Also, in wayland I had to replug monitor after restart to restore its settings.
 Also, with wayland ctrl mouse scroll switches workspaces instead of e.g. zooming in
 browsers, probably related to

@@ -250,15 +250,6 @@ log_bash_persistent_history()
 PROMPT_COMMAND="log_bash_persistent_history; $PROMPT_COMMAND"
 
 
-# Map right alt to behave as ctrl. Doesn't work in X
-if [ -n "${DISPLAY:-}" ] && command -v setxkbmap >/dev/null 2>&1; then
-    setxkbmap -option ctrl:ralt_rctrl
-fi;
-# TODO: check the following:
-# logger "setting altgr -> ctrl"
-# DISPLAY=:0 XDG_RUNTIME_DIR=/run/user/$(id -u) setxkbmap -option ctrl:ralt_rctrl
-
-
 
 # k8s autocompletion
 # https://kubernetes.io/docs/reference/kubectl/cheatsheet/
