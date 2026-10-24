@@ -64,7 +64,10 @@ etc/**
 # template, so no .tmpl suffix -- adding one would stop it being read at all.
 # Terminator is a Linux GTK terminal; environment.d is a systemd user-session
 # mechanism and macOS has no systemd. xremap is the linux stand-in for
-# karabiner, and its bridge's unit lives in systemd/user.
+# karabiner, and its bridge's unit lives in systemd/user. procps/toprc is
+# procps-ng top's, saved from top itself with W; macOS top is a different
+# program and reads none of it. No comments inside: top writes the file whole
+# and expects its own format, so re-save in top and `chezmoi re-add` it.
 # Not excluded on purpose: dot_gdbinit/dot_gdb/ (gdb installs via brew, and the
 # content is postgres pretty-printers), and the scripts in .chezmoiscripts,
 # which render to nothing on macOS where they do not apply.
@@ -73,6 +76,7 @@ etc/**
 .config/environment.d
 .config/xremap
 .config/systemd
+.config/procps
 .config/Code
 .config/Code/**
 {{ end }}
