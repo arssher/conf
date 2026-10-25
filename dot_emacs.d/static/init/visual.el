@@ -38,6 +38,13 @@
 ;; At the edge of the buffer, scroll to the edge rather than refusing: a page
 ;; down near the end moves point to the last line instead of ringing the bell.
 (setq scroll-error-top-bottom t)
+;; Holding C-i/C-k scrolls a line per key repeat, faster than redisplay keeps
+;; up with, and the skipped frames showed as jumps of several lines. While keys
+;; are pending, leave the lines scrolling past unfontified -- they are coloured
+;; once the key is released -- and estimate line heights rather than fontify
+;; everything passed over just to measure it.
+(setq redisplay-skip-fontification-on-input t)
+(setq fast-but-imprecise-scrolling t)
 
 ;; always tail *Messages* buffer
 (tail-messages-enable)
