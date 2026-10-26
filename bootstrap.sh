@@ -81,7 +81,7 @@ sudo apt-get install mpv enca
 #
 # tesseract-ocr carries English and the orientation data only; every other
 # language is its own tesseract-ocr-<lang> package, the counterpart of brew's
-# tesseract-lang -- here just Russian. Usage:
+# tesseract-lang -- here Russian, French and Dutch. Usage:
 #
 #   ocrmypdf -l rus+eng in.pdf out.pdf
 #
@@ -109,7 +109,8 @@ sudo apt-get install mpv enca
 # pdfinfo, pdfimages and pdfseparate. pdfgrep greps a directory of PDFs and
 # reports the page each hit is on. scantailor is not in trixie; see the mac
 # notes for why it is skipped there too.
-sudo apt-get -y install ocrmypdf tesseract-ocr-rus unpaper qpdf poppler-utils pdfgrep
+sudo apt-get -y install ocrmypdf tesseract-ocr-rus tesseract-ocr-fra tesseract-ocr-nld \
+     unpaper qpdf poppler-utils pdfgrep
 
 # Approximately here starts desktop.
 
