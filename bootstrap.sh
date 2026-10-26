@@ -72,6 +72,45 @@ sudo apt-get -y install gnutls-dev checkinstall
 # various desktop stuff
 sudo apt-get install mpv enca
 
+# Scanned documents: ocrmypdf adds a searchable text layer to a scan without
+# touching the image, so the page still looks like a scan and the text is
+# selectable. The same set as bootstrap_mac.sh, which has the longer notes on
+# accuracy and unpaper. ghostscript and tesseract-ocr come in as dependencies;
+# unpaper (deskewing), pngquant and jbig2 (compression) as recommends, which
+# apt installs by default.
+#
+# tesseract-ocr carries English and the orientation data only; every other
+# language is its own tesseract-ocr-<lang> package, the counterpart of brew's
+# tesseract-lang -- here just Russian. Usage:
+#
+#   ocrmypdf -l rus+eng in.pdf out.pdf
+#
+# Give -l only the languages the document actually has: rus on a pure Latin
+# page returns Cyrillic look-alikes. --deskew --clean are worth adding.
+# --clean will not cut the border away, because ocrmypdf hands unpaper
+# --layout none (Debian's 16.7 too, in ocrmypdf/_exec/unpaper.py); to get it
+# back, override the defaults wholesale:
+#
+#   ocrmypdf --clean-final --unpaper-args '--layout single --mask-scan-size 100'
+#
+# unpaper and qpdf are named so that apt marks them manual, and autoremove
+# leaves them behind if ocrmypdf ever goes. qpdf is the page surgery:
+#
+#   qpdf in.pdf --pages . 2-4 -- out.pdf    # also 1,3,5 / z-1 / 1-6:even
+#   qpdf in.pdf --pages . 1-6,x3 -- out.pdf # x excludes, and must be comma
+#                                           # joined inside the one range
+#   qpdf --empty --pages a.pdf b.pdf -- merged.pdf
+#   qpdf --split-pages in.pdf out.pdf       # out-1.pdf, out-2.pdf, ...
+#   qpdf in.pdf --rotate=+90:1 out.pdf
+#
+# poppler-utils is for pdftotext, which tells whether a file already carries a
+# text layer -- the default mode errors out when it does, and the recovery is
+# picking between --skip-text, --redo-ocr and --force-ocr. It also brings
+# pdfinfo, pdfimages and pdfseparate. pdfgrep greps a directory of PDFs and
+# reports the page each hit is on. scantailor is not in trixie; see the mac
+# notes for why it is skipped there too.
+sudo apt-get -y install ocrmypdf tesseract-ocr-rus unpaper qpdf poppler-utils pdfgrep
+
 # Approximately here starts desktop.
 
 # install ansible
