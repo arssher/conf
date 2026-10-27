@@ -62,20 +62,33 @@ make -j"$(nproc)"
 sudo make install
 
 # Tree-sitter grammars. Debian packages none of them and emacs bundles none --
-# it knows only the recipes, and the compiling happens here, with cc and git.
-# Markdown needs two, the block grammar and the inline one, which live in
-# separate directories of a single repo. They land in ~/.emacs.d/tree-sitter/,
-# which is not version-specific, so this survives the next emacs.
+# it knows only the recipes, which each mode's library registers when loaded,
+# pinned to a commit, and the compiling happens here, with cc and git. They
+# land in ~/.emacs.d/tree-sitter/, which is not version-specific, so this
+# survives the next emacs. A language added later needs no re-run: turning
+# its ts mode on by hand offers to build the grammar there and then
+# (treesit-auto-install-grammar).
+#
+# Each entry is the library that registers the recipe, then its languages.
+# Markdown needs two grammars, the block one and the inline one, from two
+# directories of a single repo. Not go, rust or c: those stay on go-mode,
+# rustic and lsp's c-mode, see lang.el.
 #
 # Explicit path: the emacs just installed, not whatever PATH resolved to
 # before. -Q because this must not depend on the init files loading cleanly
 # under a brand new emacs -- and lang.el checks for these grammars before it
-# points .md at markdown-ts-mode, so the init is the thing waiting on them.
+# turns their ts modes on, so the init is the thing waiting on them.
 /usr/local/bin/emacs -Q -batch --eval '(progn
-  (require (quote markdown-ts-mode))
-  (dolist (lang (quote (markdown markdown-inline)))
-    (unless (treesit-language-available-p lang)
-      (treesit-install-language-grammar lang))))'
+  (dolist (spec (quote ((markdown-ts-mode markdown markdown-inline)
+                        (sh-script bash)
+                        (json-ts-mode json)
+                        (yaml-ts-mode yaml)
+                        (toml-ts-mode toml)
+                        (python python))))
+    (require (car spec))
+    (dolist (lang (cdr spec))
+      (unless (treesit-language-available-p lang)
+        (treesit-install-language-grammar lang)))))'
 
 # One-time start, so packages.el installs the elpa packages it asks for.
 #

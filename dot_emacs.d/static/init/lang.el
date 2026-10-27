@@ -212,6 +212,42 @@
     (add-hook hook #'ars-markdown-ts-setup-imenu)))
 
 
+;; Tree-sitter modes for json, shell, toml and python, each once its grammar
+;; is built -- install_emacs.sh builds them, and a machine without them keeps
+;; the classic modes rather than opening files in a mode with no parser. A
+;; grammar is also built on demand by turning its ts mode on by hand once.
+;; treesit-enabled-modes is emacs 31's switch: it puts js-json-mode ->
+;; json-ts-mode and the rest into major-mode-remap-alist. setopt, not setq:
+;; the remapping is done by the option's setter, which setq skips.
+;;
+;; These replace the classic major modes, so the old modes' hooks and keymaps
+;; do not apply in them -- python-mode-hook does not run in python-ts-mode,
+;; though derived-mode-p still says python-mode. Hook the -ts-mode or the
+;; -base-mode instead. Nothing here hooked the old ones, and flycheck covers
+;; the ts modes as it did the old, except that bash-ts-mode has no posix
+;; checker for #!/bin/sh scripts, only bash -n and shellcheck.
+;;
+;; A list rather than t, which would take every ts mode emacs knows, c-ts-mode
+;; included: C stays on c-mode for lsp and its hooks, go and rust on their own
+;; packages. YAML needs no entry -- emacs 31 already sends .yml to
+;; yaml-ts-mode-maybe, which picks the ts mode once the grammar exists.
+;;
+;; sh-mode covers zsh files too, and they get remapped with the rest, but
+;; bash-ts-mode sees the shell is zsh, starts no parser and keeps sh-mode's
+;; highlighting, so .zshrc is no worse off.
+(when (and (fboundp 'treesit-available-p)
+           (treesit-available-p)
+           (require 'treesit nil t))
+  (setopt treesit-enabled-modes
+          (mapcar #'car
+                  (seq-filter (lambda (mode)
+                                (treesit-language-available-p (cdr mode)))
+                              '((json-ts-mode . json)
+                                (bash-ts-mode . bash)
+                                (toml-ts-mode . toml)
+                                (python-ts-mode . python))))))
+
+
 ;; turn on projectile
 ;; Right now I plan to use it only for two things: switching between header and
 ;; src, and, perhaps, quick project switching (basically, it just lets me avoid
