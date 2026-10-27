@@ -140,6 +140,32 @@ flatpak install flathub org.telegram.desktop
 
 flatpak install --user flathub org.keepassxc.KeePassXC
 
+# Syncthing, from upstream's apt repo rather than Debian's: trixie's package
+# stays on 1.29 for its whole life, while upstream -- and the mac's brew -- are
+# on 2.x, with monthly releases that arrive through the usual apt upgrade. The
+# snap is abandoned at 1.4.
+#
+# Check the key rather than trust the download: gpg --show-keys should print
+#   FBA2 E162 F2F4 4657 B38F  0309 E566 5F9B D597 0C47
+# the 2024 release key, certified by the 2014 one, D26E6ED000654A3E, which
+# syncthing.net/security still quotes. Its signatures are SHA-256; the 2014
+# key's SHA-1 binding is what trixie's sqv rejects, since 2026. The pin keeps
+# upstream's package ahead of Debian's whatever the versions.
+#
+# The package's user unit is enabled through chezmoi -- the symlink in
+# ~/.config/systemd/user/default.target.wants is managed -- so it runs from the
+# next login, or now with `systemctl --user start syncthing'. GUI on
+# http://127.0.0.1:8384.
+sudo mkdir -p /etc/apt/keyrings
+sudo curl -fsSL -o /etc/apt/keyrings/syncthing-archive-keyring.gpg https://syncthing.net/release-key.gpg
+gpg --show-keys /etc/apt/keyrings/syncthing-archive-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/syncthing-archive-keyring.gpg] https://apt.syncthing.net/ syncthing stable-v2" \
+    | sudo tee /etc/apt/sources.list.d/syncthing.list
+printf 'Package: *\nPin: origin apt.syncthing.net\nPin-Priority: 990\n' \
+    | sudo tee /etc/apt/preferences.d/syncthing.pref
+sudo apt-get update
+sudo apt-get -y install syncthing
+
 # mutagen is for yt-dl
 sudo apt-get -y install ffmpeg global colordiff python3-venv tor xcalib python3-mutagen unrar-free \
      vlc filezilla hexchat
