@@ -1,0 +1,44 @@
+#!/bin/bash
+#
+# sudo's askpass helper: asks for the password in a desktop dialog that names
+# the command, for sudo run without a terminal. That is Claude Code's case --
+# its commands have no tty, so sudo cannot prompt -- and ~/.sh_env points
+# SUDO_ASKPASS here in Claude Code's shells only. With a terminal, sudo ignores
+# the variable unless given -A.
+#
+# sudo runs this as you, with its prompt ("[sudo] password for ars: ") as the
+# one argument, and reads the password from stdout. So the password goes from
+# the dialog straight to sudo, and whatever ran sudo never sees it. Cancel, or
+# the timeout, prints nothing, and sudo fails as it would have anyway.
+#
+# The command comes from sudo's own command line -- this helper's parent is
+# the sudo process -- since sudo passes only the prompt, and a dialog asking
+# for the root password should say what it is for.
+#
+# Linux only so far, through zenity. On mac the same could be done with
+# osascript, roughly
+#   osascript -e 'text returned of (display dialog "..." default answer ""
+#                 with hidden answer with title "sudo")'
+# with ps -o args= -p "$PPID" in place of /proc for the command. Until then it
+# fails there, as sudo without a terminal does anyway.
+
+set -euo pipefail
+
+prompt=${1:-Password:}
+
+if ! command -v zenity >/dev/null; then
+    echo "sudo-askpass: no zenity here; on mac see the osascript note" >&2
+    exit 1
+fi
+
+# argv is NUL-separated; spaces read well enough.
+cmd=$(tr '\0' ' ' < "/proc/${PPID}/cmdline")
+cmd=${cmd% }
+
+# zenity's --text is Pango markup, and a command can hold & < >.
+escape() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'; }
+
+# The timeout closes the dialog before Claude Code's default two-minute limit
+# on a command kills the sudo waiting for it.
+exec zenity --entry --hide-text --title=sudo --timeout=100 \
+     --text="$(printf '%s\n\n%s' "$cmd" "$prompt" | escape)"

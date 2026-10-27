@@ -121,6 +121,25 @@ case "${GHOSTTY_BIN_DIR:-}" in
         ;;
 esac
 
+# ------------------------------------------------------------
+# sudo from Claude Code
+
+# Claude Code's commands run without a terminal, where sudo cannot prompt.
+# With SUDO_ASKPASS set it runs that helper instead, and sudo-askpass asks in a
+# desktop dialog naming the command -- the password goes from the dialog to
+# sudo, never through Claude. CLAUDECODE is set only in Claude Code's shells,
+# so sudo anywhere else is untouched; with a terminal sudo ignores the
+# variable anyway, unless given -A.
+#
+# Here rather than in the env of ~/.claude/settings.json: sudo wants an
+# absolute path, which differs between linux and mac, and templating that file
+# would stop `chezmoi re-add` from picking up what Claude Code writes into it.
+# Above the guard, because those shells inherit SH_ENV_LOADED from the one
+# Claude Code was started from.
+if [ -n "${CLAUDECODE:-}" ] && [ -x "$HOME/.bash_scripts/bin/sudo-askpass" ]; then
+    export SUDO_ASKPASS="$HOME/.bash_scripts/bin/sudo-askpass"
+fi
+
 if [ -n "${SH_ENV_LOADED:-}" ]; then
     return 0
 fi
