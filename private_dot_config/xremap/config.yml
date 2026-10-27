@@ -98,16 +98,22 @@ keymap:
       Alt_L-g: [Shift-End, Delete]
       Alt_L-Shift-g: [Shift-Home, Backspace]
 
-  # Kills, terminals only: in a browser ctrl+w closes the tab, ctrl+k focuses
-  # search and ctrl+u shows the source. These are the readline and Claude Code
-  # defaults for kill-line, backward-kill-line and kill-word-back. ctrl+w
-  # stops at whitespace (unix-word-rubout) where M-e in emacs stops at a word
-  # boundary. alt+r is not here: it stays ESC r, kill-word in readline and zsh.
+  # Kills, terminals only: in a browser ctrl+k focuses search and ctrl+u shows
+  # the source. These two are the readline and Claude Code defaults for
+  # kill-line and backward-kill-line.
+  #
+  # e is alt+BackSpace, ESC DEL on the wire, as left cmd + e is on mac:
+  # backward-kill-word in readline and zsh, so it stops at a slash, as M-e in
+  # emacs does, and Claude Code takes it as a word kill too. It used to be
+  # ctrl+w, which stops only at whitespace -- unix-word-rubout in readline, and
+  # kept that way on ^W in .zshrc -- so it took a whole path at once while
+  # alt+u/o stepped through it. alt+r is not here: it stays ESC r, kill-word in
+  # readline and zsh.
   - name: ergoemacs kills in terminals
     exact_match: true
     application:
       only: [Terminator, Gnome-terminal, XTerm, ghostty]
     remap:
-      Alt_L-e: C-w
+      Alt_L-e: M-Backspace
       Alt_L-g: C-k
       Alt_L-Shift-g: C-u
