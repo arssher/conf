@@ -3,12 +3,13 @@
 # the two shells cannot drift apart. .zshenv has already run by the time this
 # file does.
 #
-# The one thing sourced here is the private half, ~/.global_vars, below. It is
-# kept out of .sh_env because ~/.profile reads that, /etc/gdm3/Xsession sources
-# ~/.profile, and gnome-session imports the result into `systemd --user` -- so
-# .sh_env reaches gnome-shell and every GUI app, and the tokens in
-# .global_vars have no business being there. An interactive rc file is never on
-# that route. See ~/.profile's header.
+# The private half of the environment, ~/.global_vars, is sourced here, below.
+# It is kept out of .sh_env because ~/.profile reads that, /etc/gdm3/Xsession
+# sources ~/.profile, and gnome-session imports the result into `systemd
+# --user` -- so .sh_env reaches gnome-shell and every GUI app, and the tokens
+# in .global_vars have no business being there. An interactive rc file is never
+# on that route. See ~/.profile's header. The private aliases are sourced at the
+# very end.
 #
 # Guards itself with an exported GLOBAL_VARS_LOADED, so a nested shell reads it
 # once. source_env, defined in .sh_env, re-reads both after an edit.
@@ -659,6 +660,18 @@ unset _f
 # overwrites.
 ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=red'
 
-# Not here yet, compared with what .bashrc does for bash: the aliases from
-# .bash_scripts/aliases.sh, `stty -ixon' to free C-s, LESS and GCC_COLORS, and
-# kubectl's completion.
+# ------------------------------------------------------------
+# The private aliases, the same file .bashrc sources. It lives in the stash
+# rather than this repo, so it is absent until restore_private.sh has run. Its
+# bash-only lines check BASH_VERSION themselves.
+#
+# Last on purpose. An alias is expanded wherever a command word is parsed,
+# function bodies included, so defining these early would rewrite any later
+# definition that happened to use one of the names -- the plugins above
+# included.
+if [ -f ~/.bash_scripts/aliases.sh ]; then
+    source ~/.bash_scripts/aliases.sh
+fi
+
+# Not here yet, compared with what .bashrc does for bash: `stty -ixon' to free
+# C-s, LESS and GCC_COLORS, and kubectl's completion.
