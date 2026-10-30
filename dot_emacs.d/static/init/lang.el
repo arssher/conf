@@ -211,6 +211,26 @@
   (dolist (hook '(markdown-ts-mode-hook markdown-ts-view-mode-hook))
     (add-hook hook #'ars-markdown-ts-setup-imenu)))
 
+;; Markdown 1pt smaller than everything else, in all three of its modes: the
+;; two ts ones above and markdown-mode, which a machine without the grammars
+;; still uses. Each needs its own hook -- markdown-ts-view-mode is a child of
+;; markdown-ts-mode, and markdown-ts-mode of markdown-mode, only through
+;; derived-mode-add-parents, which run-mode-hooks ignores.
+;;
+;; A function as the :height rather than a number, so the 1pt comes off
+;; whatever the default is at the time: an integer would be an absolute size,
+;; and a float a ratio, 15/16 of 160 but 1.6pt off the light theme's 250. C-x
+;; C-+ and C-x C-- still scale on top. The remapping is buffer-local and a
+;; change of major mode drops it, so going between the view and the editing
+;; mode never stacks it. 2pt was tried first, and was too much.
+(defun ars-markdown-smaller-font ()
+  "Make the default face 1pt smaller in this buffer."
+  (face-remap-add-relative 'default :height (lambda (height) (- height 10))))
+
+(dolist (hook '(markdown-mode-hook markdown-ts-mode-hook
+                markdown-ts-view-mode-hook))
+  (add-hook hook #'ars-markdown-smaller-font))
+
 
 ;; Tree-sitter modes for json, shell, toml and python, each once its grammar
 ;; is built -- install_emacs.sh builds them, and a machine without them keeps
