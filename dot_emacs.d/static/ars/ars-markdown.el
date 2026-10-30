@@ -61,6 +61,33 @@ tells `ars-markdown-ts-edit' whether re-reading is safe."
     (unless was-modified
       (set-buffer-modified-p nil))))
 
+;; markdown-table-wrap-pretty-mode draws each table wrapped to the window, see
+;; lang.el.  Turned on from an idle timer rather than from the view's hook
+;; directly, because in the hook the width it wraps to comes out wrong:
+;; window-max-chars-per-line subtracts the line-number column, and
+;; line-number-display-width reads 0 until the window has been redisplayed in
+;; the new major mode.  Measured in a 120-column frame: drawn 132 wide from
+;; the hook, against 127 available once the numbers showed, and
+;; visual-line-mode broke every row of it.  An idle timer runs after that
+;; redisplay.  The package redraws on resize, which would correct it, but
+;; nothing resizes the window when the view comes up.
+;;
+;; Deferring also puts it after the alignment above, which has to come first:
+;; that rewrites the text, and an edit is the package's signal to take its
+;; drawing off again.
+(defun ars-markdown-ts-wrap-tables ()
+  "Turn on `markdown-table-wrap-pretty-mode' once the window has been drawn.
+Meant for `markdown-ts-view-mode-hook'."
+  (let ((buffer (current-buffer)))
+    (run-with-idle-timer
+     0 nil
+     (lambda ()
+       (when (buffer-live-p buffer)
+         (with-current-buffer buffer
+           ;; Unless the view was already left again.
+           (when (eq major-mode 'markdown-ts-view-mode)
+             (markdown-table-wrap-pretty-mode 1))))))))
+
 ;; markdown-ts-view-mode is a major mode with no way back: its only exit is the
 ;; q it inherits from special-mode-map, which buries the buffer rather than
 ;; returning you to editing.  Calling markdown-ts-mode by hand gets the mode

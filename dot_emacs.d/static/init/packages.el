@@ -38,6 +38,7 @@
     bbdb ; email contacts
     counsel-bbdb ; interface to it
     markdown-mode ; markdown editing and viewing
+    markdown-table-wrap ; wide tables wrapped in the markdown view, see lang.el
     go-mode ; go support
     sql-indent ; sql indent
     exec-path-from-shell ; source shell vars

@@ -207,6 +207,20 @@
   ;; ars-markdown.el for why this is not something the mode does itself.
   (require 'ars-markdown)
   (add-hook 'markdown-ts-view-mode-hook #'ars-markdown-ts-align-all-tables)
+  ;; And draw them wrapped to the window, since a table wider than that is
+  ;; unreadable once visual wrapping breaks its rows across lines.
+  ;; markdown-table-wrap-pretty-mode, from the markdown-table-wrap package, does
+  ;; it for display only: an overlay over each table line shows the wrapped
+  ;; rendering, with box-drawing borders, and the buffer keeps the real table.
+  ;; It redraws on resize. Every table gets drawn, not only the wide ones, so
+  ;; the alignment above shows only for a table toggled back to raw with
+  ;; markdown-table-wrap-pretty-toggle. The editing mode keeps raw tables.
+  ;; ars-markdown.el has why it is switched on through a function of ours.
+  ;; Guarded for a machine where installing the package failed.
+  (when (fboundp 'markdown-table-wrap-pretty-mode)
+    (setq markdown-table-wrap-pretty-default-on-major-modes
+          '(markdown-ts-view-mode))
+    (add-hook 'markdown-ts-view-mode-hook #'ars-markdown-ts-wrap-tables))
   ;; Both hooks on purpose, see the function.
   (dolist (hook '(markdown-ts-mode-hook markdown-ts-view-mode-hook))
     (add-hook hook #'ars-markdown-ts-setup-imenu)))

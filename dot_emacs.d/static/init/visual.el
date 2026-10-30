@@ -68,6 +68,14 @@
 ;; Show long lines as wrapped
 (global-visual-line-mode 1)
 
+;; The line-number column sized for the whole buffer up front, where by
+;; default it fits only the numbers on screen and widens as you scroll past
+;; line 999 or 9999, shifting all the text right by a column. The markdown
+;; view's wrapped tables depend on it holding still: they are drawn once to
+;; the width left beside it, see ars-markdown.el, and nothing redraws them
+;; when it changes. Set from the line count when the mode comes on, so a
+;; buffer that grows past such a line while open can still widen it.
+(setq display-line-numbers-width-start t)
 (global-display-line-numbers-mode 1) ; show line numbers
 (setq column-number-mode t) ; show column number
 
