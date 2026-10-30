@@ -13,3 +13,6 @@ what it means, and where it comes from if known. One line each.
 
 How I like to talk and work, noticed in sessions and not specific to one
 project. One line each.
+
+- Prefers a built-in or packaged solution to a hand-written one: look for it first, and say so if there is none.
+- Wants unrelated changes in separate commits.
