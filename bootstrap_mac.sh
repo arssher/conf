@@ -65,6 +65,35 @@ defaults -currentHost write -g com.apple.keyboard.modifiermapping.0-0-0 \
 # needs a reboot, and gets reset by updates. Not worth it for this.
 defaults write kCFPreferencesAnyApplication TSMLanguageIndicatorEnabled 0
 
+# Switch input source with option+space, not the stock ctrl+space: ctrl+space
+# is cua-set-mark in emacs, and a system shortcut wins over the application.
+# Option is free there -- init.el sets ns-alternate-modifier to 'none.
+#
+# It costs option+space as a non-breaking space, and in ghostty, where
+# macos-option-as-alt=left, ESC-SPC on the left key.
+#
+# 60 is "Select the previous input source"; 61, left alone, is "Select next
+# source in Input menu". The parameters are the character, the key code and the
+# modifier mask: 32, space, option.
+#
+# Set it in System Settings -> Keyboard -> Keyboard Shortcuts -> Input Sources:
+# the settings daemon caches this domain, so a write from a shell can be
+# clobbered and needs a log out and back in either way. This line records the
+# binding and seeds a fresh machine.
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 60 '
+  <dict>
+    <key>enabled</key><true/>
+    <key>value</key><dict>
+      <key>type</key><string>standard</string>
+      <key>parameters</key>
+      <array>
+        <integer>32</integer>
+        <integer>49</integer>
+        <integer>524288</integer>
+      </array>
+    </dict>
+  </dict>'
+
 # Ask for the password the moment the screen locks, rather than after a grace
 # period. The default here was 300 seconds, which is longer than it sounds,
 # because the setting covers more than the screen saver: System Settings ->
