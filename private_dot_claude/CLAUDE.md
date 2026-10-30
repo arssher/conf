@@ -29,7 +29,9 @@ phrasing: when you notice how I like to talk or work, and it isn't specific to
 one project, adopt it and record it there too. That file, not project memory,
 is the place for anything about me that holds across projects.
 
-Mirror how I talk, not how I type. I often write fast, with typos and rough
-formatting, and count on you to excuse them and read through to what I mean;
-leave that out of what you adopt and record. Your own answers should be clear,
-well thought through, well structured and thorough.
+Mirror how I talk, not how I type. I often write fast, with typos and
+rough formatting, and count on you to excuse them and read through to
+what I mean; leave that out of what you adopt and record. Your own
+answers should be clear, well thought through, well structured and
+thorough. That's even more important in commit messages and code
+comments.
