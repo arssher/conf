@@ -1,65 +1,6 @@
 ;;; -*- lexical-binding: t -*-
-;; Markdown extras: table alignment for the read-only view, and the way back
-;; out of it.
-
-;; markdown-ts-mode aligns a pipe table only on demand, with C-c C-c, and
-;; markdown-ts-view-mode switches that off entirely: it sets
-;; markdown-ts-enable-table-mode to nil, so markdown-ts-in-table-mode -- which
-;; owns the align binding -- never turns on there.  The upshot is that the one
-;; mode meant purely for reading is the one that shows tables ragged.
-;;
-;; Aligning is a buffer rewrite rather than a display effect, which is why it
-;; is not simply free in a read-only buffer.  Doing it anyway is sanctioned
-;; though: markdown-ts-view-mode runs markdown-ts-view-mode-pre-init-hook
-;; before it sets buffer-read-only, documented as the place for functions that
-;; "amend buffer content", and ships markdown-ts-add-final-newline on it by
-;; default -- which inserts a newline into your buffer just for viewing.
-;; Column widths in a pipe table are whitespace, so no rendered output changes.
-;;
-;; That hook is the precedent, not the place: it runs before the mode creates
-;; its tree-sitter parser, so aligning from it dies on "No available parser
-;; for this buffer: markdown" and takes the whole mode setup with it.  Hence
-;; markdown-ts-view-mode-hook, which runs once everything is up.
-(defun ars-markdown-ts-align-all-tables ()
-  "Align every pipe table in the buffer, leaving the modified flag as it was.
-Meant for `markdown-ts-view-mode-hook'.  The text really is rewritten;
-`ars-markdown-ts-edit' puts it back by re-reading the file on the way
-out, so the alignment lasts as long as the view does.
-
-A buffer clean on arrival is left clean, so reading a file does not offer
-to save it afterwards.  One already dirty keeps its flag, since clearing
-it would hide somebody's unsaved edits -- and that same flag is what
-tells `ars-markdown-ts-edit' whether re-reading is safe."
-  (let ((inhibit-read-only t)
-        (was-modified (buffer-modified-p))
-        (starts (mapcar #'treesit-node-start
-                        (treesit-query-capture
-                         (treesit-buffer-root-node 'markdown)
-                         '((pipe_table) @table) nil nil t))))
-    (save-excursion
-      ;; Back to front, so aligning one table cannot shift the positions of
-      ;; the ones still to come.
-      (dolist (pos (sort starts #'>))
-        (goto-char pos)
-        ;; markdown-ts-table-align-table refuses to run unless
-        ;; markdown-ts-in-table-mode has put its overlay on the table, so turn
-        ;; the minor mode on around each one.
-        ;;
-        ;; Guarded because ragged and empty-celled tables still parse with
-        ;; errors (see the known issues at the top of markdown-ts-mode.el, and
-        ;; tree-sitter-markdown issue 241), and markdown-ts-at-table-p signals
-        ;; on those.  Unguarded, one such table anywhere in a file would abort
-        ;; the hook and take the whole view with it.
-        (condition-case err
-            (progn
-              (markdown-ts-in-table-mode 1)
-              (markdown-ts-table-align-table))
-          (error
-           (message "ars-markdown: leaving table at %d unaligned: %s"
-                    pos (error-message-string err))))
-        (markdown-ts-in-table-mode -1)))
-    (unless was-modified
-      (set-buffer-modified-p nil))))
+;; Markdown extras: wrapped tables in the read-only view, the way back out of
+;; it, and imenu.
 
 ;; markdown-table-wrap-pretty-mode draws each table wrapped to the window, see
 ;; lang.el.  Turned on from an idle timer rather than from the view's hook
@@ -71,10 +12,6 @@ tells `ars-markdown-ts-edit' whether re-reading is safe."
 ;; visual-line-mode broke every row of it.  An idle timer runs after that
 ;; redisplay.  The package redraws on resize, which would correct it, but
 ;; nothing resizes the window when the view comes up.
-;;
-;; Deferring also puts it after the alignment above, which has to come first:
-;; that rewrites the text, and an edit is the package's signal to take its
-;; drawing off again.
 (defun ars-markdown-ts-wrap-tables ()
   "Turn on `markdown-table-wrap-pretty-mode' once the window has been drawn.
 Meant for `markdown-ts-view-mode-hook'."
@@ -91,9 +28,10 @@ Meant for `markdown-ts-view-mode-hook'."
 ;; markdown-ts-view-mode is a major mode with no way back: its only exit is the
 ;; q it inherits from special-mode-map, which buries the buffer rather than
 ;; returning you to editing.  Calling markdown-ts-mode by hand gets the mode
-;; line right and nothing else -- it would leave the buffer holding the view's
-;; aligned text, and still read-only, buffer-read-only being a permanent local
-;; that starting another major mode does not kill.
+;; line right and nothing else -- it would leave the buffer holding whatever
+;; the view added to the text, the final newline its pre-init hook inserts
+;; when the file lacks one, and still read-only, buffer-read-only being a
+;; permanent local that starting another major mode does not kill.
 (defun ars-markdown-ts-edit ()
   "Leave `markdown-ts-view-mode' for `markdown-ts-mode' and allow editing."
   (interactive)
@@ -102,13 +40,14 @@ Meant for `markdown-ts-view-mode-hook'."
            ;; Edits that predate the view, which re-reading would throw away.
            (not (buffer-modified-p)))
       ;; Re-reading the file is the whole job, and undoes the whole visit:
-      ;; the alignment goes, normal-mode picks markdown-ts-mode back out of
-      ;; auto-mode-alist, and after-find-file restores buffer-read-only from
-      ;; the file's own permissions, so a write-protected file stays protected
-      ;; rather than being quietly unlocked by a trip through the view.
+      ;; the text is the file's again, normal-mode picks markdown-ts-mode back
+      ;; out of auto-mode-alist, and after-find-file restores buffer-read-only
+      ;; from the file's own permissions, so a write-protected file stays
+      ;; protected rather than being quietly unlocked by a trip through the
+      ;; view.
       (revert-buffer t t)
-    ;; Nothing safe to re-read.  Switch by hand and keep the text, including
-    ;; the alignment; recompute read-only the way after-find-file would.
+    ;; Nothing safe to re-read.  Switch by hand and keep the text as it is;
+    ;; recompute read-only the way after-find-file would.
     (markdown-ts-mode)
     (read-only-mode (if (and buffer-file-name
                              (not (file-writable-p buffer-file-name)))
