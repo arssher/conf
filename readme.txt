@@ -164,21 +164,25 @@ Shortcuts:
     install_xremap.sh      copies into /etc under sudo, restarts the daemon
   The unit's header has the reasoning; install_xremap.sh pins the version.
 
-Codex status line:
+Codex config:
 
-  private_dot_codex/modify_private_config.toml manages only tui.status_line in
-  ~/.codex/config.toml through chezmoi's modify-template support. Model, plugin,
-  MCP and project settings are read from the live file and retained, rather
-  than copied into this public repo. Auth files and session state stay local.
+  private_dot_codex/modify_private_config.toml manages a few settings inside
+  ~/.codex/config.toml through chezmoi's modify-template support; the template
+  says which ones and why. Everything else there -- model, plugins, MCP
+  servers, project trust -- is read from the live file and retained, rather
+  than copied into this public repo. Do not re-add the whole Codex config.
+  Auth files and session state stay local.
 
-  The footer shows hostname, model, context size, git branch, session tokens,
-  context usage, five-hour/weekly quota remaining, and directory. /statusline
-  changes the live selection; edit the list in the modify template to keep a
-  new selection here. Do not re-add the whole Codex config.
+  Codex writes that file itself, so a setting changed from inside it
+  (/statusline, `codex features enable`) stays machine-local until the
+  template is taught about it. Teaching it means a dig for the current value
+  and a setValueAtPath beside the ones already there -- in that order, for the
+  reason the template gives.
 
-  If the list already matches, the file is left byte for byte unchanged.
-  Changing the list re-serializes TOML, preserving other settings' values but
-  normalizing formatting and dropping comments. Apply just this target with:
+  If the managed settings already match, the file is left byte for byte
+  unchanged. Changing one re-serializes TOML, preserving other settings'
+  values but normalizing formatting and dropping comments. Apply just this
+  target with:
     chezmoi diff ~/.codex/config.toml
     chezmoi apply ~/.codex/config.toml
 

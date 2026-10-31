@@ -1,6 +1,21 @@
 {{- /* chezmoi:modify-template */ -}}
-{{- /* Manage the footer only; keep all other Codex settings machine-local. */ -}}
-{{- $items := list
+{{- /* ~/.codex/config.toml is Codex's documented user config, but Codex also
+       keeps its own state there: plugin enablement, project trust, registered
+       MCP servers, and paths into /Applications and ~/.cache that differ per
+       machine.  Managing the file outright would wipe all that on the first
+       apply, or drag machine state into this public repo.  And Codex has no
+       include directive or config.d at any layer, so a couple of keys cannot
+       just be dropped in beside it.
+
+       The one way to keep them in a plain static file is
+       /etc/codex/config.toml, Codex's system layer -- but that sits outside
+       $HOME, wanting sudo and an install script rather than an apply, and it
+       ranks below the user config, so anything Codex writes into the live
+       file would win over it.
+
+       Hence a modify-template: it merges the settings below into whatever the
+       live file happens to hold, and leaves the rest of it alone. */ -}}
+{{- $status_line := list
     "hostname"
     "model"
     "context-window-size"
@@ -12,9 +27,28 @@
     "current-dir"
 -}}
 {{- $config := fromToml .chezmoi.stdin -}}
-{{- $current := dig "tui" "status_line" (list) $config -}}
-{{- if eq (toJson $current) (toJson $items) -}}
+{{- /* respect_system_proxy makes Codex route its own requests through the
+       proxy the OS is configured to use, instead of ignoring it and warning
+       that a system proxy is configured but unused.  It is a feature flag --
+       `codex features enable respect_system_proxy` writes exactly this key --
+       and still marked "under development", so `codex features list` is the
+       place to check it survived a release.  Codex reads it at startup; a
+       running one keeps the old setting. */ -}}
+{{- /* Nothing is rewritten unless one of the managed settings has drifted.
+       Codex writes this file in its own style, so re-serializing it on every
+       apply would leave chezmoi diff permanently showing that reformat, with
+       real drift lost in the noise.
+
+       Both current values are read before either is written: setValueAtPath
+       edits the dict in place, so a comparison made afterwards would always
+       match and the file would never be rewritten at all. */ -}}
+{{- $footer := dig "tui" "status_line" (list) $config -}}
+{{- $proxy := dig "features" "respect_system_proxy" false $config -}}
+{{- if and (eq (toJson $footer) (toJson $status_line)) (eq $proxy true) -}}
 {{- .chezmoi.stdin -}}
 {{- else -}}
-{{- $config | setValueAtPath "tui.status_line" $items | toToml -}}
+{{- $config
+      | setValueAtPath "tui.status_line" $status_line
+      | setValueAtPath "features.respect_system_proxy" true
+      | toToml -}}
 {{- end -}}
