@@ -1,0 +1,46 @@
+{{ if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+#
+# GNOME notifications switched off for the senders listed below, ones whose
+# every notification is noise.
+#
+# snapd's user session agent: while a snap app is running, snapd holds back
+# its update and, each time it checks again -- every four hours or so -- posts
+# a notification asking to close the app. With ghostty from the snap and a
+# terminal always open, that is every ghostty release. The update still goes
+# in, silently, once the app is closed. ghostty's own notifications, the ones
+# programs in the terminal send through it included, come under ghostty's
+# entry, not this one.
+#
+# Only the enable key is written. gnome-shell reads it by path, from the
+# sender's desktop file name lowercased with dots as dashes, so it holds even
+# before that sender has posted anything; GNOME Settings lists the sender, as
+# switched off, once it does.
+#
+# Written with dconf rather than gsettings, for the reason in
+# run_onchange_after_60-gnome-shortcuts.sh.tmpl: dconf fails without a desktop
+# session, and failing makes chezmoi run this again on the next apply.
+
+set -euo pipefail
+
+if ! gsettings list-schemas | grep -qx org.gnome.desktop.notifications; then
+    echo "gnome-notifications: not a GNOME desktop -- skipped"
+    exit 0
+fi
+
+off=(
+    io-snapcraft-sessionagent   # snapd's user session agent
+)
+
+for app in "${off[@]}"; do
+    if ! dconf write \
+            "/org/gnome/desktop/notifications/application/${app}/enable" \
+            false 2>/dev/null; then
+        echo "gnome-notifications: cannot write to dconf -- no desktop session?" >&2
+        echo "gnome-notifications: chezmoi will try again on the next apply" >&2
+        exit 1
+    fi
+done
+
+echo "gnome-notifications: ${#off[@]} off"
+{{ end -}}
