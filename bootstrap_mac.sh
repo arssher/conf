@@ -315,8 +315,8 @@ brew install imagemagick
 # tesseract on its own carries English only. tesseract-lang is every other
 # language's trained data, and the reason it is here rather than one file
 # dropped into tessdata by hand: brew owns it, so it survives a tesseract
-# upgrade. Russian, French and Dutch are the ones actually wanted, and need no
-# line of their own: tesseract-lang has them all. Usage:
+# upgrade. Russian, French, Dutch and Armenian are the ones actually wanted,
+# and need no line of their own: tesseract-lang has them all. Usage:
 #
 #   ocrmypdf -l rus+eng in.pdf out.pdf
 #
