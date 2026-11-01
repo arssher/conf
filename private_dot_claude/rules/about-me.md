@@ -16,3 +16,5 @@ project. One line each.
 
 - Prefers a built-in or packaged solution to a hand-written one: look for it first, and say so if there is none.
 - Wants unrelated changes in separate commits.
+- When a design is justified in chat, the justification belongs in a comment on the thing itself, rejected alternatives included.
+- Documentation should not restate what the file itself documents: the overview points at it, the file explains.
