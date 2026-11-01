@@ -101,7 +101,8 @@ Shell startup files:
   the private environment. PATH configuration stays in .sh_env.
 
   The interactive halves stay per-shell: .bashrc below its `case $- in *i*)`
-  guard, and .zshrc, which is bindings only so far.
+  guard, and .zshrc, which holds key bindings and the claude() wrapper
+  described below.
 
   macOS gotcha: /etc/zprofile runs path_helper in every login shell, and it
   builds PATH from /etc/paths, then /etc/paths.d, then inherited entries.
@@ -185,6 +186,17 @@ Codex config:
   target with:
     chezmoi diff ~/.codex/config.toml
     chezmoi apply ~/.codex/config.toml
+
+
+Claude Code and the macOS system proxy:
+
+  Claude Code reads HTTP_PROXY and HTTPS_PROXY but not the macOS system proxy.
+  .local/bin/claude-system-proxy bridges the two, and a claude() function in
+  .zshrc routes interactive invocations through it. Both files carry the
+  reasoning, the limits, and why the script is not named claude.
+
+  It is the only thing under ~/.local/bin managed here. The rest of that
+  directory is installed software, which chezmoi leaves alone.
 
 
 Content kept outside this repo:

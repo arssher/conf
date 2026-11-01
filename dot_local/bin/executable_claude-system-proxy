@@ -1,0 +1,114 @@
+#!/usr/bin/env python3
+"""Launch Claude Code using macOS's currently enabled manual HTTP(S) proxy.
+
+Only the manual HTTP and HTTPS settings are honoured, because they are the
+only ones HTTP_PROXY can express: a PAC URL or WPAD discovery
+(ProxyAutoConfigEnable, ProxyAutoDiscoveryEnable) and SOCKS are read as no
+proxy at all, and Claude Code then connects directly.
+
+Reached through the claude() function in .zshrc, which is why this file must
+not itself be called "claude" -- see exec_claude below.  That covers
+interactive zsh and nothing else: a script, a bash shell, or an editor
+launching claude gets no proxy.
+
+`claude-system-proxy --proxy-status` reports what it would do, as JSON,
+without launching anything.
+"""
+
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+
+PROXY_KEYS = ("HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy", "https_proxy", "all_proxy")
+
+
+def parse_scutil(text):
+    """Read global scalar values, excluding nested per-interface settings."""
+    values = {}
+    depth = 0
+    for line in text.splitlines():
+        if depth == 1:
+            match = re.fullmatch(r"\s*([A-Za-z_]\w*)\s*:\s*(.*?)\s*", line)
+            if match and not match.group(2).startswith("<"):
+                values[match.group(1)] = match.group(2)
+        depth += line.count("{") - line.count("}")
+    return values
+
+
+def proxy_url(values):
+    for kind in ("HTTPS", "HTTP"):
+        if str(values.get(kind + "Enable", "0")) != "1":
+            continue
+        host = str(values.get(kind + "Proxy", "")).strip()
+        try:
+            port = int(values.get(kind + "Port", 0))
+        except (TypeError, ValueError):
+            continue
+        if not host or not 1 <= port <= 65535 or re.search(r"[\s/@?#]", host):
+            continue
+        if ":" in host and not host.startswith("["):
+            host = f"[{host}]"
+        return f"http://{host}:{port}"
+    return None
+
+
+def system_proxy():
+    result = subprocess.run(
+        ["/usr/sbin/scutil", "--proxy"],
+        text=True, capture_output=True, timeout=5, check=True,
+    )
+    return proxy_url(parse_scutil(result.stdout))
+
+
+def launch_environment(proxy, inherited):
+    # The system settings are the whole truth here: a proxy exported by hand is
+    # dropped rather than merged, so that switching the proxy off in System
+    # Settings really does mean a direct connection.
+    env = dict(inherited)
+    for key in PROXY_KEYS:
+        env.pop(key, None)
+    if proxy:
+        env.update(HTTP_PROXY=proxy, HTTPS_PROXY=proxy)
+        if not env.get("NO_PROXY") and not env.get("no_proxy"):
+            env["NO_PROXY"] = "localhost,127.0.0.1,::1"
+    return env
+
+
+def exec_claude(args, env):
+    """Replace this process with the real claude. Returns only on failure."""
+    # shutil.which searches PATH, which the claude() shell function is not part
+    # of, so this finds the real executable.  It would find this wrapper
+    # instead, and exec it in a loop, if the file were ever named "claude".
+    executable = shutil.which("claude")
+    if not executable:
+        print("The original claude executable was not found on PATH.", file=sys.stderr)
+        return 1
+    os.execve(executable, [executable, *args], env)
+
+
+def main():
+    # .zshrc is shared with a linux machine, where /usr/sbin/scutil does not
+    # exist. Without this, reading the proxy would fail there and claude would
+    # never start at all; the inherited environment is left alone instead, so
+    # an exported HTTPS_PROXY keeps working on that side.
+    if sys.platform != "darwin":
+        if sys.argv[1:] == ["--proxy-status"]:
+            print(json.dumps({"mode": "unsupported", "proxy": None}, indent=2))
+            return 0
+        return exec_claude(sys.argv[1:], os.environ)
+    try:
+        proxy = system_proxy()
+    except (OSError, subprocess.SubprocessError) as error:
+        print(f"Could not read macOS proxy settings: {error}", file=sys.stderr)
+        return 1
+    if sys.argv[1:] == ["--proxy-status"]:
+        print(json.dumps({"mode": "proxy" if proxy else "direct", "proxy": proxy}, indent=2))
+        return 0
+    return exec_claude(sys.argv[1:], launch_environment(proxy, os.environ))
+
+
+if __name__ == "__main__":
+    sys.exit(main())

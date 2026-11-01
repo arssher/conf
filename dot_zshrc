@@ -675,3 +675,12 @@ fi
 
 # Not here yet, compared with what .bashrc does for bash: `stty -ixon' to free
 # C-s, LESS and GCC_COLORS, and kubectl's completion.
+
+# >>> Claude Code macOS system proxy >>>
+# Deliberate, despite looking exactly like an installer's append -- the shell
+# startup notes in readme.txt say to treat those as drift and revert them.
+# claude-system-proxy's header has what it does and what it does not cover.
+claude() {
+  "$HOME/.local/bin/claude-system-proxy" "$@"
+}
+# <<< Claude Code macOS system proxy <<<
