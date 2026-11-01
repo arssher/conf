@@ -15,19 +15,43 @@
 # the sudo process -- since sudo passes only the prompt, and a dialog asking
 # for the root password should say what it is for.
 #
-# Linux only so far, through zenity. On mac the same could be done with
-# osascript, roughly
-#   osascript -e 'text returned of (display dialog "..." default answer ""
-#                 with hidden answer with title "sudo")'
-# with ps -o args= -p "$PPID" in place of /proc for the command. Until then it
-# fails there, as sudo without a terminal does anyway.
+# Two dialogs, one contract: zenity on linux, osascript on mac. Both are
+# exec'd, so the password is never held by this shell, and both give up after
+# 100 seconds -- inside Claude Code's default two-minute limit on a command, so
+# the dialog closes before that limit kills the sudo waiting on it.
 
 set -euo pipefail
 
 prompt=${1:-Password:}
 
+if [ "$(uname -s)" = Darwin ]; then
+    # ps for the command line, macOS having no /proc.
+    cmd=$(ps -o args= -p "$PPID" 2>/dev/null || true)
+
+    # The AppleScript arrives on stdin and the two strings as arguments, so
+    # nothing quoted inside a command line can be read as script. It trims the
+    # command itself because display dialog grows to fit its text, and a long
+    # enough one would push the buttons off the screen.
+    #
+    # A cancel raises -128 "User canceled" by itself; the timeout is given a
+    # message of its own, so the two can be told apart in the log. Either way
+    # osascript exits non-zero having printed nothing.
+    exec osascript - "$cmd" "$prompt" <<'APPLESCRIPT'
+on run argv
+    set cmd to item 1 of argv
+    if (count of cmd) > 300 then set cmd to (text 1 thru 300 of cmd) & "..."
+    activate
+    set answer to display dialog (cmd & linefeed & linefeed & (item 2 of argv)) ¬
+        default answer "" with hidden answer ¬
+        with title "sudo" with icon caution giving up after 100
+    if gave up of answer then error "sudo-askpass: timed out" number -128
+    return text returned of answer
+end run
+APPLESCRIPT
+fi
+
 if ! command -v zenity >/dev/null; then
-    echo "sudo-askpass: no zenity here; on mac see the osascript note" >&2
+    echo "sudo-askpass: not macOS and no zenity here; nothing to ask with" >&2
     exit 1
 fi
 
@@ -38,7 +62,5 @@ cmd=${cmd% }
 # zenity's --text is Pango markup, and a command can hold & < >.
 escape() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'; }
 
-# The timeout closes the dialog before Claude Code's default two-minute limit
-# on a command kills the sudo waiting for it.
 exec zenity --entry --hide-text --title=sudo --timeout=100 \
      --text="$(printf '%s\n\n%s' "$cmd" "$prompt" | escape)"
