@@ -359,6 +359,18 @@ brew install imagemagick
 # directory of PDFs and report the page the hit was on.
 brew install ocrmypdf tesseract-lang unpaper qpdf poppler pdfgrep
 
+# Ebooks. A cask is the only form, and it installs upstream's own dmg rather
+# than a rebuild, so this is Kovid Goyal's binary with its bundled Python and
+# Qt. Worth having through brew rather than by hand for the command line suite
+# it symlinks onto PATH beside the app -- ebook-convert, calibredb, ebook-meta,
+# ebook-polish, calibre-server, fetch-ebook-metadata among them.
+#
+# The cask does not declare auto_updates, so brew owns updating it: `brew
+# upgrade --cask calibre`. Updating from inside calibre instead leaves brew
+# ready to reinstall over the result. The cask also pins older calibres for
+# older macOS, which is why a tired mac does not simply fail to install it.
+brew install --cask calibre
+
 # install rust. --no-modify-path because rustup otherwise appends
 # `. "$HOME/.cargo/env"` to every rc file it finds -- ~/.profile always, and
 # ~/.zshenv whenever zsh is on PATH, which on mac it always is. Both are
