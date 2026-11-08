@@ -280,6 +280,24 @@ brew install --cask google-chrome visual-studio-code slack iterm2 \
 # the launch it is given to -- so by hand, once per machine:
 #   palette > "Settings Sync: Configure..." > untick Settings and Keyboard Shortcuts
 
+# Syncthing. The formula follows upstream's 2.x, which is what the apt pin on
+# linux is for, so both ends stay on one major version with nothing to tap or
+# add. The syncthing-app cask is a menu bar wrapper around this same daemon.
+#
+# brew services writes ~/Library/LaunchAgents/sh.brew.syncthing.plist with
+# RunAtLoad and KeepAlive, and runs it --no-browser --no-restart: launchd does
+# the restarting here, as systemd does on linux, where the unit is enabled
+# through chezmoi instead. Log in $BREW/var/log/syncthing.log, GUI on
+# http://127.0.0.1:8384 as there.
+#
+# The first start writes ~/Library/Application Support/Syncthing: config.xml,
+# and key.pem/cert.pem which are this machine's identity. Machine state and a
+# secret, so not in this repo -- pair the machines through the GUI, with
+# `syncthing device-id` to read each one's. macOS asks once about accepting
+# incoming connections.
+brew install syncthing
+brew services start syncthing
+
 # mu/mu4e, and pass for secrets
 brew install mu isync pass
 
