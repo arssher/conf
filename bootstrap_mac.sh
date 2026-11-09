@@ -389,6 +389,23 @@ brew install ocrmypdf tesseract-lang unpaper qpdf poppler pdfgrep
 # older macOS, which is why a tired mac does not simply fail to install it.
 brew install --cask calibre
 
+# Python modules for the calibre library scripts in
+# ~/Dropbox/configs/calibre/library-cleanup: lxml, pikepdf, reportlab and
+# Pillow. Brew has no formulae for the first three, and brew's python refuses
+# pip installs into itself (PEP 668), so they get a venv of their own, the
+# way ansible does on Debian. ocrmypdf's private venv happens to carry pikepdf
+# and lxml, but it belongs to brew and has no reportlab. The scripts that run
+# under calibre-debug use calibre's bundled Python and need none of this; the
+# ones run as python3 need it:
+#
+#   ~/venv/calibre/bin/python3 library-cleanup/ocr_pdfs.py ...
+#
+# The venv is bound to brew's python minor version. When brew moves on to the
+# next one, delete ~/venv/calibre and run these lines again.
+mkdir -p ~/venv
+python3 -m venv ~/venv/calibre
+~/venv/calibre/bin/pip install lxml pikepdf reportlab pillow
+
 # install rust. --no-modify-path because rustup otherwise appends
 # `. "$HOME/.cargo/env"` to every rc file it finds -- ~/.profile always, and
 # ~/.zshenv whenever zsh is on PATH, which on mac it always is. Both are
