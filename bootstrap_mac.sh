@@ -119,6 +119,25 @@ defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 60 '
 #   sysadminctl -screenLock 300 -password -   # to put the delay back
 sysadminctl -screenLock immediate -password -
 
+# Sleep only when asked for. This machine idle-slept on both power sources:
+# pmset showed `sleep 1`, a one minute idle timer, and `pmset -g log` filled
+# with "Entering Sleep state due to 'Idle Sleep'". That timer reads oddly
+# against displaysleep until you look at the assertions: powerd holds
+# "Prevent sleep while display is on" for as long as the screen is lit, so the
+# countdown only starts once the display has gone dark. Hence the symptom --
+# screen blanks on its own schedule, machine suspends a minute later.
+#
+# sleep 0 stops the idle timer and touches nothing else. The display still
+# blanks on displaysleep, 10 minutes on AC and 2 on battery, which is wanted;
+# an explicit sleep still works, whether the Apple menu, the lid or `pmset
+# sleepnow`. Only sleeping unbidden goes away.
+#
+# -a is both power sources, which System Settings cannot express: its "Prevent
+# automatic sleeping when the display is off" is AC-only and has no battery
+# counterpart. On battery that means staying awake until the charge is gone --
+# macOS still forces sleep once it is critical, which is not configurable.
+sudo pmset -a sleep 0
+
 # Three finger drag: three fingers move a window or select text. The keys
 # System Settings -> Accessibility -> Pointer Control -> Trackpad Options
 # writes. Re-login required, and a half-applied state behaves erratically in
