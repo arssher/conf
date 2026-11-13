@@ -136,6 +136,15 @@ sysadminctl -screenLock immediate -password -
 # automatic sleeping when the display is off" is AC-only and has no battery
 # counterpart. On battery that means staying awake until the charge is gone --
 # macOS still forces sleep once it is critical, which is not configurable.
+#
+# Two cases this leaves as they were, both read off the reasons in that log.
+# Locking is not a sleep trigger at all -- no lock reason appears there -- so a
+# lock blanks the display on displaysleep and then stays up. Closing the lid
+# does still sleep, as 'Clamshell Sleep', which is its own path; an external
+# display with power and a keyboard gives clamshell mode instead, macOS's own
+# doing. Keeping a closed lid awake would need `pmset -a disablesleep 1`,
+# which disables sleep wholesale and takes the deliberate Apple menu sleep
+# with it, so no.
 sudo pmset -a sleep 0
 
 # Three finger drag: three fingers move a window or select text. The keys
