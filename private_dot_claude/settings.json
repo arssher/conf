@@ -1,6 +1,7 @@
 {
   "attribution": {
-    "commit": "Assisted-By: Claude Opus 5 <noreply@anthropic.com>"
+    "commit": "Assisted-By: Claude Opus 5 <noreply@anthropic.com>",
+    "sessionUrl": false
   },
   "model": "opus",
   "statusLine": {
