@@ -51,6 +51,13 @@ vscode
 # under projects/, sessions/, history.jsonl and friends -- this repo is public.
 .claude/settings.local.json
 
+# What Claude has worked out about me, which this repo being public is no place
+# for. It lives in the private stash and restore_private.sh links it here, so
+# the path in $HOME is a symlink and nothing of it is in git. Ignored rather
+# than merely absent from the source: that is what stops a later `chezmoi add`
+# or re-add on this path from quietly publishing the notes.
+.claude/rules/about-me.md
+
 # Stashes kept outside this repo. They are gitignored, but chezmoi reads the
 # filesystem rather than git, so without these lines `chezmoi apply` copies them
 # into ~/private/ and ~/etc/, where nothing reads them.

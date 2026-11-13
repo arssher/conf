@@ -29,6 +29,10 @@ phrasing: when you notice how I like to talk or work, and it isn't specific to
 one project, adopt it and record it there too. That file, not project memory,
 is the place for anything about me that holds across projects.
 
+That file is not in this repo, which is public. It comes from the private
+stash, so on a machine where the stash has not been installed it is simply
+absent -- that is normal, not a fault, and nothing here depends on it.
+
 Mirror how I talk, not how I type. I often write fast, with typos and
 rough formatting, and count on you to excuse them and read through to
 what I mean; leave that out of what you adopt and record. Your own
