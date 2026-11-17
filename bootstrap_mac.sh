@@ -147,6 +147,28 @@ sysadminctl -screenLock immediate -password -
 # with it, so no.
 sudo pmset -a sleep 0
 
+# Pin the hostname, or the network names the machine. .zshrc's prompt prints
+# %m, the POSIX hostname -- HostName, not ComputerName or LocalHostName.
+# Unset, as on a fresh mac, configd reverse-resolves the primary address
+# instead of falling back to those two, so the router's PTR for the current
+# lease becomes the name: a generic mac-3.home here, with older tabs still
+# reading mac-2, each shell having frozen %m at startup.
+#
+# From LocalHostName, so no machine name is spelled out here; not from
+# ComputerName, which is a display name and may hold spaces and non-ASCII
+# ("Arseny's MacBook Air"), while LocalHostName is macOS's sanitized form of
+# it and a valid DNS label. Pinning beats clearing the router's stale leases:
+# it holds on every network. `scutil --get` exits non-zero when the name is
+# unset, hence the `|| true` under set -e.
+name="$(scutil --get LocalHostName 2>/dev/null || true)"
+if [ -z "${name}" ]; then
+    echo "LocalHostName is unset -- name this mac in System Settings first" >&2
+elif [ "$(scutil --get HostName 2>/dev/null || true)" = "${name}" ]; then
+    echo "HostName is already ${name}"
+else
+    sudo scutil --set HostName "${name}"
+fi
+
 # Three finger drag: three fingers move a window or select text. The keys
 # System Settings -> Accessibility -> Pointer Control -> Trackpad Options
 # writes. Re-login required, and a half-applied state behaves erratically in
