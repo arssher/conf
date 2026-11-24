@@ -11,3 +11,7 @@ GTAGS
 .idea/
 .cache/
 compile_commands.json
+
+# claude code's machine-local state -- permission grants and the like -- which
+# it writes beside the settings.json a repo may well be tracking
+**/.claude/settings.local.json
