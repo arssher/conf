@@ -568,13 +568,14 @@
                         ]
                     },
                     {
-                        "description": "tab switching in firefox: left cmd + m and left cmd + , become cmd+option+left and cmd+option+right, which are firefox's own previous and next tab on mac. Not ctrl+tab, which can be set to recently-used order rather than positional. Same deal as the terminal rule: left cmd only, so right cmd keeps cmd+m minimise and cmd+, settings. Another browser is another bundle id here.",
+                        "description": "tab switching in browsers: left cmd + m and left cmd + , become cmd+option+left and cmd+option+right, which are previous and next tab on mac in firefox and chrome alike. Not ctrl+tab, which can be set to recently-used order rather than positional. Same deal as the terminal rule: left cmd only, so right cmd keeps cmd+m minimise and cmd+, settings. Yet another browser is another bundle id in both lists below.",
                         "manipulators": [
                             {
                                 "conditions": [
                                     {
                                         "bundle_identifiers": [
-                                            "^org\\.mozilla\\.firefox$"
+                                            "^org\\.mozilla\\.firefox$",
+                                            "^com\\.google\\.Chrome$"
                                         ],
                                         "type": "frontmost_application_if"
                                     }
@@ -595,7 +596,8 @@
                                 "conditions": [
                                     {
                                         "bundle_identifiers": [
-                                            "^org\\.mozilla\\.firefox$"
+                                            "^org\\.mozilla\\.firefox$",
+                                            "^com\\.google\\.Chrome$"
                                         ],
                                         "type": "frontmost_application_if"
                                     }

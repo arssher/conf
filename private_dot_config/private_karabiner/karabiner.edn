@@ -51,7 +51,10 @@
                             "^com\\.googlecode\\.iterm2$"
                             "^com\\.apple\\.Terminal$"
                             "^com\\.microsoft\\.VSCode$"]
-                :firefox   ["^org\\.mozilla\\.firefox$"]}
+                ;; Both browsers in one set rather than [:firefox :chrome] in
+                ;; the rule, for the reason spelled out at :tabapps above.
+                :browsers  ["^org\\.mozilla\\.firefox$"
+                            "^com\\.google\\.Chrome$"]}
 
  :main
  [;; Real keys, so a TUI understands them. Everywhere but emacs, which does
@@ -129,11 +132,12 @@
    :rules [[{:key :i :modi {:mandatory [:left_command :shift]}} :!OSi :vscode]
            [{:key :k :modi {:mandatory [:left_command :shift]}} :!OSk :vscode]]}
 
-  ;; firefox's own previous/next tab on mac. Not ctrl+tab, which can be set
-  ;; to recently-used order rather than positional.
-  {:des "tab switching in firefox"
-   :rules [[:!Cm     :!COleft_arrow  :firefox]
-           [:!Ccomma :!COright_arrow :firefox]]}
+  ;; cmd+option+arrow is previous/next tab in firefox and in chrome alike.
+  ;; Not ctrl+tab, which can be set to recently-used order rather than
+  ;; positional.
+  {:des "tab switching in browsers"
+   :rules [[:!Cm     :!COleft_arrow  :browsers]
+           [:!Ccomma :!COright_arrow :browsers]]}
 
   ;; Not scoped to any app. The terminal tab rule above emits exactly this
   ;; trigger and does not set it off: karabiner posts its output to the
