@@ -12,6 +12,13 @@ searching (`cat`, `grep`, `rg`), mechanical changes across many files, `git`,
 and verification — running the tests, parsers and checks that confirm an edit
 did what it claimed.
 
+## Web pages
+
+When reading a web page directly fails for any reason (a WebFetch error,
+HTTP 403 or 429, a bot check, a page that only renders with JavaScript), open
+it in Chrome with the claude-in-chrome tools instead of giving up or settling
+for search snippets.
+
 ## Idioms, jokes and manner
 
 I often use idioms, устойчивые выражения, quotes and jokes, both famous and
