@@ -34,6 +34,19 @@
        and still marked "under development", so `codex features list` is the
        place to check it survived a release.  Codex reads it at startup; a
        running one keeps the old setting. */ -}}
+{{- /* Hide the Computer Use picture-in-picture preview, and Mini -- the
+       floating pet.  Both have UI toggles (the chat's ... menu > Computer Use
+       > Picture in Picture > Hide, and the profile menu's Hide Pet), but
+       nothing set there survives a new machine, which is why they are pinned
+       here.  Flipping them in the app now loses to the next apply, same trade
+       as the status line above.
+
+       The names are the app's own settings-store keys, taken verbatim from
+       the 26.1120.41243 bundle -- mixed casing and all, which is theirs, not
+       a slip.  Undocumented, so check them against the bundle if the pet
+       reappears.  pet-visibility takes only "always-visible" or "on-demand";
+       petVisible is marked agentAccess "hidden", so the file is the only way
+       in. */ -}}
 {{- /* Nothing is rewritten unless one of the managed settings has drifted.
        Codex writes this file in its own style, so re-serializing it on every
        apply would leave chezmoi diff permanently showing that reformat, with
@@ -44,11 +57,18 @@
        match and the file would never be rewritten at all. */ -}}
 {{- $footer := dig "tui" "status_line" (list) $config -}}
 {{- $proxy := dig "features" "respect_system_proxy" false $config -}}
-{{- if and (eq (toJson $footer) (toJson $status_line)) (eq $proxy true) -}}
+{{- $pip := dig "desktop" "computerUseAlwaysHidePictureInPicture" false $config -}}
+{{- $pet := dig "desktop" "avatar-overlay-pet-visible" true $config -}}
+{{- $pet_mode := dig "desktop" "pet-visibility" "" $config -}}
+{{- if and (eq (toJson $footer) (toJson $status_line)) (eq $proxy true)
+           (eq $pip true) (eq $pet false) (eq $pet_mode "on-demand") -}}
 {{- .chezmoi.stdin -}}
 {{- else -}}
 {{- $config
       | setValueAtPath "tui.status_line" $status_line
       | setValueAtPath "features.respect_system_proxy" true
+      | setValueAtPath "desktop.computerUseAlwaysHidePictureInPicture" true
+      | setValueAtPath "desktop.avatar-overlay-pet-visible" false
+      | setValueAtPath "desktop.pet-visibility" "on-demand"
       | toToml -}}
 {{- end -}}
