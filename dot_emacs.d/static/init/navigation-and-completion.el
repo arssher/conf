@@ -45,3 +45,33 @@
 ;; it is turned off, so switching the timer off leaves C-h on embark instead of
 ;; dropping back to describe-prefix-bindings.
 (embark-auto-prefix-help-mode 1)
+
+
+;; Filename completion: don't believe a trailing slash
+;;
+;; Emacs decides a candidate is a directory with a probe that the Dropbox
+;; FileProvider under ~/Library/CloudStorage answers wrongly for symlinks
+;; pointing into it. So ~/.claude/rules/about-me.md, the link to the notes in
+;; the stash, completes as "about-me.md/", and opening it visits a directory
+;; that does not exist: an empty fundamental-mode buffer and a question about
+;; read-only. file-directory-p gets the same path right, so it arbitrates.
+;;
+;; Not ivy's doing -- emacs -Q completes it with the slash too, and
+;; ivy--sorted-files alone gets it right. A file inside the Dropbox tree is
+;; fine; only symlinks from outside pointing in are affected.
+;;
+;; Costs one stat per candidate that already ends in a slash, so per real
+;; directory in the listing. Remote directories are left alone: the bug is
+;; local, and there the stat could mean a round trip.
+(defun ars-drop-bogus-dir-slash (orig file dir)
+  "Drop the trailing slash from completions that are not really directories."
+  (let ((candidates (funcall orig file dir)))
+    (if (file-remote-p dir)
+        candidates
+      (mapcar (lambda (c)
+                (if (and (stringp c) (string-suffix-p "/" c)
+                         (not (file-directory-p (expand-file-name c dir))))
+                    (substring c 0 -1)
+                  c))
+              candidates))))
+(advice-add 'file-name-all-completions :around #'ars-drop-bogus-dir-slash)
