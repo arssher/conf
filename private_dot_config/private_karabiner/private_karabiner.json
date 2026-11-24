@@ -666,7 +666,7 @@
                         ]
                     },
                     {
-                        "description": "App launchers on right option: f firefox, v vscode, g ghostty, t telegram, r emacs. open brings an app forward when it is already running rather than starting a second. One manipulator per app, so each costs only that letter's composed character -- emacs is on r rather than e to leave the dead keys alone, option + e i u n and backtick being the accents on a US layout. Deliberately not a Hyper layer: binding right option to ctrl+option+shift+cmd would spend the whole key, where a binding per letter costs only that letter's composed character -- right option keeps composing everything else and stays free for other uses. Absolute path to open because karabiner runs shell_command with a bare environment, and the bundle id rather than the name so a rename cannot break it.",
+                        "description": "App launchers on right option: f firefox, c chrome, v vscode, g ghostty, t telegram, r emacs, h chatgpt. open brings an app forward when it is already running rather than starting a second. One manipulator per app, so each costs only that letter's composed character -- emacs is on r rather than e to leave the dead keys alone, option + e i u n and backtick being the accents on a US layout. Of the letters spent, c is the one whose character is likely to be missed: it composed a cedilla, where the rest gave a trademark or a square root. Deliberately not a Hyper layer: binding right option to ctrl+option+shift+cmd would spend the whole key, where a binding per letter costs only that letter's composed character -- right option keeps composing everything else and stays free for other uses. Absolute path to open because karabiner runs shell_command with a bare environment, and the bundle id rather than the name so a rename cannot break it. The one to check rather than guess is chatgpt: ChatGPT.app answers to com.openai.codex, not to anything spelling out chat.",
                         "manipulators": [
                             {
                                 "from": {
@@ -674,6 +674,14 @@
                                     "modifiers": { "mandatory": ["right_option"] }
                                 },
                                 "to": [{ "shell_command": "/usr/bin/open -b org.mozilla.firefox" }],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "c",
+                                    "modifiers": { "mandatory": ["right_option"] }
+                                },
+                                "to": [{ "shell_command": "/usr/bin/open -b com.google.Chrome" }],
                                 "type": "basic"
                             },
                             {
@@ -706,6 +714,14 @@
                                     "modifiers": { "mandatory": ["right_option"] }
                                 },
                                 "to": [{ "shell_command": "/usr/bin/open -b org.gnu.Emacs" }],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "h",
+                                    "modifiers": { "mandatory": ["right_option"] }
+                                },
+                                "to": [{ "shell_command": "/usr/bin/open -b com.openai.codex" }],
                                 "type": "basic"
                             }
                         ]

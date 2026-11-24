@@ -154,13 +154,16 @@
   ;; A string in the to position is a shell command. One rule per app, so
   ;; each costs only that letter's composed character -- emacs is on r
   ;; rather than e to leave the dead keys alone. Absolute path because
-  ;; karabiner runs shell_command with a bare environment.
+  ;; karabiner runs shell_command with a bare environment. ChatGPT.app's
+  ;; bundle id is com.openai.codex, not anything spelling out chat.
   {:des "app launchers on right option"
    :rules [[:!Ef "/usr/bin/open -b org.mozilla.firefox"]
+           [:!Ec "/usr/bin/open -b com.google.Chrome"]
            [:!Ev "/usr/bin/open -b com.microsoft.VSCode"]
            [:!Eg "/usr/bin/open -b com.mitchellh.ghostty"]
            [:!Et "/usr/bin/open -b com.tdesktop.Telegram"]
-           [:!Er "/usr/bin/open -b org.gnu.Emacs"]]}
+           [:!Er "/usr/bin/open -b org.gnu.Emacs"]
+           [:!Eh "/usr/bin/open -b com.openai.codex"]]}
 
   ;; macOS has no key for this any more -- every power-button combo Apple
   ;; documents is scoped to built-in keyboards WITHOUT touch id, and on this
