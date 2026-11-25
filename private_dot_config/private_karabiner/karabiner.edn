@@ -7,12 +7,12 @@
 ;; to watch for if it is ever revived.
 ;;
 ;; Checked against the json by compiling it with goku, most recently on
-;; 2026-10-23 with the two vscode rules in place: 14 rules and 38 manipulators
-;; on both sides, 29 identical and 9 differing only in how the app conditions
-;; are grouped -- goku emits one condition per :applications entry where the
-;; json merges the bundle ids into a single one. Karabiner ANDs conditions, so
-;; unless(A or B) is the same as unless(A) and unless(B), and the two are
-;; equivalent. Nothing differed. AGENTS.md has the procedure.
+;; 2026-11-24 with the chrome tab rule and the c/h launchers in place: 14 rules
+;; and 40 manipulators on both sides, 31 identical and 9 differing only in how
+;; the app conditions are grouped -- goku emits one condition per :applications
+;; entry where the json merges the bundle ids into a single one. Karabiner ANDs
+;; conditions, so unless(A or B) is the same as unless(A) and unless(B), and
+;; the two are equivalent. Nothing differed. AGENTS.md has the procedure.
 ;;
 ;; Modifier letters, from goku's tutorial.md:
 ;;   !  mandatory   #  optional

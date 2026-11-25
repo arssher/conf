@@ -153,10 +153,12 @@ print(f"identical {e}, equivalent {q}, different {bad}")
 PY
 ```
 
-**Expected as of 2026-10-23: identical 29, equivalent 9, different 0**, over 14
-rules and 38 manipulators -- the counts both sides reported in that run. The
-previous record was 27/9/0 over 13 rules and 36 manipulators, before the two
-vscode rules.
+**Expected as of 2026-11-24: identical 31, equivalent 9, different 0**, over 14
+rules and 40 manipulators -- the counts both sides reported in that run.  Each
+earlier record, for reading a count that has fallen behind: 29/9/0 over 38
+manipulators before the chrome and chatgpt launchers, and 27/9/0 over 13 rules
+and 36 manipulators before the two vscode rules.  Note the launchers landed as
+*identical*, not equivalent: a shell command has no conditions to group.
 
 If a run reports a difference in the tab-switching rule, look at `:tabapps`
 first. It exists because an `if` condition cannot be split: goku emits one
