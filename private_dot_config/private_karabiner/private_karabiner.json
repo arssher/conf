@@ -666,6 +666,41 @@
                         ]
                     },
                     {
+                        "description": "cmd + ` cycles windows within an app, by way of a phantom F19. A crutch, and worth knowing which part of it is the crutch. The stock shortcut is macOS's own symbolic hotkey and it stops working the moment the layout is not latin: the entry stores a character beside the key code -- parameters = (character, keycode, modifiers), as `defaults read com.apple.symbolichotkeys` shows -- and with a russian layout the key below esc no longer produces a backtick. Why the command-layout fallback that keeps cmd+c working does not rescue this one is unexplained, and not knowable from here: the matcher is compiled into the window server. So this does not fix the cause, it routes around it. Karabiner matches the physical key by its HID usage, below any layout, and emits one that has no character in any layout to get wrong. THE RULE IS HALF OF IT. The other half is System Settings -> Keyboard -> Keyboard Shortcuts -> Keyboard, where 'Move focus to next window' must be bound to cmd+F19; bootstrap_mac.sh carries that binding. Neither half complains when the other is missing -- without the binding this quietly sends a key nothing listens for, and cmd + ` does nothing at all rather than falling back. To set it, press cmd + ` into the recorder rather than trying to type cmd+F19: this rule translates on the way in, so the panel records F19. The keyboard has no F19 key, which is the whole point -- it cannot be typed by accident either. F19 and not F13 because nothing in F13-F24 is bound here and allocating downwards from the top leaves an obvious next free key; F13-F15 are also the ones a full-size or PC keyboard can actually press. Either command key, unlike the left-cmd-only rules above, because the system hotkey leaves ` entirely: leaving right cmd unmapped would make right cmd + ` dead rather than native. The shift variant reverses the cycle, which is the system's own behaviour for this hotkey and not something karabiner does -- if reverse ever stops working, that is macOS, not this rule.",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "grave_accent_and_tilde",
+                                    "modifiers": {
+                                        "mandatory": ["command", "shift"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "f19",
+                                        "modifiers": ["left_command", "left_shift"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "grave_accent_and_tilde",
+                                    "modifiers": {
+                                        "mandatory": ["command"]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "key_code": "f19",
+                                        "modifiers": ["left_command"]
+                                    }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "App launchers on right option: f firefox, c chrome, v vscode, g ghostty, t telegram, r emacs, h chatgpt. open brings an app forward when it is already running rather than starting a second. One manipulator per app, so each costs only that letter's composed character -- emacs is on r rather than e to leave the dead keys alone, option + e i u n and backtick being the accents on a US layout. Of the letters spent, c is the one whose character is likely to be missed: it composed a cedilla, where the rest gave a trademark or a square root. Deliberately not a Hyper layer: binding right option to ctrl+option+shift+cmd would spend the whole key, where a binding per letter costs only that letter's composed character -- right option keeps composing everything else and stays free for other uses. Absolute path to open because karabiner runs shell_command with a bare environment, and the bundle id rather than the name so a rename cannot break it. The one to check rather than guess is chatgpt: ChatGPT.app answers to com.openai.codex, not to anything spelling out chat.",
                         "manipulators": [
                             {

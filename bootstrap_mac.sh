@@ -94,6 +94,44 @@ defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 60 '
     </dict>
   </dict>'
 
+# Cycle windows within an app on cmd+F19 rather than the stock cmd+` -- 27 is
+# "Move focus to next window". The karabiner rule that makes this reachable is
+# in private_dot_config/private_karabiner/, and says at length why: cmd+` is
+# matched against a character that a non-latin layout does not produce, so it
+# dies the moment the layout is russian. Neither half works alone. Without the
+# karabiner rule there is no way to press this at all, since no keyboard here
+# has an F19; without this line the rule sends a key nothing listens for.
+#
+# The parameters say why F19 and not some other key. 65535 is "no character"
+# -- an F-key produces none, so the character half of the match cannot be
+# wrong in any layout, which is the entire fix. 80 is F19's key code, and
+# 9437184 is command (1048576) plus the function bit (8388608), which macOS
+# sets because the key code is an F-key rather than because anything is held.
+#
+# 27 was identified, not looked up: the id-to-label table is compiled into the
+# window server and the shipped defaults in /System/Library/Templates carry
+# only 15-26, 60, 61 and 164, none of them this one. So it was bound once in
+# System Settings -> Keyboard -> Keyboard Shortcuts -> Keyboard and the domain
+# diffed to see which id appeared. To redo that: press cmd+` into the recorder
+# rather than trying to type cmd+F19, because the karabiner rule translates on
+# the way in and the key cannot be typed otherwise.
+#
+# Reverse cycling on cmd+shift+F19 needs no entry of its own; macOS reverses
+# this hotkey under shift by itself. Same caching caveat as 60 above.
+defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 27 '
+  <dict>
+    <key>enabled</key><true/>
+    <key>value</key><dict>
+      <key>type</key><string>standard</string>
+      <key>parameters</key>
+      <array>
+        <integer>65535</integer>
+        <integer>80</integer>
+        <integer>9437184</integer>
+      </array>
+    </dict>
+  </dict>'
+
 # Ask for the password the moment the screen locks, rather than after a grace
 # period. The default here was 300 seconds, which is longer than it sounds,
 # because the setting covers more than the screen saver: System Settings ->

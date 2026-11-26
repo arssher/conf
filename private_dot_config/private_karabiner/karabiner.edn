@@ -14,6 +14,12 @@
 ;; conditions, so unless(A or B) is the same as unless(A) and unless(B), and
 ;; the two are equivalent. Nothing differed. AGENTS.md has the procedure.
 ;;
+;; STALE since: the window-cycling rule below was added after that run and has
+;; not been through it, so the config is 15 rules and 42 manipulators against
+;; the 14 and 40 recorded above. Its :f19 in particular is a to-side spelling
+;; taken on trust rather than checked against goku's tos.clj, and an unknown
+;; key is dropped without a word. Re-run the procedure to retire this note.
+;;
 ;; Modifier letters, from goku's tutorial.md:
 ;;   !  mandatory   #  optional
 ;;   C  left_command   T  left_control   O  left_option   S  left_shift
@@ -150,6 +156,29 @@
   {:des "left option + u and i switch spaces"
    :rules [[:!Ou :!Tleft_arrow]
            [:!Oi :!Tright_arrow]]}
+
+  ;; A crutch, and the crutch is macOS's. Its symbolic hotkey for this stores
+  ;; a character beside the key code -- parameters = (character, keycode,
+  ;; modifiers) -- and a russian layout stops the key below esc producing a
+  ;; backtick, so the match fails. Why the command-layout fallback that keeps
+  ;; cmd+c alive does not rescue it is unexplained and unreadable: the matcher
+  ;; is compiled into the window server. This routes around rather than fixes.
+  ;; karabiner matches the physical key by HID usage, below any layout, and
+  ;; emits one with no character in any layout to get wrong.
+  ;;
+  ;; HALF OF IT. The other half is System Settings binding "Move focus to next
+  ;; window" to cmd+F19, which bootstrap_mac.sh carries. Neither half says
+  ;; anything when the other is missing. Set it by pressing cmd + ` into the
+  ;; recorder -- this rule translates on the way in, and F19 cannot be typed.
+  ;;
+  ;; No goku letter for karabiner's plain command, which matches either key,
+  ;; so the long form again -- the same gap as plain shift above. Either key
+  ;; on purpose: the system hotkey leaves ` entirely, so right cmd + ` would
+  ;; otherwise be dead rather than native. Shift reverses the cycle, which is
+  ;; the system's doing, not this rule's.
+  {:des "cmd + ` cycles windows within an app, by way of a phantom F19"
+   :rules [[{:key :grave_accent_and_tilde :modi {:mandatory [:command :shift]}} :!CSf19]
+           [{:key :grave_accent_and_tilde :modi {:mandatory [:command]}} :!Cf19]]}
 
   ;; A string in the to position is a shell command. One rule per app, so
   ;; each costs only that letter's composed character -- emacs is on r
