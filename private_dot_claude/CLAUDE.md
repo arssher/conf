@@ -23,3 +23,10 @@ for search snippets.
 
 The personal half of this lives in `~/.claude/rules/about-me.md`. Absent is
 fine; don't recreate it -- that path wants a symlink into the private stash.
+
+## This file and its twin
+
+Codex reads the same guidance from `~/.codex/AGENTS.md`, which is a separate
+copy rather than a link, because the tool names differ between the two. Change
+one and consider whether the other wants the same change. Both are applied
+from the dotfiles repo, this one from `private_dot_claude/CLAUDE.md`.
