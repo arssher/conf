@@ -330,6 +330,27 @@ brew install --cask google-chrome visual-studio-code slack iterm2 \
 # the launch it is given to -- so by hand, once per machine:
 #   palette > "Settings Sync: Configure..." > untick Settings and Keyboard Shortcuts
 
+# Screenshots: capture, annotate and copy in one overlay. macOS spreads those
+# three across three surfaces -- shift+cmd+4 writes a file, the floating
+# thumbnail opens Markup, and the clipboard is a step after that.
+#
+# Shortcuts can close the gap and was rejected. macOS does have a "When a
+# screenshot is saved" trigger -- in a shortcut editor's action library under
+# Automation, not under the Automation tab, whose + only makes a shortcut --
+# with Markup and Copy to Clipboard to follow it. But it lives in Shortcuts'
+# iCloud container, where nothing here can manage it, and a Markup step that
+# re-saves the file re-fires its own trigger.
+#
+# Markup still earns a look for a one-off on a file already saved: space for
+# quick look, then the pen. Its Shapes popup has Mask, which dims everything
+# outside the rect; the Highlight tool beside it is a text annotation and does
+# nothing on a png.
+#
+# The cask declares auto_updates, so Shottr updates itself and brew will not.
+# Screen Recording is asked for on first launch and nothing works until it is
+# granted.
+brew install --cask shottr
+
 # Syncthing. The formula follows upstream's 2.x, which is what the apt pin on
 # linux is for, so both ends stay on one major version with nothing to tap or
 # add. The syncthing-app cask is a menu bar wrapper around this same daemon.
