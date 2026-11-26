@@ -46,9 +46,17 @@ vscode
 .emacs.d/elpa
 .emacs.d/elpa/**
 
-# Machine-local Claude Code permission overrides. Only this file: the rest of
-# dot_claude/ is managed. Never add ~/.claude/.credentials.json or the state
-# under projects/, sessions/, history.jsonl and friends -- this repo is public.
+# Machine-local Claude Code settings. Only this file: the rest of dot_claude/
+# is managed. Never add ~/.claude/.credentials.json or the state under
+# projects/, sessions/, history.jsonl and friends -- this repo is public.
+#
+# Permission overrides, and the auto mode profile: /auto-mode-setup writes an
+# autoMode key describing this machine's trust boundary -- what is public,
+# where the secrets are, which branch is default -- which the classifier reads
+# before deciding whether to run an action without asking. That is machine
+# state, and per-machine at that, so it belongs here and not in settings.json
+# beside it, which is managed and would carry it to the other box and into a
+# public repo. Written here it also stops losing to a chezmoi apply.
 .claude/settings.local.json
 
 # What Claude has worked out about me, which this repo being public is no place
