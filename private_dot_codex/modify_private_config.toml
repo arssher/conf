@@ -13,78 +13,26 @@
        ranks below the user config, so anything Codex writes into the live
        file would win over it.
 
-       Hence a modify-template: it merges the settings below into whatever the
-       live file happens to hold, and leaves the rest of it alone. */ -}}
-{{- $status_line := list
-    "hostname"
-    "model"
-    "context-window-size"
-    "git-branch"
-    "used-tokens"
-    "context-used"
-    "five-hour-limit"
-    "weekly-limit"
-    "current-dir"
--}}
-{{- $config := fromToml .chezmoi.stdin -}}
-{{- /* respect_system_proxy makes Codex route its own requests through the
-       proxy the OS is configured to use, instead of ignoring it and warning
-       that a system proxy is configured but unused.  It is a feature flag --
-       `codex features enable respect_system_proxy` writes exactly this key --
-       and still marked "under development", so `codex features list` is the
-       place to check it survived a release.  Codex reads it at startup; a
-       running one keeps the old setting. */ -}}
-{{- /* Hide the Computer Use picture-in-picture preview, and Mini -- the
-       floating pet.  Both have UI toggles (the chat's ... menu > Computer Use
-       > Picture in Picture > Hide, and the profile menu's Hide Pet), but
-       nothing set there survives a new machine, which is why they are pinned
-       here.  Flipping them in the app now loses to the next apply, same trade
-       as the status line above.
+       Hence a modify-template: it merges the settings into whatever the live
+       file happens to hold, and leaves the rest of it alone.  The settings
+       themselves are plain data in .chezmoidata/codex.toml, one dotted path
+       per line with the reason beside it.  Nothing about them belongs here;
+       this file is only the merge.
 
-       The names are the app's own settings-store keys, taken verbatim from
-       the 26.1120.41243 bundle -- mixed casing and all, which is theirs, not
-       a slip.  Undocumented, so check them against the bundle if the pet
-       reappears.  pet-visibility takes only "always-visible" or "on-demand";
-       petVisible is marked agentAccess "hidden", so the file is the only way
-       in. */ -}}
-{{- /* Open links in the system default browser, not the app's own browser
-       pane.  Settings > Browser has a radio for it, but leaving it unset is
-       not the same as choosing the default browser: the app then falls back
-       to a server-side feature flag, defaultLinkOpenTargetPreference, so the
-       destination can change on a release.  This pins it.
-
-       Key and values are the app's own, from the 26.1120.41243 bundle;
-       "in-app-browser" is the only other value.  The sibling
-       open-local-url-in-target-preference, for localhost, is deliberately
-       left alone -- the pane is where Codex can drive a page itself, worth
-       keeping for a dev server.  Cmd-click already sends a single link out,
-       per external-browser-link-shortcut. */ -}}
-{{- /* Nothing is rewritten unless one of the managed settings has drifted.
+       That merge rewrites nothing unless a managed setting has drifted.
        Codex writes this file in its own style, so re-serializing it on every
        apply would leave chezmoi diff permanently showing that reformat, with
-       real drift lost in the noise.
-
-       Every current value is read before any is written: setValueAtPath
-       edits the dict in place, so a comparison made afterwards would always
-       match and the file would never be rewritten at all. */ -}}
-{{- $footer := dig "tui" "status_line" (list) $config -}}
-{{- $proxy := dig "features" "respect_system_proxy" false $config -}}
-{{- $pip := dig "desktop" "computerUseAlwaysHidePictureInPicture" false $config -}}
-{{- $pet := dig "desktop" "avatar-overlay-pet-visible" true $config -}}
-{{- $pet_mode := dig "desktop" "pet-visibility" "" $config -}}
-{{- $link := dig "desktop" "open-link-in-target-preference" "" $config -}}
-{{- if and (eq (toJson $footer) (toJson $status_line)) (eq $proxy true)
-           (eq $pip true) (eq $pet false) (eq $pet_mode "on-demand")
-           (eq $link "external-browser") -}}
+       real drift lost in the noise.  stdin is parsed a second time because
+       setValueAtPath edits the dict in place: $live keeps the file as Codex
+       wrote it, and comparing the two through toToml compares values, blind
+       to the layout that differs anyway. */ -}}
+{{- $config := fromToml .chezmoi.stdin -}}
+{{- $live := fromToml .chezmoi.stdin -}}
+{{- range $path, $value := .codex.settings -}}
+{{-   $config = setValueAtPath $path $value $config -}}
+{{- end -}}
+{{- if eq (toToml $config) (toToml $live) -}}
 {{- .chezmoi.stdin -}}
 {{- else -}}
-{{- $config
-      | setValueAtPath "tui.status_line" $status_line
-      | setValueAtPath "features.respect_system_proxy" true
-      | setValueAtPath "desktop.computerUseAlwaysHidePictureInPicture" true
-      | setValueAtPath "desktop.avatar-overlay-pet-visible" false
-      | setValueAtPath "desktop.pet-visibility" "on-demand"
-      | setValueAtPath "desktop.open-link-in-target-preference"
-                       "external-browser"
-      | toToml -}}
+{{- toToml $config -}}
 {{- end -}}

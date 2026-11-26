@@ -1,0 +1,60 @@
+# Settings merged into the live ~/.codex/config.toml on every apply, by
+# private_dot_codex/modify_private_config.toml -- which holds the merge and
+# nothing else.  Keys below are dotted paths into that file and values are
+# what they should be.  Adding a key here starts managing it; removing one
+# stops, and leaves the live value wherever it has got to.
+#
+# So anything set here wins over the app's own UI: flip one of these in
+# Codex or ChatGPT and the next apply flips it back.  That is the point --
+# nothing set in the UI survives a new machine -- but it is also the trade,
+# and the way to change one of these for good is to change it here.
+#
+# The names are the app's own settings-store keys, taken verbatim from the
+# bundle -- mixed casing and all, which is theirs, not a slip.  None of them
+# are documented, so check them against the bundle when one stops biting:
+# they are declared in Contents/Resources/app.asar as `key:"..."` beside a
+# schema listing the values each one accepts.  Last checked against
+# 26.1120.50957.
+
+[codex.settings]
+
+"tui.status_line" = [
+  "hostname",
+  "model",
+  "context-window-size",
+  "git-branch",
+  "used-tokens",
+  "context-used",
+  "five-hour-limit",
+  "weekly-limit",
+  "current-dir",
+]
+
+# Route Codex's own requests through the proxy the OS is configured to use,
+# instead of ignoring it and warning that a system proxy is configured but
+# unused.  It is a feature flag -- `codex features enable respect_system_proxy`
+# writes exactly this key -- and still marked "under development", so
+# `codex features list` is the place to check it survived a release.  Codex
+# reads it at startup; a running one keeps the old setting.
+"features.respect_system_proxy" = true
+
+# Hide the Computer Use picture-in-picture preview, and Mini -- the floating
+# pet.  Both have UI toggles (the chat's ... menu > Computer Use > Picture in
+# Picture > Hide, and the profile menu's Hide Pet).  pet-visibility takes only
+# "always-visible" or "on-demand"; avatar-overlay-pet-visible is marked
+# agentAccess "hidden", so this file is the only way in.
+"desktop.computerUseAlwaysHidePictureInPicture" = true
+"desktop.avatar-overlay-pet-visible" = false
+"desktop.pet-visibility" = "on-demand"
+
+# Open links in the system default browser, not the app's own browser pane.
+# Settings > Browser has a radio for it, but leaving it unset is not the same
+# as choosing the default browser: the app then falls back to a server-side
+# feature flag, defaultLinkOpenTargetPreference, so the destination can change
+# on a release.  This pins it.  "in-app-browser" is the only other value.
+#
+# The sibling open-local-url-in-target-preference, for localhost, is
+# deliberately left alone -- the pane is where Codex can drive a page itself,
+# worth keeping for a dev server.  Cmd-click already sends a single link out,
+# per external-browser-link-shortcut.
+"desktop.open-link-in-target-preference" = "external-browser"
