@@ -477,6 +477,25 @@ mkdir -p ~/venv
 python3 -m venv ~/venv/calibre
 ~/venv/calibre/bin/pip install lxml pikepdf reportlab pillow
 
+# pypdf, for automated pdf editing: merge, split, rotate, crop, reorder,
+# metadata, encryption, bookmarks, stamping an overlay, filling form fields.
+# Pure python and BSD, so no compiled blob and no licence to think about.
+#
+# It overlaps qpdf above and pikepdf in the calibre venv -- pikepdf is qpdf's
+# binding -- and earns its place on the friendlier API, for a script doing page
+# surgery that would be awkward as a shell pipeline.
+#
+# Three things it cannot do at all: render a page to pixels, report text with
+# coordinates, and redact -- removing the content rather than drawing a black
+# box over text that is still there underneath. PyMuPDF is the library for
+# those and was passed over: AGPL or a paid licence, 58MB against 4, and none
+# of it needed yet. Revisit if it is.
+#
+# Own venv for the reason the calibre one above has one, tied to brew's python
+# minor version the same way.
+python3 -m venv ~/venv/pypdf
+~/venv/pypdf/bin/pip install pypdf
+
 # install rust. --no-modify-path because rustup otherwise appends
 # `. "$HOME/.cargo/env"` to every rc file it finds -- ~/.profile always, and
 # ~/.zshenv whenever zsh is on PATH, which on mac it always is. Both are
