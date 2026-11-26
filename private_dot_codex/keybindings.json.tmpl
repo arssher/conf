@@ -1,0 +1,37 @@
+{{- /* Keybindings for the ChatGPT desktop app -- the merged ChatGPT/Codex
+       app, bundle id com.openai.codex -- which reads this file from
+       CODEX_HOME: a flat array of {command, key}, key being an accelerator or
+       null to unbind.  The app's own keyboard-shortcuts editor writes the same
+       file, so a shortcut recorded there loses to the next apply; change it
+       here instead.  Read at startup, so a running app keeps the old keys.
+
+       Its parser takes cmdorctrl/commandorcontrol, command/cmd/super,
+       control/ctrl, alt/option and shift, case-insensitively, and treats the
+       remaining token as the key; a handful of names (esc, up, pgup, space,
+       plus) are spelled out and everything else is the literal character.
+       That and the command ids are read out of the 26.1120.50957 bundle,
+       where the commands are declared with their defaultKeybindings.
+
+       control is both control keys -- neither this file nor Electron can tell
+       left from right -- and caps lock is left control by way of karabiner, so
+       caps+' reaches this too.
+
+       Listing a command here drops all of its built-in keys, which is why
+       toggleSidebar names cmd+b as well: several entries for one command are
+       allowed and each one binds.  Its other default, cmd+shift+s, is let go
+       rather than disabled; it collided with nothing and earns no line.
+
+       openAvatarOverlay is "Toggle Mini", the floating pet, and its macOS
+       default is option+space at shortcutScope "os-global" -- registered
+       system wide, so it fires whether or not the app has focus.  That is the
+       input source switch, symbolic hotkey 60 in bootstrap_mac.sh, and an app
+       taking it globally is how that stops working.  Hence null, which is not
+       "fall back to the default": a null entry leaves its command with no key
+       at all, whatever else here names it.  Mini is then reachable only from
+       its Toggle Mini menu item, which suits the pet-visibility and
+       avatar-overlay-pet-visible settings in .chezmoidata/codex.toml. */ -}}
+[
+  { "command": "openAvatarOverlay", "key": null },
+  { "command": "toggleSidebar", "key": "Control+'" },
+  { "command": "toggleSidebar", "key": "CmdOrCtrl+B" }
+]
