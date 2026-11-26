@@ -29,7 +29,23 @@
 ;; show in C-x b recently opened files
 (require 'recentf)
 (recentf-mode 1)
-(setq recentf-max-menu-items 25)
+;; How many of them survive a restart.  The default is 25, and it applies when
+;; the list is written rather than as files are added -- recentf-push only
+;; dedupes and pushes, it never truncates -- so a long session remembers
+;; everything and only a restart drops back to this.  Not
+;; recentf-max-menu-items, which stood here instead and sizes nothing but
+;; File > Open Recent.
+(setq recentf-max-saved-items 500)
+;; recentf's one save hook is kill-emacs-hook, and its one timer runs
+;; recentf-cleanup, which prunes the list without writing it.  So without the
+;; line below the file lands on a clean exit and at no other time, and a crash
+;; or a reboot loses every file opened since startup -- days of them, on a
+;; machine where emacs stays up.  savehist above autosaves on its own timer,
+;; which is why that file stays current while recentf.eld went stale.
+;;
+;; Silent: recentf-save-list passes 'quiet to write-region unless it was
+;; called interactively.  nil time means start now, then every REPEAT.
+(run-at-time nil (* 5 60) #'recentf-save-list)
 
 ;; always update bookmarks file
 (setq bookmark-save-flag 1)
