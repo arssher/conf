@@ -47,12 +47,24 @@
        reappears.  pet-visibility takes only "always-visible" or "on-demand";
        petVisible is marked agentAccess "hidden", so the file is the only way
        in. */ -}}
+{{- /* Open links in the system default browser, not the app's own browser
+       pane.  Settings > Browser has a radio for it, but leaving it unset is
+       not the same as choosing the default browser: the app then falls back
+       to a server-side feature flag, defaultLinkOpenTargetPreference, so the
+       destination can change on a release.  This pins it.
+
+       Key and values are the app's own, from the 26.1120.41243 bundle;
+       "in-app-browser" is the only other value.  The sibling
+       open-local-url-in-target-preference, for localhost, is deliberately
+       left alone -- the pane is where Codex can drive a page itself, worth
+       keeping for a dev server.  Cmd-click already sends a single link out,
+       per external-browser-link-shortcut. */ -}}
 {{- /* Nothing is rewritten unless one of the managed settings has drifted.
        Codex writes this file in its own style, so re-serializing it on every
        apply would leave chezmoi diff permanently showing that reformat, with
        real drift lost in the noise.
 
-       Both current values are read before either is written: setValueAtPath
+       Every current value is read before any is written: setValueAtPath
        edits the dict in place, so a comparison made afterwards would always
        match and the file would never be rewritten at all. */ -}}
 {{- $footer := dig "tui" "status_line" (list) $config -}}
@@ -60,8 +72,10 @@
 {{- $pip := dig "desktop" "computerUseAlwaysHidePictureInPicture" false $config -}}
 {{- $pet := dig "desktop" "avatar-overlay-pet-visible" true $config -}}
 {{- $pet_mode := dig "desktop" "pet-visibility" "" $config -}}
+{{- $link := dig "desktop" "open-link-in-target-preference" "" $config -}}
 {{- if and (eq (toJson $footer) (toJson $status_line)) (eq $proxy true)
-           (eq $pip true) (eq $pet false) (eq $pet_mode "on-demand") -}}
+           (eq $pip true) (eq $pet false) (eq $pet_mode "on-demand")
+           (eq $link "external-browser") -}}
 {{- .chezmoi.stdin -}}
 {{- else -}}
 {{- $config
@@ -70,5 +84,7 @@
       | setValueAtPath "desktop.computerUseAlwaysHidePictureInPicture" true
       | setValueAtPath "desktop.avatar-overlay-pet-visible" false
       | setValueAtPath "desktop.pet-visibility" "on-demand"
+      | setValueAtPath "desktop.open-link-in-target-preference"
+                       "external-browser"
       | toToml -}}
 {{- end -}}
