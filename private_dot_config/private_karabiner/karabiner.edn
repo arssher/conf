@@ -7,18 +7,16 @@
 ;; to watch for if it is ever revived.
 ;;
 ;; Checked against the json by compiling it with goku, most recently on
-;; 2026-11-24 with the chrome tab rule and the c/h launchers in place: 14 rules
-;; and 40 manipulators on both sides, 31 identical and 9 differing only in how
-;; the app conditions are grouped -- goku emits one condition per :applications
-;; entry where the json merges the bundle ids into a single one. Karabiner ANDs
+;; 2026-11-26 with the window-cycling rule in place: 15 rules and 42
+;; manipulators on both sides, 33 identical and 9 differing only in how the app
+;; conditions are grouped -- goku emits one condition per :applications entry
+;; where the json merges the bundle ids into a single one. Karabiner ANDs
 ;; conditions, so unless(A or B) is the same as unless(A) and unless(B), and
 ;; the two are equivalent. Nothing differed. AGENTS.md has the procedure.
 ;;
-;; STALE since: the window-cycling rule below was added after that run and has
-;; not been through it, so the config is 15 rules and 42 manipulators against
-;; the 14 and 40 recorded above. Its :f19 in particular is a to-side spelling
-;; taken on trust rather than checked against goku's tos.clj, and an unknown
-;; key is dropped without a word. Re-run the procedure to retire this note.
+;; That run was for one thing in particular, and settled it: the window rule's
+;; two manipulators came back identical, so :f19 is a to-side spelling goku
+;; accepts rather than one it drops without a word.
 ;;
 ;; Modifier letters, from goku's tutorial.md:
 ;;   !  mandatory   #  optional

@@ -143,22 +143,38 @@ def k(m):
     for t in d.get('to',[]):
         if 'modifiers' in t: t['modifiers']=sorted(t['modifiers'])
     return json.dumps(d,sort_keys=True)
+gm=sum(len(r['manipulators']) for r in g)
+cm=sum(len(r['manipulators']) for r in c)
+print(f"rules: goku {len(g)} live {len(c)}; manipulators: goku {gm} live {cm}")
+if len(g)!=len(c) or gm!=cm: print("COUNTS DIFFER -- rest covers the overlap")
 e=q=bad=0
-for G,C in zip(g,c):
+for n,(G,C) in enumerate(zip(g,c)):
     for a,b in zip(G['manipulators'],C['manipulators']):
         if a==b: e+=1
         elif k(a)==k(b): q+=1
-        else: bad+=1; print("DIFFERS:\n  goku", json.dumps(a), "\n  live", json.dumps(b))
+        else:
+            bad+=1
+            print(f"DIFFERS rule {n}:\n  goku", json.dumps(a),
+                  "\n  live", json.dumps(b))
 print(f"identical {e}, equivalent {q}, different {bad}")
 PY
 ```
 
-**Expected as of 2026-11-24: identical 31, equivalent 9, different 0**, over 14
-rules and 40 manipulators -- the counts both sides reported in that run.  Each
-earlier record, for reading a count that has fallen behind: 29/9/0 over 38
+Print the counts and compare them, rather than reading the three totals alone.
+`zip` stops at the shorter side, so a rule present on one side and not the
+other is dropped silently and the run still reports `different 0` -- the one
+failure this check exists to catch, reported as a pass.  The totals above are
+what the counts should be; a rule added since will move them.
+
+**Expected as of 2026-11-26: identical 33, equivalent 9, different 0**, over 15
+rules and 42 manipulators -- the counts both sides reported in that run.  Each
+earlier record, for reading a count that has fallen behind: 31/9/0 over 14
+rules and 40 manipulators before the window-cycling rule, 29/9/0 over 38
 manipulators before the chrome and chatgpt launchers, and 27/9/0 over 13 rules
 and 36 manipulators before the two vscode rules.  Note the launchers landed as
-*identical*, not equivalent: a shell command has no conditions to group.
+*identical*, not equivalent: a shell command has no conditions to group, and
+so did the window rule's two, which is what that run was for -- it is the only
+evidence that goku accepts `:f19` rather than dropping it.
 
 If a run reports a difference in the tab-switching rule, look at `:tabapps`
 first. It exists because an `if` condition cannot be split: goku emits one
