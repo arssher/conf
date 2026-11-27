@@ -132,6 +132,43 @@ defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add 27 '
     </dict>
   </dict>'
 
+# Screenshots go to the clipboard, not to a file on the Desktop. This is the
+# one piece of the capture-annotate-copy flow that is a preference rather than
+# something in the repo, and the rest leans on it: karabiner's right option + 3
+# and 4 press the system's own shift+cmd+3 or 4 and then run
+# ~/.bash_scripts/bin/annotate_clipboard.sh, which waits for the shot to land
+# on the clipboard. Pointed at a file it would wait its minute and give up.
+# That script's header has the design; the karabiner rule has the keys.
+#
+# Two keys for the one setting, because which surface reads which was never
+# teased apart: the Screenshot UI, shift+cmd+5 > Options, writes
+# target-screenshot, while screencapture(1) documents target. Recordings are
+# left alone -- target-screenrecording stays a file, a video being no use on a
+# clipboard.
+defaults write com.apple.screencapture target -string clipboard
+defaults write com.apple.screencapture target-screenshot -string clipboard
+
+# Shottr was the answer to the above and is gone: a cask that updated itself,
+# wanted a Screen Recording grant on first launch, and was never once opened
+# before the built-in flow replaced it. `brew uninstall --cask shottr` leaves
+# ~/Library/Containers/cc.ffitch.shottr behind, 32K of container metadata.
+#
+# Shortcuts can close the same gap and was rejected. macOS does have a "When a
+# screenshot is saved" trigger -- in a shortcut editor's action library under
+# Automation, not under the Automation tab, whose + only makes a shortcut --
+# with Markup and Copy to Clipboard to follow it. But it lives in Shortcuts'
+# iCloud container, where nothing here can manage it, and a Markup step that
+# re-saves the file re-fires its own trigger.
+#
+# Markup proper still earns a look for a one-off on a file already saved:
+# space for quick look, then the pen. It is the nicer editor, and unreachable
+# from a script -- only from that panel and from the screenshot thumbnail,
+# which with the clipboard as destination never appears at all. Its Shapes
+# popup has Mask, which dims everything outside the rect; the Highlight tool
+# beside it is a text annotation and does nothing on a png. Preview's own
+# Markup toolbar, shift+cmd+A, is the same set of tools and is what the script
+# opens.
+
 # Ask for the password the moment the screen locks, rather than after a grace
 # period. The default here was 300 seconds, which is longer than it sounds,
 # because the setting covers more than the screen saver: System Settings ->
@@ -368,26 +405,8 @@ brew install --cask google-chrome visual-studio-code slack iterm2 \
 # the launch it is given to -- so by hand, once per machine:
 #   palette > "Settings Sync: Configure..." > untick Settings and Keyboard Shortcuts
 
-# Screenshots: capture, annotate and copy in one overlay. macOS spreads those
-# three across three surfaces -- shift+cmd+4 writes a file, the floating
-# thumbnail opens Markup, and the clipboard is a step after that.
-#
-# Shortcuts can close the gap and was rejected. macOS does have a "When a
-# screenshot is saved" trigger -- in a shortcut editor's action library under
-# Automation, not under the Automation tab, whose + only makes a shortcut --
-# with Markup and Copy to Clipboard to follow it. But it lives in Shortcuts'
-# iCloud container, where nothing here can manage it, and a Markup step that
-# re-saves the file re-fires its own trigger.
-#
-# Markup still earns a look for a one-off on a file already saved: space for
-# quick look, then the pen. Its Shapes popup has Mask, which dims everything
-# outside the rect; the Highlight tool beside it is a text annotation and does
-# nothing on a png.
-#
-# The cask declares auto_updates, so Shottr updates itself and brew will not.
-# Screen Recording is asked for on first launch and nothing works until it is
-# granted.
-brew install --cask shottr
+# No screenshot app here any more: the capture, annotate and copy flow is
+# built-in now, and lives with the defaults writes above.
 
 # Syncthing. The formula follows upstream's 2.x, which is what the apt pin on
 # linux is for, so both ends stay on one major version with nothing to tap or
