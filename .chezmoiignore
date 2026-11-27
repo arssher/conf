@@ -104,11 +104,14 @@ etc/**
 # The other direction: macOS-only targets, skipped on linux. Karabiner is a mac
 # app, so its config would only sit unread in ~/.config there. Ghostty used to
 # be here too; it runs on both now, its config templated for the font size.
+# annotate_clipboard.sh is the one file taken out of ~/.bash_scripts/bin, which
+# is otherwise shared: it is osascript and Preview from end to end.
 {{ if ne .chezmoi.os "darwin" }}
 .config/karabiner
 .config/karabiner/**
 Library
 Library/**
+.bash_scripts/bin/annotate_clipboard.sh
 {{ end }}
 
 # vscode's keybindings, one file per platform rather than one shared file: the

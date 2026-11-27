@@ -790,6 +790,33 @@
                                 "type": "basic"
                             }
                         ]
+                    },
+                    {
+                        "description": "Right option + 3 captures the whole screen, right option + 4 a region, and each then annotates it: they send the system's own shift+cmd+3 or shift+cmd+4 and run ~/.bash_scripts/bin/annotate_clipboard.sh --wait, which waits for the capture to land on the clipboard, writes it to a temp file, opens it in Preview for the Markup tools, and copies the annotated version back; the script's own header has the why. The digits rather than letters because these are the system keys' siblings. Sending the key rather than letting the script call screencapture leaves the Screen Recording grant with the system: screencapture started from here would want one for karabiner, and that is a dialog nothing in this repo can answer. Each manipulator's two to events fire in order on key down, so the capture and the script come up together and the script waits for the clipboard to change -- which is also what makes escaping the region overlay cost nothing. 3 has no escape to worry about, the shot being taken the moment the key lands; what it does with more than one display attached is untested, there being one here. The script's other mode, annotating an image already on the clipboard, is deliberately unbound: right option + a was the obvious key for it and is wanted for Claude desktop. $HOME expands because karabiner does pass it and a shell does interpret the command; it is PATH that the bare environment lacks, which is why the script itself calls everything by absolute path.",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "3",
+                                    "modifiers": { "mandatory": ["right_option"] }
+                                },
+                                "to": [
+                                    { "key_code": "3", "modifiers": ["left_command", "left_shift"] },
+                                    { "shell_command": "$HOME/.bash_scripts/bin/annotate_clipboard.sh --wait" }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "from": {
+                                    "key_code": "4",
+                                    "modifiers": { "mandatory": ["right_option"] }
+                                },
+                                "to": [
+                                    { "key_code": "4", "modifiers": ["left_command", "left_shift"] },
+                                    { "shell_command": "$HOME/.bash_scripts/bin/annotate_clipboard.sh --wait" }
+                                ],
+                                "type": "basic"
+                            }
+                        ]
                     }
                 ]
             },

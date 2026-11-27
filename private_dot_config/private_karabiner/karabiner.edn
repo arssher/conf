@@ -7,16 +7,19 @@
 ;; to watch for if it is ever revived.
 ;;
 ;; Checked against the json by compiling it with goku, most recently on
-;; 2026-11-26 with the window-cycling rule in place: 15 rules and 42
-;; manipulators on both sides, 33 identical and 9 differing only in how the app
+;; 2026-11-27 with the screenshot rule in place: 16 rules and 44
+;; manipulators on both sides, 35 identical and 9 differing only in how the app
 ;; conditions are grouped -- goku emits one condition per :applications entry
 ;; where the json merges the bundle ids into a single one. Karabiner ANDs
 ;; conditions, so unless(A or B) is the same as unless(A) and unless(B), and
 ;; the two are equivalent. Nothing differed. AGENTS.md has the procedure.
 ;;
-;; That run was for one thing in particular, and settled it: the window rule's
-;; two manipulators came back identical, so :f19 is a to-side spelling goku
-;; accepts rather than one it drops without a word.
+;; Each of the last two runs was for one shape in particular, and settled it.
+;; The window rule's two manipulators came back identical, so :f19 is a
+;; to-side spelling goku accepts rather than one it drops without a word. The
+;; screenshot rule's two did as well, so a key event and a shell command in
+;; one to vector compile to the two-element "to" array they are meant to, with
+;; the $HOME in the command passed through untouched.
 ;;
 ;; Modifier letters, from goku's tutorial.md:
 ;;   !  mandatory   #  optional
@@ -227,4 +230,23 @@
   ;; manipulator under parameters. Same number, wider blast radius: here it
   ;; would become the default to_delayed_action delay for every rule.
   {:des "right option + l locks and turns the screen off"
-   :rules [[:!El :!TCq nil {:delayed {:invoked "/usr/bin/pmset displaysleepnow"}}]]}]}
+   :rules [[:!El :!TCq nil {:delayed {:invoked "/usr/bin/pmset displaysleepnow"}}]]}
+
+  ;; macOS has both ends of this and not the middle: with the screenshot
+  ;; destination set to the clipboard, the floating thumbnail that opens
+  ;; Markup never appears, and its Done button saves a file rather than
+  ;; copying. The script is the middle -- clipboard to a temp file, Preview
+  ;; for the drawing, back to the clipboard on save -- and its header has the
+  ;; rest. The 4 binding presses shift+cmd+4 rather than calling screencapture
+  ;; itself, which leaves the Screen Recording grant with the system.
+  ;;
+  ;; Two to events in one vector, as the lock rule above tried and could not
+  ;; use. Harmless here: karabiner posts them microseconds apart, and the
+  ;; script's first act is to wait for the clipboard to change.
+  ;;
+  ;; The script's other mode -- annotate an image already on the clipboard,
+  ;; the same thing without the capture -- is left unbound on purpose: right
+  ;; option + a is wanted for Claude desktop.
+  {:des "right option + 3 and 4 capture the screen or a region, and annotate it"
+   :rules [[:!E3 [:!CS3 "$HOME/.bash_scripts/bin/annotate_clipboard.sh --wait"]]
+           [:!E4 [:!CS4 "$HOME/.bash_scripts/bin/annotate_clipboard.sh --wait"]]]}]}
