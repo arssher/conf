@@ -44,7 +44,7 @@ run below sets `SHELL` and why `env -i` alone makes it die with
 `Cannot run program ""`.  joker is in brew **core**, so it needs no tap:
 
 ```sh
-brew install joker        # brew uninstall joker when done; nothing else uses it
+brew install joker        # left installed between runs, see Cleaning up
 ```
 
 ## The sandbox
@@ -166,15 +166,18 @@ other is dropped silently and the run still reports `different 0` -- the one
 failure this check exists to catch, reported as a pass.  The totals above are
 what the counts should be; a rule added since will move them.
 
-**Expected as of 2026-11-26: identical 33, equivalent 9, different 0**, over 15
-rules and 42 manipulators -- the counts both sides reported in that run.  Each
-earlier record, for reading a count that has fallen behind: 31/9/0 over 14
-rules and 40 manipulators before the window-cycling rule, 29/9/0 over 38
-manipulators before the chrome and chatgpt launchers, and 27/9/0 over 13 rules
-and 36 manipulators before the two vscode rules.  Note the launchers landed as
-*identical*, not equivalent: a shell command has no conditions to group, and
-so did the window rule's two, which is what that run was for -- it is the only
-evidence that goku accepts `:f19` rather than dropping it.
+**Expected as of 2026-11-27: identical 35, equivalent 9, different 0**, over 16
+rules and 44 manipulators -- the counts both sides reported in that run.  Each
+earlier record, for reading a count that has fallen behind: 33/9/0 over 15
+rules and 42 manipulators before the screenshot rule, 31/9/0 over 14 rules and
+40 manipulators before the window-cycling rule, 29/9/0 over 38 manipulators
+before the chrome and chatgpt launchers, and 27/9/0 over 13 rules and 36
+manipulators before the two vscode rules.  Note the launchers landed as
+*identical*, not equivalent: a shell command has no conditions to group.  So
+did the two rules each of the last two runs was for -- the only evidence that
+goku accepts `:f19` rather than dropping it, and that a key event and a shell
+command in one to vector reach the json as the two-element `to` array they are
+meant to be, `$HOME` in the command untouched.
 
 If a run reports a difference in the tab-switching rule, look at `:tabapps`
 first. It exists because an `if` condition cannot be split: goku emits one
@@ -215,5 +218,8 @@ Treat a clean compile as evidence of very little.  The comparison is the test.
 
 ```sh
 rm -rf "$W"/goku_dl "$W"/goku_bin "$W"/jail
-brew uninstall joker
 ```
+
+joker stays installed.  It is 19M from brew core, nothing else uses it --
+`brew uses --installed joker` is empty -- and every run of this check wants
+it; `brew uninstall joker` if that stops being a fair trade.
