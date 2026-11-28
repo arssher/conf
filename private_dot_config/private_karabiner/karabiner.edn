@@ -154,6 +154,14 @@
    :rules [[:!Cm     :!TStab :finder]
            [:!Ccomma :!Ttab  :finder]]}
 
+  ;; Finder has no duplicate-tab command; cmd+t opens the "New Finder windows
+  ;; show" folder. The script reads the current folder, presses cmd+t itself
+  ;; through System Events, and points the new tab at the folder -- so the
+  ;; read comes first for certain, with no pause. That costs an Accessibility
+  ;; grant for karabiner's helper. Its header has the rest.
+  {:des "duplicate the current tab in finder: left cmd + t"
+   :rules [[:!Ct "$HOME/.bash_scripts/bin/finder_duplicate_tab.sh" :finder]]}
+
   ;; Not scoped to any app. The terminal tab rule above emits exactly this
   ;; trigger and does not set it off: karabiner posts its output to the
   ;; virtual keyboard without feeding it back through the rules.

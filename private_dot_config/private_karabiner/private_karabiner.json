@@ -660,6 +660,25 @@
                         ]
                     },
                     {
+                        "description": "duplicate the current tab in finder: left cmd + t runs ~/.bash_scripts/bin/finder_duplicate_tab.sh. Finder has no duplicate-tab command -- cmd+t opens the \"New Finder windows show\" folder -- so the script reads the front window's folder, presses cmd+t itself through System Events, and points the new tab at that folder. The script presses the key rather than karabiner so that the read comes first for certain: karabiner's cmd+t needed a 150ms pause to let the script read ahead of it, and that showed. The price is an Accessibility grant for karabiner's helper, asked for on the first press; its header has the rest. Left cmd only, so right cmd + t still opens a plain new tab.",
+                        "manipulators": [
+                            {
+                                "conditions": [
+                                    {
+                                        "bundle_identifiers": ["^com\\.apple\\.finder$"],
+                                        "type": "frontmost_application_if"
+                                    }
+                                ],
+                                "from": {
+                                    "key_code": "t",
+                                    "modifiers": { "mandatory": ["left_command"] }
+                                },
+                                "to": [{ "shell_command": "$HOME/.bash_scripts/bin/finder_duplicate_tab.sh" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "left option + m switches apps: a quicker reach than cmd+tab, and left option was free -- it only composed a mu. Not scoped to any app, so it works everywhere. Indistinguishable from cmd+tab in use, the held switcher included: karabiner keeps left_command down for as long as m is held, so the window stays up and further presses walk it. The terminal tab rule above emits exactly this trigger, left option + m, and does not set it off: karabiner posts its output to the virtual keyboard without feeding it back through the rules, so the two coexist and left cmd + m still switches tabs in a terminal rather than switching apps. Tested, not assumed -- it is the kind of collision that would otherwise be silent.",
                         "manipulators": [
                             {
