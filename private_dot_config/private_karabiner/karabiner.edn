@@ -61,7 +61,8 @@
                 ;; Both browsers in one set rather than [:firefox :chrome] in
                 ;; the rule, for the reason spelled out at :tabapps above.
                 :browsers  ["^org\\.mozilla\\.firefox$"
-                            "^com\\.google\\.Chrome$"]}
+                            "^com\\.google\\.Chrome$"]
+                :finder    ["^com\\.apple\\.finder$"]}
 
  :main
  [;; Real keys, so a TUI understands them. Everywhere but emacs, which does
@@ -145,6 +146,13 @@
   {:des "tab switching in browsers"
    :rules [[:!Cm     :!COleft_arrow  :browsers]
            [:!Ccomma :!COright_arrow :browsers]]}
+
+  ;; ctrl+shift+tab and ctrl+tab are Finder's Window menu shortcuts for the
+  ;; previous and next tab. Unlike in a browser, ctrl+tab is safe here: Finder
+  ;; has no recently-used order, so it always goes by position.
+  {:des "tab switching in finder"
+   :rules [[:!Cm     :!TStab :finder]
+           [:!Ccomma :!Ttab  :finder]]}
 
   ;; Not scoped to any app. The terminal tab rule above emits exactly this
   ;; trigger and does not set it off: karabiner posts its output to the
