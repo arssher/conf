@@ -395,7 +395,7 @@ brew install tmux
 
 # various desktop stuff
 brew install --cask google-chrome visual-studio-code slack iterm2 \
-     telegram keepassxc
+     telegram keepassxc iina
 
 # vscode's Settings Sync, if signed in, must leave out settings and
 # keybindings. chezmoi applies both now -- see vscode/readme.txt for the paths
